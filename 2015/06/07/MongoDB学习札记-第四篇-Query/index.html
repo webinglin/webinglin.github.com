@@ -1,0 +1,531 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MongoDB学习札记 第四篇 Query | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="MongoDB学习札记 第四篇 Query">
+  
+  <meta name="keywords" content="mongodb,query,mongodbQuery,mongo query">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MongoDB学习札记 第四篇 Query"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MongoDB学习札记 第四篇 Query</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>MongoDB学习札记 第四篇 Query</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <h2 id="查询条件"><a href="#查询条件" class="headerlink" title="查询条件"></a>查询条件</h2><p>首先往数据库集合里面插入几条数据。<br>测试数据：</p>
+<pre><code>&gt; db.users.insert({username:&quot;mongo&quot;, url:&quot;webinglin.github.io&quot;, tags:[&quot;mongodb&quot;, database&quot;,&quot;nosql&quot;],likes:999, author:&quot;linwenbin&quot;})
+&gt; db.users.insert({username:&quot;redis&quot;, url:&quot;webinglin.github.io&quot;, tags:[&quot;redis&quot;,&quot;database&quot;,&quot;nosql&quot;],likes:888, author:&quot;linwenbin&quot;})
+&gt; db.users.insert({username:&quot;spring&quot;, url:&quot;webinglin.github.io&quot;, tags:[&quot;spring&quot;,&quot;framework&quot;],likes:777, author:&quot;linwenbin&quot;})
+</code></pre><a id="more"></a>
+<p><br></p>
+<pre><code>&gt; db.users.find().pretty()
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;),
+        &quot;username&quot; : &quot;mongo&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;mongodb&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 999,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;),
+        &quot;username&quot; : &quot;redis&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;redis&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 888,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;),
+        &quot;username&quot; : &quot;spring&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;spring&quot;,
+                &quot;framework&quot;
+        ],
+        &quot;likes&quot; : 777,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+</code></pre><p>pretty() 方法是对查询结果进行格式化</p>
+<p>查询的时候可以带上查询条件,那具体的查询条件怎么使用？</p>
+<h4 id="等于"><a href="#等于" class="headerlink" title="等于"></a>等于</h4><p>等于操作直接使用 {key:value} 这样的文档形式即可</p>
+<pre><code>&gt; db.users.find({username:&quot;mongo&quot;})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+&gt;
+</code></pre><h4 id="大于"><a href="#大于" class="headerlink" title="大于"></a>大于</h4><p>语法： {key : {$gt:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$gt:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+&gt;
+</code></pre><h4 id="大于等于"><a href="#大于等于" class="headerlink" title="大于等于"></a>大于等于</h4><p>语法： {key : {$gte:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$gte:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="小于"><a href="#小于" class="headerlink" title="小于"></a>小于</h4><p>语法：　{key : {$lt:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$lt:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;), &quot;username&quot; : &quot;spring&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;spring&quot;, &quot;framework&quot; ], &quot;likes&quot; : 777, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="小于等于"><a href="#小于等于" class="headerlink" title="小于等于"></a>小于等于</h4><p>语法：　{key : {$lte:value}}</p>
+<pre><code>&gt; db.users.find({likes:{$lte:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;), &quot;username&quot; : &quot;spring&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;spring&quot;, &quot;framework&quot; ], &quot;likes&quot; : 777, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="不等于"><a href="#不等于" class="headerlink" title="不等于"></a>不等于</h4><p>语法：  {key : {$ne:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$ne:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;), &quot;username&quot; : &quot;spring&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;spring&quot;, &quot;framework&quot; ], &quot;likes&quot; : 777, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="且操作-AND"><a href="#且操作-AND" class="headerlink" title="且操作 AND"></a>且操作 AND</h4><p>语法： {key1:value1, key2:value2, key3:value3 …}</p>
+<pre><code>&gt; db.users.find({likes:{$gt:777},username:&quot;mongo&quot;})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+
+&gt; db.users.find({likes:{$gt:777}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="或操作-OR"><a href="#或操作-OR" class="headerlink" title="或操作 OR"></a>或操作 OR</h4><p>语法： { $or: [ {key1: value1}, {key2:value2} ]  } 将or条件的所有 {key:value} 都放在 $or 的value中（数组）</p>
+<pre><code>&gt; db.users.find({$or:[{username:&quot;mongo&quot;},{username:&quot;redis&quot;}]})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="复杂条件查询"><a href="#复杂条件查询" class="headerlink" title="复杂条件查询"></a>复杂条件查询</h4><p>如何将所有的条件都连起来用呢？</p>
+<p>比如我们想要这样查询 like&gt;=888 &amp;&amp; (username=”mongo” or username=”spring”)<br>由于上面的数据只有三条， 我们知道 like&gt;=888 只有 mongo 和 redis 这两条数据满足条件， 后面的username=”mongo” or username=”spring” 又有 mongo和 spring 满足条件， 这两个and操作之后 就只剩下 mongo 这条数据满足条件了。 所以最终应该查出一条mongo的Document.</p>
+<pre><code>&gt; db.users.find({likes:{$gte:888},$or:[{username:&quot;mongo&quot;},{username:&quot;spring&quot;}]})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+&gt;
+</code></pre><h2 id="find-其他用法"><a href="#find-其他用法" class="headerlink" title="find() 其他用法"></a>find() 其他用法</h2><h4 id="Projection"><a href="#Projection" class="headerlink" title="Projection"></a>Projection</h4><p>mongodb中 projection 意味着显示你希望看到的字段而非所有的字段都显示,这是什么意思呢？</p>
+<p>比如： 我们的测试数据里面有那么多的字段: username,likes,tags,author,url 而我们经常要用到的就只有 username 和 likes 那么就显示这两个字段就好了，其他的字段就别显示出来了。</p>
+<p>find({},{KEY:1/0}) find的第二个参数，KEY为要显示或隐藏的字段，value为1表示显示，0表示隐藏，看着也很简单，试一下吧</p>
+<pre><code>&gt; db.users.find({},{_id:0,url:0,tags:0,author:0})
+{ &quot;username&quot; : &quot;mongo&quot;, &quot;likes&quot; : 999 }
+{ &quot;username&quot; : &quot;redis&quot;, &quot;likes&quot; : 888 }
+{ &quot;username&quot; : &quot;spring&quot;, &quot;likes&quot; : 777 }
+&gt;
+</code></pre><h2 id="limit-skip-sort"><a href="#limit-skip-sort" class="headerlink" title="limit, skip, sort"></a>limit, skip, sort</h2><p>为了更好的测试分页的效果，新建一个集合，并插入30条数据</p>
+<pre><code>&gt; for(var i=0; i&lt;30; i++){
+... db.pages.insert({&quot;val&quot;:i});
+... }
+WriteResult({ &quot;nInserted&quot; : 1 })
+&gt; db.pages.find()
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e37f&quot;), &quot;val&quot; : 0 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e380&quot;), &quot;val&quot; : 1 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e381&quot;), &quot;val&quot; : 2 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e382&quot;), &quot;val&quot; : 3 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e383&quot;), &quot;val&quot; : 4 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e384&quot;), &quot;val&quot; : 5 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e385&quot;), &quot;val&quot; : 6 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e386&quot;), &quot;val&quot; : 7 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e387&quot;), &quot;val&quot; : 8 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e388&quot;), &quot;val&quot; : 9 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e389&quot;), &quot;val&quot; : 10 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38a&quot;), &quot;val&quot; : 11 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38b&quot;), &quot;val&quot; : 12 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38c&quot;), &quot;val&quot; : 13 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38d&quot;), &quot;val&quot; : 14 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38e&quot;), &quot;val&quot; : 15 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38f&quot;), &quot;val&quot; : 16 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e390&quot;), &quot;val&quot; : 17 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+Type &quot;it&quot; for more
+</code></pre><p><br></p>
+<pre><code>&gt; db.pages.find().limit(5)
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e37f&quot;), &quot;val&quot; : 0 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e380&quot;), &quot;val&quot; : 1 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e381&quot;), &quot;val&quot; : 2 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e382&quot;), &quot;val&quot; : 3 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e383&quot;), &quot;val&quot; : 4 }
+</code></pre><p>可以发现，如果使用 limit方法的话会显示整个集合的所有文档。 指定了 limit 之后， 显示具体的条数，上文中，limit(5) 表示， 显示5条文档。</p>
+<p>limit方法除外，还有一个 skip 方法，skip也是接受一个整型的参数，表示查询结果跳过多少个文档。</p>
+<p>例如上面插入的30条记录中，我们要显示18-22条记录，那么就应该使用<br><code>db.pages.find().skip(18).limit(5)</code></p>
+<pre><code>&gt; db.pages.find().skip(18).limit(5)
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e393&quot;), &quot;val&quot; : 20 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e394&quot;), &quot;val&quot; : 21 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e395&quot;), &quot;val&quot; : 22 }
+</code></pre><p>skip和limit的组合就能做到分页的功能了。但是如果数据量很大，理论上分页就会变得很慢了，比如有一亿条数据，要拿最后一页。那skip的数据量就很多很多了。这样就会变得比较慢。话说回来，有谁会看数据看到最后的几页？正常都是看前面几页数据，所以，skip和limit实现分页是可以接受的。</p>
+<p>在mongodb中，如果要对查询结果排序，那么需要使用sort方法。sort方法接收一个文档参数。也就是{key:value}的形式。其中，key表示要排序的字段，value的可取值为 1 / -1 。1表示升序asc，-1表示降序desc。话不多说，直接上例子：</p>
+<pre><code>&gt; db.pages.find().sort({val:-1})
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e39c&quot;), &quot;val&quot; : 29 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e39b&quot;), &quot;val&quot; : 28 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e39a&quot;), &quot;val&quot; : 27 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e399&quot;), &quot;val&quot; : 26 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e398&quot;), &quot;val&quot; : 25 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e397&quot;), &quot;val&quot; : 24 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e396&quot;), &quot;val&quot; : 23 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e395&quot;), &quot;val&quot; : 22 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e394&quot;), &quot;val&quot; : 21 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e393&quot;), &quot;val&quot; : 20 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e390&quot;), &quot;val&quot; : 17 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38f&quot;), &quot;val&quot; : 16 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38e&quot;), &quot;val&quot; : 15 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38d&quot;), &quot;val&quot; : 14 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38c&quot;), &quot;val&quot; : 13 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38b&quot;), &quot;val&quot; : 12 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38a&quot;), &quot;val&quot; : 11 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e389&quot;), &quot;val&quot; : 10 }
+Type &quot;it&quot; for more
+</code></pre><p>这个是对val这个key进行逆序排序，所以value取值为-1。 那value值为1的话，就变成升序了。</p>
+<pre><code>&gt; db.pages.find().sort({val:1})
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e37f&quot;), &quot;val&quot; : 0 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e380&quot;), &quot;val&quot; : 1 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e381&quot;), &quot;val&quot; : 2 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e382&quot;), &quot;val&quot; : 3 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e383&quot;), &quot;val&quot; : 4 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e384&quot;), &quot;val&quot; : 5 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e385&quot;), &quot;val&quot; : 6 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e386&quot;), &quot;val&quot; : 7 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e387&quot;), &quot;val&quot; : 8 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e388&quot;), &quot;val&quot; : 9 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e389&quot;), &quot;val&quot; : 10 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38a&quot;), &quot;val&quot; : 11 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38b&quot;), &quot;val&quot; : 12 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38c&quot;), &quot;val&quot; : 13 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38d&quot;), &quot;val&quot; : 14 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38e&quot;), &quot;val&quot; : 15 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38f&quot;), &quot;val&quot; : 16 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e390&quot;), &quot;val&quot; : 17 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+Type &quot;it&quot; for more
+&gt;
+</code></pre><p>那如果要对多个值进行组合排序呢？ 就好比如对于我们最初的例子 users 集合。 要对users集合进行排序。其中 按照likes升序， 按照username降序。为了达到我们的效果，我们再往users集合里面插入两条数据</p>
+<pre><code>&gt; db.users.insert({username:&quot;mongodb&quot;,likes:999})
+&gt; db.users.insert({username:&quot;springMVC&quot;,likes:888})
+</code></pre><p>下面是运行结果，注意观察 likes为888的两个文档。发现username逆序排序了。至此，说明我们的sort实验成功了。</p>
+<pre><code>&gt; db.users.find().sort({likes:1,username:-1}).pretty()
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;),
+        &quot;username&quot; : &quot;spring&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;spring&quot;,
+                &quot;framework&quot;
+        ],
+        &quot;likes&quot; : 777,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574cefa192e9dda0925e39e&quot;),
+        &quot;username&quot; : &quot;springMVC&quot;,
+        &quot;likes&quot; : 888
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;),
+        &quot;username&quot; : &quot;redis&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;redis&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 888,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574cef5192e9dda0925e39d&quot;),
+        &quot;username&quot; : &quot;mongodb&quot;,
+        &quot;likes&quot; : 999
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;),
+        &quot;username&quot; : &quot;mongo&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;mongodb&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 999,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+&gt;
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3>	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/07/MongoDB学习札记-第五篇-监控/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/06/Markdown简明语法/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/07/MongoDB学习札记-第四篇-Query/" data-title="MongoDB学习札记 第四篇 Query" data-url="http://webinglin.github.io/2015/06/07/MongoDB学习札记-第四篇-Query/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-07 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/MongoDB/">MongoDB<span>10</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

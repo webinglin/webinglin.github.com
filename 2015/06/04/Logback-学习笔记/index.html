@@ -1,0 +1,475 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Logback 学习笔记 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="logback实例解读">
+  
+  <meta name="keywords" content="logback,slf4j,log">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Logback 学习笔记"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Logback 学习笔记</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>logback实例解读</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <h2 id="Logback背景"><a href="#Logback背景" class="headerlink" title="Logback背景"></a>Logback背景</h2><p>Logback是一个开源的日志组件，是log4j的作者开发的用来替代log4j的。</p>
+<p>logback由三个部分组成，logback-core, logback-classic, logback-access。其中logback-core是其他两个模块的基础。</p>
+<p>slf4j 定义日志接口及基本实现，而具体的实现由其他日志组件提供</p>
+<ol>
+<li>log4j</li>
+<li>commons-logging</li>
+<li>logback</li>
+</ol>
+<p>因此，如果想替换成其他的日志组件，只需要替换jar包即可。</p>
+<a id="more"></a>
+<h4 id="logback中三个重要概念：-Logger-Appender-Layout"><a href="#logback中三个重要概念：-Logger-Appender-Layout" class="headerlink" title="logback中三个重要概念： Logger,Appender,Layout"></a>logback中三个重要概念： Logger,Appender,Layout</h4><p>Logger: 日志记录器，把它关联到应用对应的context上后，主要用于存放日志对象，定义日志类型，级别。</p>
+<p>Appender：　指定日志输出的目的地，目的地可以是控制台，文件，或者数据库等</p>
+<p>Layout: 负责把事件转换成字符串，格式化日志信息的输出</p>
+<h4 id="寻找logback-xml"><a href="#寻找logback-xml" class="headerlink" title="寻找logback.xml"></a>寻找logback.xml</h4><ol>
+<li>logback首先在classpath寻找logback.groovy文件，</li>
+<li>如果没找到，继续寻找logback-test.xml文件</li>
+<li>如果没找到，继续寻找logback.xml文件</li>
+<li>如果仍然没找到，则使用默认配置（打印到控制台）</li>
+</ol>
+<h2 id="为什么使用Logback"><a href="#为什么使用Logback" class="headerlink" title="为什么使用Logback"></a>为什么使用Logback</h2><p><a href="http://www.cnblogs.com/yuanermen/archive/2012/02/13/2348942.html" target="_blank" rel="external">为什么要使用logback引用博客园的一段话，如下</a> </p>
+<blockquote>
+<p>1、更快的实现  Logback的内核重写了，在一些关键执行路径上性能提升10倍以上。而且logback不仅性能提升了，初始化内存加载也更小了。</p>
+<p>2、非常充分的测试  Logback经过了几年，数不清小时的测试。Logback的测试完全不同级别的。在作者的观点，这是简单重要的原因选择logback而不是log4j。</p>
+<p>3、Logback-classic非常自然实现了SLF4j    Logback-classic实现了 SLF4j。在使用SLF4j中，你都感觉不到logback-classic。而且因为logback-classic非常自然地实现了SLF4J，  所 以切换到log4j或者其他，非常容易，只需要提供成另一个jar包就OK，根本不需要去动那些通过SLF4JAPI实现的代码。</p>
+<p>4、非常充分的文档  官方网站有两百多页的文档。</p>
+<p>5、自动重新加载配置文件  当配置文件修改了，Logback-classic能自动重新加载配置文件。扫描过程快且安全，它并不需要另外创建一个扫描线程。这个技术充分保证了应用程序能跑得很欢在JEE环境里面。</p>
+<p>6、Lilith   Lilith是log事件的观察者，和log4j的chainsaw类似。而lilith还能处理大数量的log数据 。</p>
+<p>7、谨慎的模式和非常友好的恢复  在谨慎模式下，多个FileAppender实例跑在多个JVM下，能 够安全地写道同一个日志文件。RollingFileAppender会有些限制。Logback的FileAppender和它的子类包括 RollingFileAppender能够非常友好地从I/O异常中恢复。</p>
+<p>8、配置文件可以处理不同的情况   开发人员经常需要判断不同的Logback配置文件在不同的环境下（开发，测试，生产）。而这些配置文件仅仅只有一些很小的不同，可以通过,和来实现，这样一个配置文件就可以适应多个环境。</p>
+<p>9、Filters（过滤器）  有些时候，需要诊断一个问题，需要打出日志。在log4j，只有降低日志级别，不过这样会打出大量的日志，会影响应用性能。在Logback，你可以继续 保持那个日志级别而除掉某种特殊情况，如alice这个用户登录，她的日志将打在DEBUG级别而其他用户可以继续打在WARN级别。要实现这个功能只需 加4行XML配置。可以参考MDCFIlter 。</p>
+<p>10、SiftingAppender（一个非常多功能的Appender）  它可以用来分割日志文件根据任何一个给定的运行参数。如，SiftingAppender能够区别日志事件跟进用户的Session，然后每个用户会有一个日志文件。</p>
+<p>11、自动压缩已经打出来的log  RollingFileAppender在产生新文件的时候，会自动压缩已经打出来的日志文件。压缩是个异步过程，所以甚至对于大的日志文件，在压缩过程中应用不会受任何影响。</p>
+<p>12、堆栈树带有包版本  Logback在打出堆栈树日志时，会带上包的数据。</p>
+<p>13、自动去除旧的日志文件  通过设置TimeBasedRollingPolicy或者SizeAndTimeBasedFNATP的maxHistory属性，你可以控制已经产生日志文件的最大数量。如果设置maxHistory 12，那那些log文件超过12个月的都会被自动移除。</p>
+<p>总之，logback比log4j太优秀了，让我们的应用全部建立logback上吧 ！</p>
+</blockquote>
+<h2 id="Logback配置文件及实例解读"><a href="#Logback配置文件及实例解读" class="headerlink" title="Logback配置文件及实例解读"></a>Logback配置文件及实例解读</h2><p>这个logback的实例会这样展开：</p>
+<ul>
+<li>项目结构</li>
+<li>项目中使用到的类和配置文件</li>
+<li>根据源码对logback.xml这个配置文件进行解释</li>
+</ul>
+<p><img src="http://i1.tietuku.com/74a637c058273d01.jpg" alt=""></p>
+<p>其中Test.java<br>    package com.piedra.logback;</p>
+<pre><code>import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Test {
+    private final static Logger logger = LoggerFactory.getLogger(Test.class);
+
+    public static void main(String[] args) {
+        logger.info(&quot;logback {}&quot;,&quot;INFO ( TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR )&quot;);
+        logger.error(&quot;logback {}&quot;,&quot;ERROR ( TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR )&quot;);
+    }
+}
+</code></pre><p>logback.xml:</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;configuration debug=&quot;false&quot;&gt;
+    &lt;contextName&gt;Logback Demo&lt;/contextName&gt;
+
+    &lt;property name=&quot;LOG_HOME&quot; value=&quot;logs&quot; /&gt;  
+
+    &lt;!-- 控制台输出 --&gt;
+    &lt;appender name=&quot;STDOUT&quot; class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;
+        &lt;!-- encoder默认配置为PartternLayoutEncoder    --&gt;
+        &lt;encoder class=&quot;ch.qos.logback.classic.encoder.PatternLayoutEncoder&quot;&gt;
+            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+    &lt;/appender&gt;
+
+    &lt;appender name=&quot;FILE&quot; class=&quot;ch.qos.logback.core.FileAppender&quot;&gt;
+        &lt;file&gt;${LOG_HOME}/myLog.log&lt;/file&gt;
+        &lt;encoder&gt;
+            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+    &lt;/appender&gt;
+
+    &lt;!-- 按照每天生成日志文件 --&gt;
+    &lt;appender name=&quot;ROLLINGFILE&quot;  class=&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;
+        &lt;rollingPolicy class=&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;
+            &lt;!--日志文件输出的文件名--&gt;
+            &lt;FileNamePattern&gt;${LOG_HOME}/%d{yyyy-MM-dd}.log&lt;/FileNamePattern&gt;
+            &lt;!--日志文件保留天数--&gt;
+            &lt;MaxHistory&gt;30&lt;/MaxHistory&gt;
+        &lt;/rollingPolicy&gt;
+        &lt;encoder class=&quot;ch.qos.logback.classic.encoder.PatternLayoutEncoder&quot;&gt;
+            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+        &lt;!--日志文件最大的大小--&gt;
+       &lt;triggeringPolicy class=&quot;ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy&quot;&gt;
+         &lt;MaxFileSize&gt;10MB&lt;/MaxFileSize&gt;
+       &lt;/triggeringPolicy&gt;
+    &lt;/appender&gt;
+
+    &lt;logger name=&quot;org.hibernate.engine.query.HQLQueryPlan&quot; level=&quot;DEBUG&quot; additivity=&quot;false&quot; /&gt; 
+    &lt;logger name=&quot;com.piedra.logback&quot; level=&quot;WARN&quot;&gt;
+        &lt;appender-ref ref=&quot;FILE&quot;/&gt;
+    &lt;/logger&gt;
+
+    &lt;root level=&quot;ERROR&quot;&gt;
+        &lt;appender-ref ref=&quot;STDOUT&quot; /&gt;
+        &lt;appender-ref ref=&quot;ROLLINGFILE&quot; /&gt;
+    &lt;/root&gt;
+&lt;/configuration&gt;
+</code></pre><p>build.gradle</p>
+<pre><code>apply plugin:&quot;java&quot;
+apply plugin:&quot;eclipse&quot;
+
+repositories{
+    mavenCentral()
+}
+
+dependencies{
+    compile &quot;ch.qos.logback:logback-classic:1.1.2&quot;
+}
+</code></pre><p>至此，已经将项目的源码和目录结构都截图说明了，接下来根据Test.java来对logback.xml文件进行解释说明。</p>
+<pre><code>configuration: 为logback.xml配置文件的根节点,具有属性 scan,scanPeriod,debug
+scan:    当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。
+scanPeriod: 设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。
+debug: 当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false
+</code></pre><ul>
+<li><p>contextName 表示工程的名称，唯一值</p>
+</li>
+<li><p>property 节点用来定义变量值，具有两个属性，name和value，后续的配置中可以通过 ${var} 来引用在property中定义的变量</p>
+</li>
+<li><p>appender 是<configuration>的子节点，负责写日志的组件，具备如下属性:</configuration></p>
+<pre><code>name: appender的名称
+class: appender全限定名
+</code></pre></li>
+</ul>
+<hr>
+<p><em>具体的Appender分类</em></p>
+<ul>
+<li><p>ConsoleAppender 子节点：</p>
+<pre><code>encoder: 对日志进行格式化
+target: System.out 或者 System.err默认为System.out
+</code></pre></li>
+<li><p>FileAppender    将日志文件写到文件中</p>
+<pre><code>file: 被写入的文件名，相对目录或者绝对目录，如果上级目录不存在会自动创建，无默认值
+append: 如果为true，末尾追加。  如果为false，清空现有文件
+encoder: 格式化
+prudent: 如果为true，日志会被安全的写入文件，效率低   默认为false
+</code></pre></li>
+<li><p>RollingFileAppender  滚动记录文件，先将日志记录到指定的文件，当符合某个调价你的时候，将日志记录到其他文件。有以下子节点：</p>
+<pre><code>file: 被写入的文件名
+append: true表示追加  默认为true
+encoder:　格式化
+rollingPolicy:
+triggeringPolicy
+prudent:
+</code></pre></li>
+</ul>
+<hr>
+<ul>
+<li><p>logger 用来设置某一个包或者某一个类的日志打印级别，以及指定<appender></appender></p>
+<pre><code>name: 用来指定受此logger约束的某一个包或者某一个类
+level: 用来设定打印机别. TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR
+   additivity: 默认为true，将此loger的打印信息向上级传递；
+&lt;logger&gt;可以包含0到多个 &lt;appender-ref&gt;
+</code></pre></li>
+</ul>
+<p>对于</p>
+<pre><code>&lt;logger name=&quot;com.piedra.logback&quot; level=&quot;WARN&quot;&gt;
+    &lt;appender-ref ref=&quot;FILE&quot;/&gt;
+&lt;/logger&gt;
+</code></pre><p>这个logger来说，指定了com.piedra.logback这个包的日志级别为WARN，appender-ref为FILE，并且additivity默认为true，表示向上级传递。所以，当Test类记录日志的时候，调用error方法的日志会被输出到FILE的Appender中，并且向上传递到root logger。因为root logger为ERROR的日志级别，所以，也会将信息输出到STDOUT和ROLLINGFILE这两个Appender中。</p>
+<ul>
+<li><p>root 也是<logger>元素,但是它是根logger。只有一个level属性。因为已经被命名为为root</logger></p>
+<pre><code>参数参考&lt;logger&gt;元素的相关说明
+</code></pre></li>
+</ul>
+<h2 id="多项目依赖"><a href="#多项目依赖" class="headerlink" title="多项目依赖"></a>多项目依赖</h2><p>如果日志模块单独出一个项目，比如上面的例子，单独出一个logback模块，那么另外一个项目A引用这个模块，如果说项目A没有任何logback.xml 或者 logback-test.xml配置文件的话，就会采用引入的子模块logback中的配置文件来输出日志信息。</p>
+<p>如果项目A中定义了自己的logback.xml配置文件，那么就使用项目A自己的配置。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3><h3 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h3><ol>
+<li><a href="http://logback.qos.ch/documentation.html" target="_blank" rel="external">Logback官方文档</a></li>
+<li><a href="http://aub.iteye.com/blog/1110008" target="_blank" rel="external">logback.xml常用配置</a></li>
+</ol>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/05/MongoDB学习札记-第一篇/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/05/18/Linux-硬盘分区与目录结构/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/04/Logback-学习笔记/" data-title="Logback 学习笔记" data-url="http://webinglin.github.io/2015/06/04/Logback-学习笔记/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-04 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Logback/">Logback<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

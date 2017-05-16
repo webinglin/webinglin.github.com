@@ -1,0 +1,324 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>IntelliJ IDEA14 起步 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="首次使用IntelliJ IDEA14">
+  
+  <meta name="keywords" content="IDEA,IntelliJ IDEA14">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="IntelliJ IDEA14 起步"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> IntelliJ IDEA14 起步</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>首次使用IntelliJ IDEA14</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p>Myeclipse确实功能很强大，我也一直在用Myeclipse。但是Myeclipse确实太庞大了，有的没的一大堆。听闻IntelliJ IDEA非常好用，一年前就用了两个月。工作原因又回归到Myeclipse。这次再次使用IDEA的时候发现很多东西都陌生了。甚至一些IDEA基本的概念都忘却了。</p>
+<a id="more"></a>
+<h3 id="IDEA和Eclipse的一些区别"><a href="#IDEA和Eclipse的一些区别" class="headerlink" title="IDEA和Eclipse的一些区别"></a>IDEA和Eclipse的一些区别</h3><p>IDEA 的Project 对应 Eclipse 的workspace</p>
+<p>IDEA 的Module 对应 Eclipse 的Project</p>
+<p>IDEA中一个Project可以有多个Module</p>
+<p>Eclipse中一个Workspace可以包含多个Project</p>
+<h3 id="Facets-和-artifacts-的区别"><a href="#Facets-和-artifacts-的区别" class="headerlink" title="Facets 和 artifacts 的区别"></a>Facets 和 artifacts 的区别</h3><p>Facets 表示这个module有什么特征，比如 web，spring，hibernate等</p>
+<p>Artifact 是mvaen的一个概念，表示某个module要如何打包，例如：war explored、war、jar、ear等等打包方式 </p>
+<p>一个module有了 Artifacts 就可以部署到应用服务器中了。</p>
+<blockquote>
+<p>Artifact可以理解为软件开发过程中的某一个阶段的产物,工件</p>
+</blockquote>
+<p><strong>在给项目配置Artifacts的时候有好多type选项，exploed是什么意思?</strong></p>
+<p>explode在这里表示展开，不压缩的意思。也就是war，jar等产出物没压缩前的目录结构。建议在开发的时候使用这种模式，便于修改文件的效果立刻显现出来。</p>
+<p>默认情况下，IDEA的Modules和Artifacts的output目录已经设定好了，不需要改动。打包成war包的时候会自动在WEB-INF下产生classes目录。然后把编译后的文件放进去。</p>
+<h3 id="IDEA和Tomcat"><a href="#IDEA和Tomcat" class="headerlink" title="IDEA和Tomcat"></a>IDEA和Tomcat</h3><ol>
+<li><p>配置Tomcat， 通过 File-&gt; settings 找到Application Servers的配置，点击绿色按钮添加自己的tomcat版本<br><img src="http://i3.tietuku.com/38dbfcc8f479ee4b.jpg" alt=""></p>
+</li>
+<li><p>查看我们的web项目，看是否有web特性， 通过右键-&gt;Open Module Setting 或者使用快捷键 F4来打开我们的模块设置<br><img src="http://i3.tietuku.com/b123f540523c5d38.jpg" alt=""></p>
+</li>
+</ol>
+<p>根据上文提到的一些概念我们已经明白了，要部署web应用，需要给我们的模块添加Web特性。<br>所以添加了web特性的模块我们就可以用来部署了。</p>
+<p>为我们的模块添加添加web特性的时候，可以让IDEA帮我们生成web.xml，我们需要将web.xml修改成我们自己的目录结构位置。<br><img src="http://i3.tietuku.com/a4eab4a02cbb29eb.jpg" alt=""></p>
+<p>同时需要指定web应用默认的根目录。我们依旧指定（修改） 为我们自己的目录结构中的web应用根目录（Gradle，Maven中使用 src/main/webapp)<br><img src="http://i3.tietuku.com/005a51f86c1211cc.jpg" alt=""></p>
+<p>部署web应用到tomcat中，需要在Edit Configuration配置我们的tomcat，如果配置处没有找到tomcat servers，那么就是我们在清理IDEA插件的时候把Tomcat插件清楚了，去pluigns配置项里面启用即可。<br><img src="http://i3.tietuku.com/009a1b40b15a3f6b.jpg" alt=""></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://blog.csdn.net/likaihon/article/details/44174553" target="_blank" rel="external">http://blog.csdn.net/likaihon/article/details/44174553</a></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/11/01/SpringMVC-接收数组参数/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/25/MyEclipse常见问题与性能优化/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/07/02/IntelliJ-IDEA14-起步/" data-title="IntelliJ IDEA14 起步" data-url="http://webinglin.github.io/2015/07/02/IntelliJ-IDEA14-起步/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-07-02 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Idea/">Idea<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

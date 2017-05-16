@@ -1,0 +1,322 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MyEclipse常见问题与性能优化 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="MyEclipse常见问题与性能优化">
+  
+  <meta name="keywords" content="eclipse,性能调优,myeclipse性能,eclipse常见问题">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MyEclipse常见问题与性能优化"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MyEclipse常见问题与性能优化</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>MyEclipse常见问题与性能优化</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p>Myeclipse是一个非常好用的IDE（集成开发环境），使用很简单，但是要驾驭它却要一个长期的使用和总结经验，之所以写这篇文章是因为今天早上我的myeclipse总是自动退出，试过很多办法都没法解决，后来我的同事（肖帅哥）问我myeclipse有没有优化，我说，是指调整内存吗？ 接着他就过来教了我几招。因此就写下此文来记录今天所学以及之前使用过程中的一些经验教训</p>
+<a id="more"></a>
+<p>平时在使用myeclipse的时候并没有过多的在意所谓的性能，基本上我的myeclipse启动起来，快捷键也基本都是用默认的，一些基本的配置会用（比如配置插件，tomcat，字体，jdk，maven等等）。其他也没有过多的考虑。很惭愧，用了myeclipse这么久，只知道启动的时候会很慢，也没想过要去对这个启动过程调优。</p>
+<h3 id="调整myeclipse的使用内存"><a href="#调整myeclipse的使用内存" class="headerlink" title="调整myeclipse的使用内存"></a>调整myeclipse的使用内存</h3><p>找到myeclipse的安装目录，在根目录下面有一个myeclipse.ini文件，打开并编辑</p>
+<pre><code>-vmargs
+-Xmx512m
+-XX:PermSize=256m
+-XX:MaxPermSize=256m
+-XX:ReservedCodeCacheSize=64m
+</code></pre><p>其中 -Xmx512m 表示给堆内存区分配最大内存512MB，而PermSize表示的是class文件存放的内存，经常出现的Perngen outof memory，类似这样的问题，解决方法之一就是调整这个内存。（导致的原因有很多，在tomcat的官网有一些关于<permgenexception> –异常名称大致是这样 的介绍）</permgenexception></p>
+<p>###优化myeclipse的启动加载项<br>打开myeclipse 找到  Window –&gt; Perferences  搜索 startup<br><img src="http://i1.tietuku.com/4b309ecd27d6c494.jpg" alt=""></p>
+<p>把自己不需要的组件全部都去勾选，这样子的话启动myeclipse会快很多。勾选完之后，点击OK 重启myeclipse即可看到效果。</p>
+<h3 id="显示对内存使用状态"><a href="#显示对内存使用状态" class="headerlink" title="显示对内存使用状态"></a>显示对内存使用状态</h3><p><img src="http://i1.tietuku.com/22c7f52014369a20.jpg" alt=""></p>
+<p>设置好之后，就可以在myeclipse的右下角看到堆内存使用状态了</p>
+<p><img src="http://i1.tietuku.com/e07f37dd51d4f4c9.jpg" alt=""></p>
+<h3 id="去掉所有的验证"><a href="#去掉所有的验证" class="headerlink" title="去掉所有的验证"></a>去掉所有的验证</h3><p>myeclipse会自己帮我们验证很多东西，js，jsp等。 这样会导致我们编译什么的都非常慢,所以我习惯性的将所有的自动验证都去掉，所有的验证都自己来。<br><img src="http://i1.tietuku.com/052e58c7bbf93241.jpg" alt=""></p>
+<h3 id="Clean技巧"><a href="#Clean技巧" class="headerlink" title="Clean技巧"></a>Clean技巧</h3><p>经常将应用部署到tomcat的时候，由于缓存的原因，自动化编译的时候不能将重新编译的class文件热部署到tomcat中。然后我们就会一直沉浸在旧代码中调试，一直疑问为什么修改了还没有效果的时候。clean或许是一种很有效的方法</p>
+<p><img src="http://i1.tietuku.com/01754870b3c4a9a4.jpg" alt=""></p>
+<p>因为工作空间的项目我都关闭了，所以 Clean…是灰色的</p>
+<h3 id="Myeclipse自动退出问题"><a href="#Myeclipse自动退出问题" class="headerlink" title="Myeclipse自动退出问题"></a>Myeclipse自动退出问题</h3><p>我遇到最尴尬的问题就是自动退出了，当我们写着代码的时候，突然输入点号（比如 a.b ) 当输入b就自动退出了，然后 点号不用输入的，而是从其他文本编辑器写好，然后复制进来，这样竟然就不会退出。非常纠结，一开始就以为内存问题，因为退出的时候会提示内存的配置信息。所以就自以为是的调整内存大小。调整来调整去也不见得啥效果，期间也试过网上说的很多办法。后来我的一个同事（蔡帅哥）说切换一下工作空间试试。这句话点醒了我，于是乎我就<strong>把workspace的metadata文件给删了，然后重启myeclipse让其重新生成metadata文件夹</strong>，这样问题就解决了。</p>
+<blockquote>
+<p><strong>如果您有更多关于myeclipse的使用技巧，或者说优化技巧，欢迎留言和我们分享~~</strong></p>
+<p>如果本文有不足之处，欢迎指正~~</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/07/02/IntelliJ-IDEA14-起步/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/24/JQuery事件-document绑定-VS-ID绑定/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/25/MyEclipse常见问题与性能优化/" data-title="MyEclipse常见问题与性能优化" data-url="http://webinglin.github.io/2015/06/25/MyEclipse常见问题与性能优化/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-25 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Eclipse/">Eclipse<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

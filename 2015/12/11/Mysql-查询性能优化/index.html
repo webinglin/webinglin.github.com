@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Mysql 查询性能优化 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="msyqls 性能优化">
+  
+  <meta name="keywords" content="mysql,性能优化">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Mysql 查询性能优化"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Mysql 查询性能优化</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>msyqls 性能优化</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p>先前写过一篇关于Mysql入库性能调优的文章，既然入库了，数据必然是要使用的，查询并以某种可视化的方式展现数据是很常见的使用方式。（如：D3.JS，Echarts，Highchart, i2 或是 其他的可视化工具）。</p>
+<p>寒天一滴水，点点在心头。这里记录下Mysql优化的一些学习笔记。</p>
+<ul>
+<li>对于查询的优化，首先应该避免全表扫描，所以在where 及 order by涉及到的列上建索引。</li>
+</ul>
+<a id="more"></a>
+<ul>
+<li><p>避免使用null值的判断，否则会导致全表扫描。应该在入库的时候设置正确的数据类型，以及默认值。 比如 <code>where col=0 ;</code> 而不应该用 <code>where col is null;</code></p>
+</li>
+<li><p>如果可以，避免使用范围查询，如： !=, &gt; ,&lt; , in , not in , between 等操作符，这些会导致查询不走索引，造成全表扫描。</p>
+</li>
+<li><p>由于Mysql索引符合最左匹配原则，所以 like ‘%str%’ 是不会走索引的。 而 like ‘str%’ 这个确实会走索引的。所以，尽量不要再mysql中做全文检索的操作，这种工作可以用solr，elasticsearch 这种搜索引擎来处理。</p>
+</li>
+<li><p>避免在 where 子句中对字段进行函数操作，这会导致放弃索引而造成全表扫描。</p>
+</li>
+<li><p>对于 in 的操作可以考虑使用 join…on 来关联查询</p>
+</li>
+<li><p>group by col 默认的情况下，group by 会对col进行排序，这就是为什么在使用 explain的时候 在extr这列会有 filesort 。 所以，如果仅仅只需要分组，而不需要排序的话，在 group by 后面加上 order by null ( 如: <code>select username , count(1) as cnt from user group by username order by null ;</code>) 。这样会快很多。因为少了filesort。 filesort是很慢的。</p>
+</li>
+<li><p>整数类型查询不使用引号 。 字符串查询加上引号，否则不会使用索引。 对于字符串的查询不合理的做法：<code>select xx from tb where str=111;</code> ； 合理的查询语句应该是： <code>select xx from tb where str=&#39;111&#39;</code></p>
+</li>
+<li><p>对于select语句，尽量是需要什么就查什么，不要一下子就习惯性的使用 <code>select * from t;</code>， 而应该只把你想要的查出来就好了。 <code>select name from t ;</code> ； 我个人还有一个习惯，在对一张未知的表进行查询之前，习惯性的会先查总数 <code>select count(1) from t;</code> ，如果总数不是太大，就可以直接查所有了。 不然就使用limit限制一下查询条数。</p>
+</li>
+<li><p>说到limit，也有一点值得说的，比如你知道某一个查询结果只会有一条记录，那么可以在查询语句上限制 <code>limit 1;</code> 。 比如在有几条记录，我们想要根据时间，取到最近的一条记录。如果不适用limit的话，我们可能会这样查:<code>select xtime from t where xtime=(select max(xtime) from t) ;</code> 。 所以，用limit的话就变成 <code>select xtime from t order by xtime limit 1 ;</code> 。响应文章开头所属的，对于order by 的列记得建个索引。建索引语法:<code>create index your_idx on tablename(colNmae) l</code></p>
+</li>
+</ul>
+<p>总结： 多用 <strong>EXPLAIN</strong> 分析查询语句</p>
+<h3 id="附-查询缓存相关的命令"><a href="#附-查询缓存相关的命令" class="headerlink" title="(附)查询缓存相关的命令"></a>(附)查询缓存相关的命令</h3><pre><code>-- 设置查询缓存:
+
+-- 查询缓存是否开启， on:表示开启， off:表示关闭
+&gt; select @@query_cache_type;
+&gt; set session query_cache_type=off;
+&gt; set session query_cache_type=on;
+
+-- 查询缓存的大小:
+&gt; select @@global.query_cache_size;
+&gt; set @@global.query_cache_size=1000000;
+
+-- 查询缓存的上限:
+&gt; select @@global.query_cache_limit;
+&gt; set @@global.query_cache_limit=5000000;
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://webinglin.github.io">http://webinglin.github.io</a></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2016/01/28/MySQL-分区/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/12/01/Mysql-入库性能优化/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/12/11/Mysql-查询性能优化/" data-title="Mysql 查询性能优化" data-url="http://webinglin.github.io/2015/12/11/Mysql-查询性能优化/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-12-11 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/MySQL/">MySQL<span>3</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

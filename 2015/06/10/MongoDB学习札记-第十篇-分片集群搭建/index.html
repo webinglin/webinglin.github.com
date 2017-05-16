@@ -1,0 +1,504 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MongoDB学习札记 第十篇 分片集群搭建 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="MongoDB学习札记 第十篇 分片 测试架构实战">
+  
+  <meta name="keywords" content="mongo,mongodb,sharding,shard,mongodb shard">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MongoDB学习札记 第十篇 分片集群搭建"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MongoDB学习札记 第十篇 分片集群搭建</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>MongoDB学习札记 第十篇 分片 测试架构实战</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p>##实验环境准备：</p>
+<p><strong>configSerer</strong></p>
+<blockquote>
+<p>192.168.236.131:27000</p>
+</blockquote>
+<p><strong>mongos</strong></p>
+<blockquote>
+<p>192.168.236.131:28000</p>
+</blockquote>
+<p><strong>shards</strong></p>
+<blockquote>
+<p>192.168.236.131:29001</p>
+<p>192.168.236.131:29002</p>
+<p>192.168.236.131:29003</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="第一步-创建分片实验需要的目录"><a href="#第一步-创建分片实验需要的目录" class="headerlink" title="第一步: 创建分片实验需要的目录"></a>第一步: 创建分片实验需要的目录</h4><pre><code>root@ubuntu:~# mkdir -p ~/mongoData/shard/s1
+root@ubuntu:~# mkdir -p ~/mongoData/shard/s2
+root@ubuntu:~# mkdir -p ~/mongoData/shard/s3
+root@ubuntu:~# mkdir -p ~/mongoData/shard/log
+root@ubuntu:~# mkdir -p ~/mongoData/shard/config
+</code></pre><h4 id="第二步：-启动configServer"><a href="#第二步：-启动configServer" class="headerlink" title="第二步： 启动configServer"></a>第二步： 启动configServer</h4><pre><code>root@ubuntu:~# mongod --configsvr --dbpath ~/mongoData/shard/config/ --fork --logpath ~/mongoData/shard/log/configsvr.log --logappend --port 27000
+</code></pre><h4 id="第三步：-启动mongos"><a href="#第三步：-启动mongos" class="headerlink" title="第三步：　启动mongos"></a>第三步：　启动mongos</h4><pre><code>root@ubuntu:~# mongos --configdb 192.168.236.131:27000 --port 28000 --fork --logpath ~/mongoData/shard/log/mongs.log
+</code></pre><h4 id="第四步：-启动所有的shard分片"><a href="#第四步：-启动所有的shard分片" class="headerlink" title="第四步： 启动所有的shard分片"></a>第四步： 启动所有的shard分片</h4><pre><code>root@ubuntu:~/mongoData# mongod --dbpath ~/mongoData/shard/s1/ --port 29001 --fork --logpath ~/mongoData/shard/log/s1.log --shardsvr --logappend    
+root@ubuntu:~/mongoData# mongod --dbpath ~/mongoData/shard/s2/ --port 29002 --fork --logpath ~/mongoData/shard/log/s2.log --shardsvr --logappend
+root@ubuntu:~/mongoData# mongod --dbpath ~/mongoData/shard/s3/ --port 29003 --fork --logpath ~/mongoData/shard/log/s3.log --shardsvr --logappend
+</code></pre><h4 id="第五步：-将shard添加到mongos中-并配置"><a href="#第五步：-将shard添加到mongos中-并配置" class="headerlink" title="第五步： 将shard添加到mongos中    并配置"></a>第五步： 将shard添加到mongos中    并配置</h4><pre><code>root@ubuntu:~/mongoData# mongo --port 28000
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:28000/test
+... ...
+mongos&gt; use admin
+switched to db admin
+mongos&gt; sh.addShard(&quot;192.168.236.131:29001&quot;)
+{ &quot;shardAdded&quot; : &quot;shard0000&quot;, &quot;ok&quot; : 1 }
+mongos&gt; sh.addShard(&quot;192.168.236.131:29002&quot;)
+{ &quot;shardAdded&quot; : &quot;shard0001&quot;, &quot;ok&quot; : 1 }
+mongos&gt; sh.addShard(&quot;192.168.236.131:29003&quot;)
+{ &quot;shardAdded&quot; : &quot;shard0002&quot;, &quot;ok&quot; : 1 }
+mongos&gt;
+</code></pre><p><br><br>使用下面两个命令来配置需要分片的数据库及集合以及对应的片键</p>
+<p>sh.enableSharding(“<database>“)</database></p>
+<p>sh.shardCollection(“<database>.<collection>“, shard-key-pattern)</collection></database></p>
+<pre><code>mongos&gt; sh.enableSharding(&quot;test&quot;)
+{ &quot;ok&quot; : 1 }
+mongos&gt; sh.shardCollection(&quot;test.users&quot;,{&quot;username&quot;:1,&quot;_id&quot;:1})
+{ &quot;collectionsharded&quot; : &quot;test.users&quot;, &quot;ok&quot; : 1 }
+mongos&gt;
+</code></pre><p>如果是添加副本集作为分片怎么处理？</p>
+<blockquote>
+<p><strong>addShard</strong></p>
+<p>The hostname and port of the mongod instance to be added as a shard. To add a replica set as a shard, specify the name of the replica set and the hostname and port of a member of the replica set.</p>
+</blockquote>
+<p>上面这段话引用自官网，也就是说，我们只需要指定副本集的名称然后再指定其中一台机器即可。</p>
+<p>比如： </p>
+<blockquote>
+<p>sh.addShard(“replicaSet0/&lt;ont host of the replica set&gt;:&lt;port&gt;”);</p>
+</blockquote>
+<h4 id="验证分片集群部署情况"><a href="#验证分片集群部署情况" class="headerlink" title="验证分片集群部署情况"></a>验证分片集群部署情况</h4><p>先往mongos插入100条数据，然后通过 db.users.stats() 查看集合的状态，发现集合被切分到三个分片中了，虽然第一个分片数据量比较多，其他两个分片数据量相对较少 （这个和片键 sharding key 的设置有关，我没有详细看官网关于shard key设置的文章，所以这里的片键设置比较简单，随意。）</p>
+<pre><code>mongos&gt; for(var i=0; i&lt;100; i++) {
+... db.users.insert({&quot;username&quot;:&quot;&quot; + i,age:i*2 , addr:&quot;ardr&quot;+i})
+... }
+WriteResult({ &quot;nInserted&quot; : 1 })
+mongos&gt; db.users.stats()
+{
+        &quot;sharded&quot; : true,
+        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+        &quot;userFlags&quot; : 1,
+        &quot;capped&quot; : false,
+        &quot;ns&quot; : &quot;test.users&quot;,
+        &quot;count&quot; : 100,
+        &quot;numExtents&quot; : 4,
+        &quot;size&quot; : 11200,
+        &quot;storageSize&quot; : 57344,
+        &quot;totalIndexSize&quot; : 49056,
+        &quot;indexSizes&quot; : {
+                &quot;_id_&quot; : 24528,
+                &quot;username_1__id_1&quot; : 24528
+        },
+        &quot;avgObjSize&quot; : 112,
+        &quot;nindexes&quot; : 2,
+        &quot;nchunks&quot; : 3,
+        &quot;shards&quot; : {
+                &quot;shard0000&quot; : {
+                        &quot;ns&quot; : &quot;test.users&quot;,
+                        &quot;count&quot; : 88,
+                        &quot;size&quot; : 9856,
+                        &quot;avgObjSize&quot; : 112,
+                        &quot;numExtents&quot; : 2,
+                        &quot;storageSize&quot; : 40960,
+                        &quot;lastExtentSize&quot; : 32768,
+                        &quot;paddingFactor&quot; : 1,
+                        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+                        &quot;userFlags&quot; : 1,
+                        &quot;capped&quot; : false,
+                        &quot;nindexes&quot; : 2,
+                        &quot;totalIndexSize&quot; : 16352,
+                        &quot;indexSizes&quot; : {
+                                &quot;_id_&quot; : 8176,
+                                &quot;username_1__id_1&quot; : 8176
+                        },
+                        &quot;ok&quot; : 1
+                },
+                &quot;shard0001&quot; : {
+                        &quot;ns&quot; : &quot;test.users&quot;,
+                        &quot;count&quot; : 11,
+                        &quot;size&quot; : 1232,
+                        &quot;avgObjSize&quot; : 112,
+                        &quot;numExtents&quot; : 1,
+                        &quot;storageSize&quot; : 8192,
+                        &quot;lastExtentSize&quot; : 8192,
+                        &quot;paddingFactor&quot; : 1,
+                        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+                        &quot;userFlags&quot; : 1,
+                        &quot;capped&quot; : false,
+                        &quot;nindexes&quot; : 2,
+                        &quot;totalIndexSize&quot; : 16352,
+                        &quot;indexSizes&quot; : {
+                                &quot;_id_&quot; : 8176,
+                                &quot;username_1__id_1&quot; : 8176
+                        },
+                        &quot;ok&quot; : 1
+                },
+                &quot;shard0002&quot; : {
+                        &quot;ns&quot; : &quot;test.users&quot;,
+                        &quot;count&quot; : 1,
+                        &quot;size&quot; : 112,
+                        &quot;avgObjSize&quot; : 112,
+                        &quot;numExtents&quot; : 1,
+                        &quot;storageSize&quot; : 8192,
+                        &quot;lastExtentSize&quot; : 8192,
+                        &quot;paddingFactor&quot; : 1,
+                        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+                        &quot;userFlags&quot; : 1,
+                        &quot;capped&quot; : false,
+                        &quot;nindexes&quot; : 2,
+                        &quot;totalIndexSize&quot; : 16352,
+                        &quot;indexSizes&quot; : {
+                                &quot;_id_&quot; : 8176,
+                                &quot;username_1__id_1&quot; : 8176
+                        },
+                        &quot;ok&quot; : 1
+                }
+        },
+        &quot;ok&quot; : 1
+}
+</code></pre><p>这时候如果用mongo客户端去连接 29001 , 29002， 29003端口，会发现只有集合的部分数据是可见的，这也证明了我们实验成功了</p>
+<pre><code>root@ubuntu:~/mongoData# mongo --port 29001
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:29001/test
+... ...
+&gt; db.users.find().count()
+88
+&gt; exit
+bye
+root@ubuntu:~/mongoData# mongo --port 29002
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:29002/test
+... ...
+&gt; db.users.find().count()
+11
+&gt; exit
+bye
+root@ubuntu:~/mongoData# mongo --port 29003
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:29003/test
+... ...
+&gt; db.users.find().count()
+1
+&gt; exit
+bye
+root@ubuntu:~/mongoData#
+</code></pre><p>整个分片的实验基本上已经验证成功了。</p>
+<p>如果某个集合没有进行分片，数据会存放在primary shard里面。 </p>
+<pre><code>mongos&gt; db.sites.insert({&quot;site&quot;:&quot;webinglin.github.io&quot;,&quot;author&quot;:&quot;linwenbin&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+... ...
+mongos&gt; db.sites.insert({&quot;site&quot;:&quot;webinglin.github.io&quot;,&quot;author&quot;:&quot;linwenbin&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+mongos&gt; db.sites.stats()
+{
+        &quot;sharded&quot; : false,
+        &quot;primary&quot; : &quot;shard0000&quot;,
+        &quot;ns&quot; : &quot;test.sites&quot;,
+        &quot;count&quot; : 7,
+        &quot;size&quot; : 784,
+        &quot;avgObjSize&quot; : 112,
+        &quot;numExtents&quot; : 1,
+        &quot;storageSize&quot; : 8192,
+        &quot;lastExtentSize&quot; : 8192,
+        &quot;paddingFactor&quot; : 1,
+        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+        &quot;userFlags&quot; : 1,
+        &quot;capped&quot; : false,
+        &quot;nindexes&quot; : 1,
+        &quot;totalIndexSize&quot; : 8176,
+        &quot;indexSizes&quot; : {
+                &quot;_id_&quot; : 8176
+        },
+        &quot;ok&quot; : 1
+}
+mongos&gt;
+</code></pre><blockquote>
+<p>这篇文章介绍了简单的搭建分片集群的步骤。更多关于怎么选择片键（Shard Key)，参考<a href="http://docs.mongodb.org/manual/tutorial/choose-a-shard-key/" target="_blank" rel="external">这里</a>。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://docs.mongodb.org/manual/core/sharded-cluster-architectures-test/" target="_blank" rel="external">http://docs.mongodb.org/manual/core/sharded-cluster-architectures-test/</a></p>
+<p><a href="http://docs.mongodb.org/manual/reference/sharding/" target="_blank" rel="external">http://docs.mongodb.org/manual/reference/sharding/</a></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/24/JQuery事件-document绑定-VS-ID绑定/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/10/MongoDB学习札记-第九篇-分片核心概念/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/10/MongoDB学习札记-第十篇-分片集群搭建/" data-title="MongoDB学习札记 第十篇 分片集群搭建" data-url="http://webinglin.github.io/2015/06/10/MongoDB学习札记-第十篇-分片集群搭建/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-10 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/MongoDB/">MongoDB<span>10</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

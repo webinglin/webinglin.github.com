@@ -1,0 +1,313 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JQuery事件 document绑定 VS ID绑定 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="$(document).on(&#39;click&#39;, &#39;#id&#39;, function() {}) vs $(&#39;#id&#39;).on(&#39;click&#39;, function(){})">
+  
+  <meta name="keywords" content="jquery,事件,$(document).on(),$(&quot;#id&quot;).on()">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="JQuery事件 document绑定 VS ID绑定"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> JQuery事件 document绑定 VS ID绑定</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>$(document).on(‘click’, ‘#id’, function() {}) vs $(‘#id’).on(‘click’, function(){})</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <h4 id="document-on-39-click-39-39-id-39-function-和-39-id-39-on-39-click-39-function-到底有什么区别？"><a href="#document-on-39-click-39-39-id-39-function-和-39-id-39-on-39-click-39-function-到底有什么区别？" class="headerlink" title="$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) 和 $(&#39;#id&#39;).on(&#39;click&#39;,function(){}) 到底有什么区别？"></a><code>$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) 和 $(&#39;#id&#39;).on(&#39;click&#39;,function(){})</code> 到底有什么区别？</h4><p>这个问题在stackoverflow上面已经讨论过了，我今天也遇到这个问题。但是我在遇到该问题的时候想到的不是第一种做法，而是采用第二种在改版。后来我的同事小丸子这样写事件监听，我觉得很神奇，我就去google了。看到stackoverflow的这个答案我就明朗了。感谢小丸子！</p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><a id="more"></a>
+<p>有这样一个模块A，A模块是以前写的，A模块的所有子模块都是通过左侧菜单列表形式展现的，即一堆的&lt;li&gt;&lt;/li&gt;元素组成，这些li元素全都是通过jsp脚本语言生成的。现在需要为A模块添加另外一个子模块C，而子模块C的响应时间非常长，因此需要异步来构造。异步构造好了之后，发现新增加的子模块C没有了其他子模块的特效（因为整个页面一出来，通过jsp脚本创建的li元素都已经绑定好了事件），比如点击之后展开子模块的子模块，并改变自身的样式等等效果。此时想到的第一个问题就是，我没有为新增加的子模块C添加特效的事件监听。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
+<li>为子模块C添加事件监听。即通过<code>$(&quot;#C&quot;).off(&quot;click&quot;).on(&quot;click&quot;,function(){});</code>这样的方式来监听，添加完之后，确实可以达到我想要的效果。</li>
+<li>自以为一切尽在掌握，偏偏是人外有人，天外有天啊。看到同事小丸子的写法是<code>$(document).on(&quot;click&quot;,&quot;#C&quot;,function(){});</code>，这段是在一开始初始化的时候就监听的，动态创建的子模块就都不用再监听click事件了</li>
+</ol>
+<h2 id="document-on-39-click-39-39-id-39-function-vs-39-id-39-on-39-click-39-function-两者的区别"><a href="#document-on-39-click-39-39-id-39-function-vs-39-id-39-on-39-click-39-function-两者的区别" class="headerlink" title="$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) vs $(&#39;#id&#39;).on(&#39;click&#39;,function(){})两者的区别"></a><code>$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) vs $(&#39;#id&#39;).on(&#39;click&#39;,function(){})</code>两者的区别</h2><p>发现事情的神奇之后，我开始寻找$(document).on()来绑定事件的原因了。</p>
+<blockquote>
+<p><strong>$(document).on(“click”,”#C”,function(){}) :</strong></p>
+<p>通过将事件绑定到更高层的Dom tree上面(在这里是document对象)    这样事件处理器就会在事件到达选择器选中的元素的时候触发。（通过代理一个事件处理器这样的方式，这样的话即使元素在绑定事件的时候不存在DOM Tree上面，而是后续动态创建的，也会被执行。）</p>
+<p><strong>$(“#C).on(function(){}) :</strong></p>
+<p>如果使用这种方式，并且 #C 的元素是在绑定事件之后创建的，那么事件处理函数将永远不会被执行。使用这个方式来监听事件，你要确保在你绑定事件之前，#C元素在DOM里已经存在了。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://stackoverflow.com/questions/14879168/document-onclick-id-function-vs-id-onclick-function" target="_blank" rel="external">$(document).on(‘click’, ‘#id’, function() {}) VS $(‘#id’).on(‘click’, function(){})</a></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/25/MyEclipse常见问题与性能优化/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/10/MongoDB学习札记-第十篇-分片集群搭建/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/24/JQuery事件-document绑定-VS-ID绑定/" data-title="JQuery事件 document绑定 VS ID绑定" data-url="http://webinglin.github.io/2015/06/24/JQuery事件-document绑定-VS-ID绑定/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-24 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/JQuery/">JQuery<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

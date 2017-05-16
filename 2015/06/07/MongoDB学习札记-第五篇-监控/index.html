@@ -1,0 +1,390 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MongoDB学习札记 第五篇 监控 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="MongoDB学习札记 第五篇 监控">
+  
+  <meta name="keywords" content="mongo,mongodb,monitor">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MongoDB学习札记 第五篇 监控"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MongoDB学习札记 第五篇 监控</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>MongoDB学习札记 第五篇 监控</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p>对数据库的监控对于数据库管理人员（包括开发人员排查问题也是）来说是一项很重要的工作。</p>
+<p>Mongodb提供了三种监控策略：</p>
+<ul>
+<li>mongodb提供的工具集合，实时监听数据库的活动。</li>
+<li>database commands 返回当前数据库的状态</li>
+<li>MongoDB Management Service(MMS) 提供可视化的监控结果。</li>
+</ul>
+<a id="more"></a>
+<h4 id="MongoDB-Utilities"><a href="#MongoDB-Utilities" class="headerlink" title="MongoDB Utilities"></a>MongoDB Utilities</h4><p><strong>mongostat</strong></p>
+<p>mongostat显示每秒钟插入，查询，更新，删除，连接数 的统计信息。</p>
+<pre><code>root@ubuntu:~# mongostat
+insert query update delete getmore command flushes mapped  vsize   res faults qr|qw ar|aw netIn netOut conn     time
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:15
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:16
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:17
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:18
+    *0    *0     *0     *0       0     2|0       1 160.0M 527.0M 69.0M      0   0|0   0|0  133b    10k    2 17:37:19
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:20
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:21
+^Croot@ubuntu:~#
+</code></pre><p><strong>mongotop</strong><br>mongotop 统计当前活动的mongodb实例的集合读写时长,可以用来验证是否我们的mongodb实例还活着或者验证操作时长是否达到我们的要求。</p>
+<pre><code>root@ubuntu:~# mongotop
+2015-06-07T17:48:58.772-0700    connected to: 127.0.0.1
+                     ns    total    read    write    2015-06-07T17:52:03-07:00
+             test.pages     65ms    65ms      0ms
+     admin.system.roles      0ms     0ms      0ms
+   admin.system.version      0ms     0ms      0ms
+      local.startup_log      0ms     0ms      0ms
+   local.system.indexes      0ms     0ms      0ms
+local.system.namespaces      0ms     0ms      0ms
+   local.system.replset      0ms     0ms      0ms
+    test.system.indexes      0ms     0ms      0ms
+ test.system.namespaces      0ms     0ms      0ms
+              test.user      0ms     0ms      0ms
+</code></pre><p><strong>Http控制台</strong></p>
+<p>我用的mongodb是3.0.3版本，默认没有开启28017端口，所以你访问 <a href="http://yourhost:28017" target="_blank" rel="external">http://yourhost:28017</a> 是访问不了的， 如果要访问28017端口的应用， 需要在启动monogd的时候加入 –rest 参数<br><code>./mongod --dbpath ../data/db/ --rest</code></p>
+<h4 id="MongoDB-Command"><a href="#MongoDB-Command" class="headerlink" title="MongoDB Command"></a>MongoDB Command</h4><p><strong>db.serverStatus()</strong></p>
+<p>返回的结果是数据库的状态信息，包含磁盘，内存的使用情况，连接数，索引访问情况等。 db.serverStatus()返回结果非常快速，并不会影响到mongoDB的性能。</p>
+<pre><code>&gt; db.serverStatus()
+{
+        &quot;host&quot; : &quot;ubuntu&quot;,
+        &quot;version&quot; : &quot;3.0.3&quot;,
+        &quot;process&quot; : &quot;mongod&quot;,
+        &quot;pid&quot; : NumberLong(2354),
+        &quot;uptime&quot; : 13191,
+
+        ... ...
+
+        &quot;ok&quot; : 1
+}
+</code></pre><p><strong>db.stats()</strong></p>
+<p>返回当前数据库的存储的内存大小，集合数量，索引占用内存大小等情况。</p>
+<pre><code>&gt; db.stats()
+{
+        &quot;db&quot; : &quot;test&quot;,
+        &quot;collections&quot; : 4,
+        &quot;objects&quot; : 42,
+        &quot;avgObjSize&quot; : 67.80952380952381,
+        &quot;dataSize&quot; : 2848,
+        &quot;storageSize&quot; : 28672,
+        &quot;numExtents&quot; : 4,
+        &quot;indexes&quot; : 2,
+        &quot;indexSize&quot; : 16352,
+
+        ... ...
+
+        &quot;ok&quot; : 1
+}
+</code></pre><p><strong>db.collection.stats()</strong></p>
+<p>相对于db.stats()，db.collection.stats()返回的是集合的统计信息。</p>
+<pre><code>&gt; db.pages.stats()
+{
+        &quot;ns&quot; : &quot;test.pages&quot;,
+        &quot;count&quot; : 30,
+        &quot;size&quot; : 1440,
+        &quot;avgObjSize&quot; : 48,
+        &quot;numExtents&quot; : 1,
+        &quot;storageSize&quot; : 8192,
+        &quot;lastExtentSize&quot; : 8192,
+        &quot;paddingFactor&quot; : 1,
+
+        ... ...
+
+        &quot;ok&quot; : 1
+}
+&gt;
+</code></pre><h4 id="其他工具"><a href="#其他工具" class="headerlink" title="其他工具"></a>其他工具</h4><p>来源官网manual手册</p>
+<blockquote>
+<p>Third Party Tools<br>A number of third party monitoring tools have support for MongoDB, either directly, or through their own plugins.</p>
+<p>Self Hosted Monitoring Tools<br>These are monitoring tools that you must install, configure and maintain on your own servers. Most are open source.<br><img src="http://i1.tietuku.com/ee8766835a8adf00.jpg" alt=""></p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3><h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><p><a href="http://docs.mongodb.org/manual/administration/monitoring/" target="_blank" rel="external">http://docs.mongodb.org/manual/administration/monitoring/</a></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/08/MongoDB学习札记-第六篇-主从复制/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/07/MongoDB学习札记-第四篇-Query/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/07/MongoDB学习札记-第五篇-监控/" data-title="MongoDB学习札记 第五篇 监控" data-url="http://webinglin.github.io/2015/06/07/MongoDB学习札记-第五篇-监控/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-07 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/MongoDB/">MongoDB<span>10</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

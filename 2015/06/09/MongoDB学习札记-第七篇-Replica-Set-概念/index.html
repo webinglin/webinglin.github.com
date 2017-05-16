@@ -1,0 +1,371 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MongoDB学习札记 第七篇 Replica Set 核心概念 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="MongoDB学习札记 第七篇 Replica Set 核心概念">
+  
+  <meta name="keywords" content="mongodb,mongo,replica Set,replication">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MongoDB学习札记 第七篇 Replica Set 核心概念"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MongoDB学习札记 第七篇 Replica Set 核心概念</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>MongoDB学习札记 第七篇 Replica Set 核心概念</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p>副本集是一组mongod进程组成的，提供了数据冗余和高可用性。</p>
+<h2 id="副本集的成员"><a href="#副本集的成员" class="headerlink" title="副本集的成员"></a>副本集的成员</h2><p><strong>Replica Set Primary</strong></p>
+<blockquote>
+<p>The primary is the only member of a replica set that accepts write operations.</p>
+</blockquote>
+<p><strong>Replica Set Secondary Members</strong></p>
+<blockquote>
+<p>Secondary members replicate the primary’s data set and accept read operations. If the set has no primary, a secondary <strong>can become primary.</strong></p>
+</blockquote>
+<p><strong>Priority 0 Replica Set Members</strong></p>
+<blockquote>
+<p>Priority 0 members are secondaries that <strong>cannot become the primary.</strong></p>
+</blockquote>
+<p><strong>Hidden Replica Set Members</strong></p>
+<blockquote>
+<p>Hidden members are secondaries that are invisible to applications. These members support dedicated workloads, such as reporting or <strong>backup.</strong></p>
+</blockquote>
+<p><strong>Replica Set Arbiter</strong></p>
+<blockquote>
+<p>An arbiter <strong>does not maintain a copy of the data set</strong> but participate in <strong>elections.</strong></p>
+</blockquote>
+<a id="more"></a>
+<p>观察上面提到的集中成员，归根结底就是两种 Primary和Secondary，只不过Secondary根据不用的用途再次划分了。</p>
+<blockquote>
+<p>Most deployments, however, will keep three members that store data: A primary and two secondary members.</p>
+</blockquote>
+<p>这句话说明了正常情况下，会有一个primary节点和两个secondare节点。</p>
+<p>在mongodb3.0.0以后的版本，最多可以有50个节点，但是只能有7个投票的节点</p>
+<blockquote>
+<p>Changed in version 3.0.0: A replica set can have up to 50 members but only 7 voting members</p>
+</blockquote>
+<p>那如果超过了50个节点，应该采用master-slave的模式了。但是master-slave的模式就不能自动的故障恢复了。(不能像副本集那样自动选举主节点)</p>
+<p>##Primary节点<br>primary节点是在副本集中唯一能够接受写操作的节点。Mongodb将这些写操作应用到primary节点中，然后将这些操作记录在primary节点的oplog中。 Secondary节点复制这个oplog，并将里面的操作应用到自己的数据库中。（和Redis的aop备份方式一样的道理）</p>
+<p><img src="http://docs.mongodb.org/manual/_images/replica-set-read-write-operations-primary.png" alt=""></p>
+<p>在上图中，有三个节点的副本集，primary节点接受所有的写操作。然后Secondary节点从primary节点复制oplog并应用到他们的数据集里面。</p>
+<p>所有的副本集成员都能够接受读的请求。但是默认情况下，应用程序会将读请求定向到primary节点、这个是可以修改的。</p>
+<p>一个副本集最多只能拥有一个Primary节点，一旦这个Primary节点变得不可用了，副本集就会选出一个Secondary，让它成为新的Primary节点。</p>
+<p><img src="http://docs.mongodb.org/manual/_images/replica-set-trigger-election.png" alt=""></p>
+<h2 id="Secondary节点"><a href="#Secondary节点" class="headerlink" title="Secondary节点"></a>Secondary节点</h2><p>上文中提到了，Secondary节点维护者primary节点的数据拷贝。一个副本集能够拥有一个或多个Secondary节点。</p>
+<p>尽管客户端不能往Secondary节点写入数据，但是能够从Secondary节点读取数据。</p>
+<p>一个Secondary节点也能成为primary节点，当primary节点变得不可用的时候，Replica Sets（副本集）会选举出新的Primary节点（是否是Zookeeper的master选举方式呢？还不清楚）。</p>
+<p>对于Secondary节点，我们可以根据不能的目的，将secondary节点配置成不同用途的secondary：</p>
+<ul>
+<li>Priority 0 Replica Set Members</li>
+<li>Hidden Replica Set Members.</li>
+<li>Delayed Replica Set Members.</li>
+</ul>
+<p><strong>Priority 0 Replica Set Members</strong></p>
+<blockquote>
+<p>阻止Secondary成为Primary节点，可用来让其一直处于secondar状态，只读。或者做冷备份。</p>
+<p>如果一个副本集中的机器配置都不一样的话，可以将性能不那么优秀的机器配置成priority 0 的 Secondary节点。这样的话就能够保证只有高性能机器能够成为Primary节点了。当然，这种是备份的目的，也可以考虑将这样的节点设置成Hidden节点</p>
+</blockquote>
+<p><strong>Hidden Replica Set Members</strong></p>
+<blockquote>
+<p>应用程序都无法访问的节点。可以用来做备份</p>
+<p>Hidden Member必须是priority 0 成员节点。那样才能不成为Primary节点。（对客户端都不可见，成为Primary节点太危险,太诡异）</p>
+<p>虽然Hidden节点对客户端不可见，而且不能成为Primary节点，但是当Primary节点挂掉的时候可以参与投票。</p>
+</blockquote>
+<p><strong>Delayed Replica Set Members</strong></p>
+<blockquote>
+<p>历史副本的镜像备份，具备延迟性，方便从致命性的错误中恢复回来，如：无意的删除数据库或者集合。</p>
+<p>例如，当前时间 9:50，然后delayed memeber设置一小时的延迟，那么这个delayed member的数据是8:50之前的数据。</p>
+<p>Delayed member必须是priority 0 memeber，这样不能成为primary节点。应该是hidden member，这样能够阻止应用程序访问delayed member。</p>
+</blockquote>
+<h4 id="Arbiter"><a href="#Arbiter" class="headerlink" title="Arbiter"></a>Arbiter</h4><p>一个arbiter节点不会拥有数据拷贝，也不能成为主节点。它只能在选举Primary节点的时候参与投票。而且只能投出一票。</p>
+<p>如果有有偶数台机器，那么加上一台arbiter，(arbiter也就这时候用吧？) 因为arbiter member需要很少的资源，随便再加一台普通的机子即可。</p>
+<blockquote>
+<p><strong>IMPORTANT</strong></p>
+<p>Do not run an arbiter on systems that also host the primary or the secondary members of the replica set.</p>
+<p>即Arbiter节点不要和primary或者secondar节点在同一台机器上。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="http://docs.mongodb.org/manual/core/replication/" target="_blank" rel="external">http://docs.mongodb.org/manual/core/replication/</a></p>
+<p>《MongoDB权威指南》</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/09/MongoDB学习札记-第八篇-Replica-Set-实战/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/08/MongoDB学习札记-第六篇-主从复制/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/09/MongoDB学习札记-第七篇-Replica-Set-概念/" data-title="MongoDB学习札记 第七篇 Replica Set 核心概念" data-url="http://webinglin.github.io/2015/06/09/MongoDB学习札记-第七篇-Replica-Set-概念/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-09 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/MongoDB/">MongoDB<span>10</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

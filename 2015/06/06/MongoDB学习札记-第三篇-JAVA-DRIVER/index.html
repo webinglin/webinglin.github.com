@@ -1,0 +1,533 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MongoDB学习札记 第三篇 JAVA-DRIVER | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="环境准备：
+
+mongo能够正常运行，可参考第一篇文章的介绍
+如果已经有demo数据库了，建议删除，确保数据干净。 
+
+use demo switched to db demodb.dropDatabase() { “dropped” : “demo”, “ok” : 1 }">
+  
+  <meta name="keywords" content="mongodb,mongo,java mongo,mongodb-java,mongo JAVA驱动">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MongoDB学习札记 第三篇 JAVA-DRIVER"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MongoDB学习札记 第三篇 JAVA-DRIVER</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <p>环境准备：</p>
+<ol>
+<li>mongo能够正常运行，可参考第一篇文章的介绍</li>
+<li><p>如果已经有demo数据库了，建议删除，确保数据干净。 </p>
+<blockquote>
+<p>use demo<br> switched to db demo<br>db.dropDatabase()<br> { “dropped” : “demo”, “ok” : 1 }</p>
+</blockquote>
+</li>
+</ol>
+<a id="more"></a>
+<p>本文并没有开启用户认证，直接操作。使用gradle来构建工程。(Gradle怎么使用，参考我的关于gradle介绍的文章)</p>
+<p>创建项目 mongo ，并在根目录下面创建 build.gradle 文件</p>
+<pre><code>apply plugin:&quot;java&quot;
+apply plugin:&quot;eclipse&quot;
+
+repositories{
+    mavenCentral()
+}
+
+dependencies{
+    compile &apos;org.mongodb:mongo-java-driver:3.0.2&apos;
+}
+</code></pre><p>此外，还要创建和maven那样约定好的源文件，暂不用test的目录</p>
+<pre><code>└─src
+   └─main
+       ├─java
+       └─resources
+</code></pre><p>那么我们以后的源代码会放在java目录底下，资源文件会放到resources目录底下。</p>
+<p>下面我们就开始我们的mongo-java之旅了。</p>
+<p>我们在mongo项目根路径 运行 <code>&gt; gradle cleanEclipse eclipse</code> 来生成Eclipse的java项目。然后通过Eclipse的Import… 功能来引入我们的mongo项目，如图</p>
+<pre><code>D:\workspace_myeclipse\mongo&gt;gradle cleanEclipse eclipse
+</code></pre><p><img src="http://i1.tietuku.com/9cbe5670da9ecdf4.jpg" alt=""></p>
+<p>HelloMongo.java的源码如下：</p>
+<pre><code>package com.piedra.mongo;
+
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.lte;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.Block;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+
+/**
+ * HelloMongo 
+ * 参考: http://mongodb.github.io/mongo-java-driver/3.0/driver/getting-started/quick-tour/
+ * @author LINWENBIN
+ * @since 2015-6-6
+ */
+public class HelloMongo {
+
+    /**
+     * 往集合里面插入一条数据
+     * @param coll
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void insertOne(MongoCollection&lt;Document&gt; coll){
+        /*
+        {
+           &quot;name&quot; : &quot;MongoDB&quot;,
+           &quot;type&quot; : &quot;database&quot;,
+           &quot;count&quot; : 1,
+           &quot;info&quot; : {
+                       x : 203,
+                       y : 102
+                     }
+        }
+        */
+        System.out.println(&quot;insertOne 插入记录之前 users集合的数量:&quot; + coll.count());
+
+        Document doc = new Document(&quot;name&quot;,&quot;MongoDB&quot;)
+        .append(&quot;type&quot;,&quot;database&quot;).append(&quot;count&quot;, 1).append(&quot;info&quot;, new Document(&quot;x&quot;,&quot;203&quot;).append(&quot;y&quot;,&quot;102&quot;));
+
+        coll.insertOne(doc);
+
+        System.out.println(&quot;insertOne 插入记录之后 users集合的数量:&quot; + coll.count());
+    }
+
+    /**
+     * 插入多条数据
+     * @param coll
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void insertMany(MongoCollection&lt;Document&gt; coll){
+        /*
+         * 循环插入 {&quot;i&quot; : i}的document
+         */
+        List&lt;Document&gt; docs = new ArrayList&lt;Document&gt;();
+        for(int i=0; i&lt;10; i++){
+            docs.add(new Document(&quot;i&quot;,i));
+        }
+
+        coll.insertMany(docs);
+
+        System.out.println(&quot;insertMany 插入10条 {i:i} 记录之后 users集合的数量:&quot; + coll.count());        
+    }
+
+    /**
+     * 查询集合coll中的所有数据
+     * @param coll
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void findAll(MongoCollection&lt;Document&gt; coll){
+        MongoCursor&lt;Document&gt; cursor = coll.find().iterator();
+        try {
+            System.out.println(&quot;findAll 打印结果：&quot;);
+            while(cursor.hasNext()){
+                System.out.println(cursor.next().toJson());
+            }
+        } finally {
+            cursor.close();
+        }
+    }
+
+    /**
+     * 查询满足条件的第一条数据
+     * @param coll
+     * @param filter
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void findSpecifyDoc(MongoCollection&lt;Document&gt; coll, Bson filter){
+        System.out.println(&quot;findSpecifyDoc 打印结果：&quot;);
+        System.out.println(coll.find(filter).first().toJson());
+    }
+
+    /**
+     * 查询满足条件的文档集合
+     * @param coll
+     * @param filter
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void findDocs(MongoCollection&lt;Document&gt; coll, Bson filter){
+        Block&lt;Document&gt; printBlock = new Block&lt;Document&gt;() {
+             @Override
+             public void apply(final Document document) {
+                 System.out.println(document.toJson());
+             }
+        };
+        System.out.println(&quot;findDocs 打印结果：&quot;);
+        coll.find(filter).forEach(printBlock);
+    }
+
+    /**
+     * 更新文档属性
+     * @param coll        要操作的集合
+     * @param criteria    要更新的文档过滤条件
+     * @param newDoc    新的文档属性
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void update(MongoCollection&lt;Document&gt; coll, Bson criteria, Document newDoc){
+        coll.updateMany(criteria, new Document(&quot;$set&quot;,newDoc));
+    }
+
+    /**
+     * 删除文档
+     * @param coll
+     * @param criteria
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void delete(MongoCollection&lt;Document&gt; coll, Bson criteria){
+        coll.deleteMany(criteria);
+    }
+
+    public static void main(String[] args) {
+        HelloMongo helloMongo = new HelloMongo();
+
+        //mongoClient实例本身代表着数据库的连接池
+        MongoClient mongoClient = new MongoClient(&quot;127.0.0.1&quot;, 27017);
+        /**
+         * Calling the getDatabase() on MongoClient does not create a database. 
+         * Only when a database is written to will a database be created
+         */
+        MongoDatabase db = mongoClient.getDatabase(&quot;demo&quot;);
+        MongoCollection&lt;Document&gt; users = db.getCollection(&quot;users&quot;);
+
+
+        helloMongo.insertOne(users);
+        helloMongo.insertMany(users);
+        helloMongo.findAll(users);
+        helloMongo.findSpecifyDoc(users, eq(&quot;i&quot;,5));
+        helloMongo.findDocs(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+
+        helloMongo.update(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)), new Document(&quot;ii&quot;,99));
+        helloMongo.findDocs(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+
+        helloMongo.delete(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+        helloMongo.findDocs(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+
+        //销毁
+        mongoClient.dropDatabase(&quot;demo&quot;);
+        //关闭数据库连接
+        mongoClient.close();
+    }
+}
+</code></pre><p>打印结果：</p>
+<pre><code>insertOne 插入记录之前 users集合的数量:0
+insertOne 插入记录之后 users集合的数量:1
+insertMany 插入10条 {i:i} 记录之后 users集合的数量:11
+findAll 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bd8&quot; }, &quot;name&quot; : &quot;MongoDB&quot;, &quot;type&quot; : &quot;database&quot;, &quot;count&quot; : 1, &quot;info&quot; : { &quot;x&quot; : &quot;203&quot;, &quot;y&quot; : &quot;102&quot; } }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bd9&quot; }, &quot;i&quot; : 0 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bda&quot; }, &quot;i&quot; : 1 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdb&quot; }, &quot;i&quot; : 2 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdc&quot; }, &quot;i&quot; : 3 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdd&quot; }, &quot;i&quot; : 4 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bde&quot; }, &quot;i&quot; : 5 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdf&quot; }, &quot;i&quot; : 6 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be0&quot; }, &quot;i&quot; : 7 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be1&quot; }, &quot;i&quot; : 8 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be2&quot; }, &quot;i&quot; : 9 }
+findSpecifyDoc 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bde&quot; }, &quot;i&quot; : 5 }
+findDocs 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be0&quot; }, &quot;i&quot; : 7 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be1&quot; }, &quot;i&quot; : 8 }
+findDocs 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be0&quot; }, &quot;i&quot; : 7, &quot;ii&quot; : 99 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be1&quot; }, &quot;i&quot; : 8, &quot;ii&quot; : 99 }
+findDocs 打印结果：
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/06/Ubuntu桌面操作系统札记/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/05/MongoDB学习札记-第二篇-mongodb安全/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/06/MongoDB学习札记-第三篇-JAVA-DRIVER/" data-title="MongoDB学习札记 第三篇 JAVA-DRIVER" data-url="http://webinglin.github.io/2015/06/06/MongoDB学习札记-第三篇-JAVA-DRIVER/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-06 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/MongoDB/">MongoDB<span>10</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

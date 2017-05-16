@@ -1,0 +1,3148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+    
+    <entry>
+      <title><![CDATA[引用awesome打造漂亮图标]]></title>
+      <url>http://webinglin.github.io/2017/05/16/%E5%BC%95%E7%94%A8awesome%E6%89%93%E9%80%A0%E6%BC%82%E4%BA%AE%E5%9B%BE%E6%A0%87/</url>
+      <content type="html"><![CDATA[<blockquote>
+<ol>
+<li>引用css文件 <link rel="stylesheet" href="${URL}/css/common/awesome/css/font-awesome.min.css"></li>
+<li>将awesome文件引入工程路径，并修改font-awesome.min.css的字体文件路径。</li>
+</ol>
+<p>如果你也不想修改字体的路径，可以按照如下目录结构放置即可</p>
+<p>-awesome</p>
+<p>​    -css</p>
+<p>​        font-awesome.min.css</p>
+<p>​    -font</p>
+<p>​        fontawesome-webfont.woff</p>
+<p>​        … and so on</p>
+</blockquote>
+<p>用法讲解：</p>
+<p>只需要将<code>&lt;i class=&quot;icon-search&quot;&gt;&lt;/i&gt;</code> 添加到想要设置图标的文字之前即可。加上空格会更美观</p>
+<p>如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;button&gt;&lt;i class=&quot;icon-search&quot;&gt;&lt;/i&gt; 搜索&lt;/button&gt;</div></pre></td></tr></table></figure>
+<p>icon-search 这样的图标样式awesome都已经帮我们定义好了，我们只需要引用即可。</p>
+<p>下面用一幅图展示截取截止目前可用的图标样式:（来源官网）</p>
+<a id="more"></a>
+<p><img src="https://github.com/webinglin/blogImages/blob/master/awesome-icons.png?raw=true" alt=""></p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://www.bootcss.com/p/font-awesome/" target="_blank" rel="external">font-awesome</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Java执行Python、Shell]]></title>
+      <url>http://webinglin.github.io/2017/05/04/Java%E6%89%A7%E8%A1%8CPython%E3%80%81Shell/</url>
+      <content type="html"><![CDATA[<h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>​    使用阿里的datax进行数据的同步，一开始用手动同步，在shell命令行执行python命令，没毛病。现在需要改成定时自动增量同步。所以使用Spring来实现定时任务的执行。这就涉及到使用JAVA来调用python脚本了，执行后，发现数据都没有同步成功。</p>
+<h3 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h3><p>​    一开始用Process对象的getInputStream()获取输出结果，只有部分的输出结果，对比直接在shell命令行执行的输出结果还少了很多日志打印。</p>
+<p>​    接着就怀疑是不是datax打印的日志太多了导致语句不能正常执行，于是就把logback.xml的stdout输出注释掉。问题依旧。</p>
+<p>​    于是就在想怎么查看错误日志，看了datax的log目录底下的日志，没有错误信息。 通过 Process对象的 getErrorStream查看到了错误信息：     <code>/bin/sh/: java : command not found</code></p>
+<a id="more"></a>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>​    报错的原因是java在执行python脚本的时候，默认是用系统的/bin/目录下的命令。 错误提示java命令找不到，那么就需要将java命令添加到/bin/目录底下，通过建立link来关联 java的命令</p>
+<p><code>ln -s /usr/jdk1.7/bin java</code></p>
+<p>再次通过java执行python脚本进行数据同步，同步成功。</p>
+<h3 id="部分源码"><a href="#部分源码" class="headerlink" title="部分源码"></a>部分源码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">Process process = Runtime.getRuntime().exec(cmds);</div><div class="line">process.waitFor();</div><div class="line"></div><div class="line"><span class="comment">// 打印正常的输出结果</span></div><div class="line">in = process.getInputStream();</div><div class="line">reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(in));</div><div class="line">logger.info(<span class="string">"执行命令结果:"</span>);</div><div class="line">String line ;</div><div class="line"><span class="keyword">while</span>((line = reader.readLine()) != <span class="keyword">null</span>) &#123;</div><div class="line">	logger.info(<span class="string">"&#123;&#125;"</span>, line);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 打印错误的输出结果</span></div><div class="line">List&lt;String&gt; errorLines = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">errReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(process.getErrorStream()));</div><div class="line"><span class="keyword">while</span>((line = errReader.readLine()) != <span class="keyword">null</span>) &#123;</div><div class="line">	errorLines.add(line);</div><div class="line">&#125;</div><div class="line"><span class="keyword">if</span>(errorLines.size()&gt;<span class="number">0</span>) &#123;</div><div class="line">	logger.error(<span class="string">"执行命令出错信息:"</span>);</div><div class="line">	<span class="keyword">for</span>(String errorLine : errorLines)&#123;</div><div class="line">		logger.error(errorLine);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://webinglin.github.io/">webinglin.github.io</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Ubuntu安装后传]]></title>
+      <url>http://webinglin.github.io/2017/01/14/Ubuntu%E5%AE%89%E8%A3%85%E5%90%8E%E4%BC%A0/</url>
+      <content type="html"><![CDATA[<h2 id="替换阿里源"><a href="#替换阿里源" class="headerlink" title="替换阿里源"></a>替换阿里源</h2><ol>
+<li><code>cd /etc/apt</code></li>
+<li><code>sudo cp sources.list sources.list.bak</code></li>
+<li><code>sudo vim sources.list</code></li>
+<li>删除原来的源，替换成下面的三个源</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"># 阿里源</div><div class="line">deb-src http://archive.ubuntu.com/ubuntu xenial main restricted #Added by software-properties</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted</div><div class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial main restricted multiverse universe #Added by software-properties</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted</div><div class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted multiverse universe #Added by software-properties</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial universe</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates universe</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial multiverse</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-updates multiverse</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse</div><div class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse #Added by software-properties</div><div class="line">deb http://archive.canonical.com/ubuntu xenial partner</div><div class="line">deb-src http://archive.canonical.com/ubuntu xenial partner</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted</div><div class="line">deb-src http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted multiverse universe #Added by software-properties</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security universe</div><div class="line">deb http://mirrors.aliyun.com/ubuntu/ xenial-security multiverse</div><div class="line"></div><div class="line"># 东北大学</div><div class="line">deb-src http://mirror.neu.edu.cn/ubuntu/ xenial main restricted #Added by software-properties</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial main restricted</div><div class="line">deb-src http://mirror.neu.edu.cn/ubuntu/ xenial restricted multiverse universe #Added by software-properties</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial-updates main restricted</div><div class="line">deb-src http://mirror.neu.edu.cn/ubuntu/ xenial-updates main restricted multiverse universe #Added by software-properties</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial universe</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial-updates universe</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial multiverse</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial-updates multiverse</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</div><div class="line">deb-src http://mirror.neu.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse #Added by software-properties</div><div class="line">deb http://archive.canonical.com/ubuntu xenial partner deb-src http://archive.canonical.com/ubuntu xenial partner</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial-security main restricted</div><div class="line">deb-src http://mirror.neu.edu.cn/ubuntu/ xenial-security main restricted multiverse universe #Added by software-properties</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial-security universe</div><div class="line">deb http://mirror.neu.edu.cn/ubuntu/ xenial-security multiverse</div><div class="line"></div><div class="line"># 清华大学</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial universe</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates universe</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial multiverse</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates multiverse</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted</div><div class="line">deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security universe deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security multiverse</div></pre></td></tr></table></figure>
+<ol>
+<li><p>替换好源之后，执行<code>sudo apt-get update</code> 　更新</p>
+<p>​<a id="more"></a></p>
+</li>
+</ol>
+<h2 id="清理不常用软件"><a href="#清理不常用软件" class="headerlink" title="清理不常用软件"></a>清理不常用软件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">sudo apt-get remove libreoffice-common	</div><div class="line">sudo apt-get remove unity-webapps-common </div><div class="line">sudo apt-get remove thunderbird totem rhythmbox empathy brasero simple-scan gnome-mahjongg aisleriot </div><div class="line">sudo apt-get remove gnome-mines cheese transmission-common gnome-orca webbrowser-app gnome-sudoku  landscape-client-ui-install  </div><div class="line">sudo apt-get remove onboard deja-dup</div></pre></td></tr></table></figure>
+<h2 id="更新Home目录中文名称为英文"><a href="#更新Home目录中文名称为英文" class="headerlink" title="更新Ｈome目录中文名称为英文"></a>更新Ｈome目录中文名称为英文</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt; export LANG=en_US</div><div class="line">&gt; xdg-user-dirs-gtk-update</div><div class="line">这时候会弹出界面，让我们选择是否更新名称，　选择是即可</div><div class="line">&gt; export LANG=zh_CN</div><div class="line">重启，会再次提示是否修改，　这时候，我们选择不修改，保留英文即可。　然后选择不再提示</div></pre></td></tr></table></figure>
+<h2 id="禁用宾客会话"><a href="#禁用宾客会话" class="headerlink" title="禁用宾客会话"></a>禁用宾客会话</h2><p>如果没有lightdm.conf 那么就新建一个<br><code>sudo vim /etc/lightdm/lightdm.conf</code></p>
+<p>接着将这段代码复制黏贴</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[SeatDefaults]</div><div class="line">greeter-session=unity-greeter</div><div class="line">allow-guest=false</div></pre></td></tr></table></figure>
+<p>保存之后，重启一下lightdm　就不会有来宾账号了</p>
+<p><code>service lightdm restart</code></p>
+<h2 id="安装常用软件"><a href="#安装常用软件" class="headerlink" title="安装常用软件"></a>安装常用软件</h2><blockquote>
+<p>常用软件安装到SSD, 像idea和jdk也都拷贝到SSD上</p>
+</blockquote>
+<h4 id="安装Typora"><a href="#安装Typora" class="headerlink" title="安装Typora"></a>安装Typora</h4><p>直接复制执行即可。如果安装没成功，重新执行一遍</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># optional, but recommended</div><div class="line">sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE</div><div class="line"># add Typora&apos;s repository</div><div class="line">sudo add-apt-repository &apos;deb https://typora.io ./linux/&apos;</div><div class="line">sudo apt-get update</div><div class="line"># install typora</div><div class="line">sudo apt-get install typora</div></pre></td></tr></table></figure>
+<h4 id="安装网易云音乐"><a href="#安装网易云音乐" class="headerlink" title="安装网易云音乐"></a>安装网易云音乐</h4><ol>
+<li><p>到官网下载 .deb软件包</p>
+</li>
+<li><p>重新配置依赖</p>
+<p><code>sudo apt-get -f install</code></p>
+</li>
+<li><p><code>sudo dpkg -i netease-cloud-music_1.0.0_amd64_ubuntu16.04.deb</code></p>
+</li>
+</ol>
+<p>安装之后就可以在 Dash中搜索到云音乐了，　或者执行<code>&gt; netease-cloud-music</code> 就可以启动网易云音乐了</p>
+<h4 id="安装JDK"><a href="#安装JDK" class="headerlink" title="安装JDK"></a>安装JDK</h4><p>官网下载linux_jdk1.8_x64，　解压</p>
+<p>配置环境变量</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&gt; sudo vim /etc/profile</div><div class="line"></div><div class="line"><span class="comment"># 将下面的环境变量设置拷贝到.profile文件的末尾</span></div><div class="line"><span class="built_in">export</span> JAVA_HOME=/usr/lib/jvm/jdk1.7.0_55   </div><div class="line"><span class="built_in">export</span> JRE_HOME=<span class="variable">$&#123;JAVA_HOME&#125;</span>/jre  </div><div class="line"><span class="built_in">export</span> CLASSPATH=.:<span class="variable">$&#123;JAVA_HOME&#125;</span>/lib:<span class="variable">$&#123;JRE_HOME&#125;</span>/lib  </div><div class="line"><span class="built_in">export</span> PATH=<span class="variable">$&#123;JAVA_HOME&#125;</span>/bin:<span class="variable">$PATH</span></div><div class="line"></div><div class="line"><span class="comment"># 执行source命令，让环境变量立刻生效</span></div><div class="line">&gt; <span class="built_in">source</span> /etc/profile</div><div class="line">&gt; java -version</div></pre></td></tr></table></figure>
+<h4 id="安装IDEA"><a href="#安装IDEA" class="headerlink" title="安装IDEA"></a>安装IDEA</h4><p>官网下载IDEA　Linux版，执行　bin/idea.sh　即可启动 </p>
+<p>IDEA2016 注册码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">43B4A73YYJ-eyJsaWNlbnNlSWQiOiI0M0I0QTczWVlKIiwibGljZW5zZWVOYW1lIjoibGFuIHl1IiwiYXNzaWduZWVOYW1lIjoiIiwiYXNzaWduZWVFbWFpbCI6IiIsImxpY2Vuc2VSZXN0cmljdGlvbiI6IkZvciBlZHVjYXRpb25hbCB1c2Ugb25seSIsImNoZWNrQ29uY3VycmVudFVzZSI6ZmFsc2UsInByb2R1Y3RzIjpbeyJjb2RlIjoiSUkiLCJwYWlkVXBUbyI6IjIwMTctMDItMjUifSx7ImNvZGUiOiJBQyIsInBhaWRVcFRvIjoiMjAxNy0wMi0yNSJ9LHsiY29kZSI6IkRQTiIsInBhaWRVcFRvIjoiMjAxNy0wMi0yNSJ9LHsiY29kZSI6IlBTIiwicGFpZFVwVG8iOiIyMDE3LTAyLTI1In0seyJjb2RlIjoiRE0iLCJwYWlkVXBUbyI6IjIwMTctMDItMjUifSx7ImNvZGUiOiJDTCIsInBhaWRVcFRvIjoiMjAxNy0wMi0yNSJ9LHsiY29kZSI6IlJTMCIsInBhaWRVcFRvIjoiMjAxNy0wMi0yNSJ9LHsiY29kZSI6IlJDIiwicGFpZFVwVG8iOiIyMDE3LTAyLTI1In0seyJjb2RlIjoiUEMiLCJwYWlkVXBUbyI6IjIwMTctMDItMjUifSx7ImNvZGUiOiJSTSIsInBhaWRVcFRvIjoiMjAxNy0wMi0yNSJ9LHsiY29kZSI6IldTIiwicGFpZFVwVG8iOiIyMDE3LTAyLTI1In0seyJjb2RlIjoiREIiLCJwYWlkVXBUbyI6IjIwMTctMDItMjUifSx7ImNvZGUiOiJEQyIsInBhaWRVcFRvIjoiMjAxNy0wMi0yNSJ9XSwiaGFzaCI6IjMzOTgyOTkvMCIsImdyYWNlUGVyaW9kRGF5cyI6MCwiYXV0b1Byb2xvbmdhdGVkIjpmYWxzZSwiaXNBdXRvUHJvbG9uZ2F0ZWQiOmZhbHNlfQ==-keaxIkRgXPKE4BR/ZTs7s7UkP92LBxRe57HvWamu1EHVXTcV1B4f/KNQIrpOpN6dgpjig5eMVMPmo7yMPl+bmwQ8pTZaCGFuLqCHD1ngo6ywHKIQy0nR249sAUVaCl2wGJwaO4JeOh1opUx8chzSBVRZBMz0/MGyygi7duYAff9JQqfH3p/BhDTNM8eKl6z5tnneZ8ZG5bG1XvqFTqWk4FhGsEWdK7B+He44hPjBxKQl2gmZAodb6g9YxfTHhVRKQY5hQ7KPXNvh3ikerHkoaL5apgsVBZJOTDE2KdYTnGLmqxghFx6L0ofqKI6hMr48ergMyflDk6wLNGWJvYHLWw==-MIIEPjCCAiagAwIBAgIBBTANBgkqhkiG9w0BAQsFADAYMRYwFAYDVQQDDA1KZXRQcm9maWxlIENBMB4XDTE1MTEwMjA4MjE0OFoXDTE4MTEwMTA4MjE0OFowETEPMA0GA1UEAwwGcHJvZDN5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxcQkq+zdxlR2mmRYBPzGbUNdMN6OaXiXzxIWtMEkrJMO/5oUfQJbLLuMSMK0QHFmaI37WShyxZcfRCidwXjot4zmNBKnlyHodDij/78TmVqFl8nOeD5+07B8VEaIu7c3E1N+e1doC6wht4I4+IEmtsPAdoaj5WCQVQbrI8KeT8M9VcBIWX7fD0fhexfg3ZRt0xqwMcXGNp3DdJHiO0rCdU+Itv7EmtnSVq9jBG1usMSFvMowR25mju2JcPFp1+I4ZI+FqgR8gyG8oiNDyNEoAbsR3lOpI7grUYSvkB/xVy/VoklPCK2h0f0GJxFjnye8NT1PAywoyl7RmiAVRE/EKwIDAQABo4GZMIGWMAkGA1UdEwQCMAAwHQYDVR0OBBYEFGEpG9oZGcfLMGNBkY7SgHiMGgTcMEgGA1UdIwRBMD+AFKOetkhnQhI2Qb1t4Lm0oFKLl/GzoRykGjAYMRYwFAYDVQQDDA1KZXRQcm9maWxlIENBggkA0myxg7KDeeEwEwYDVR0lBAwwCgYIKwYBBQUHAwEwCwYDVR0PBAQDAgWgMA0GCSqGSIb3DQEBCwUAA4ICAQC9WZuYgQedSuOc5TOUSrRigMw4/+wuC5EtZBfvdl4HT/8vzMW/oUlIP4YCvA0XKyBaCJ2iX+ZCDKoPfiYXiaSiH+HxAPV6J79vvouxKrWg2XV6ShFtPLP+0gPdGq3x9R3+kJbmAm8w+FOdlWqAfJrLvpzMGNeDU14YGXiZ9bVzmIQbwrBA+c/F4tlK/DV07dsNExihqFoibnqDiVNTGombaU2dDup2gwKdL81ua8EIcGNExHe82kjF4zwfadHk3bQVvbfdAwxcDy4xBjs3L4raPLU3yenSzr/OEur1+jfOxnQSmEcMXKXgrAQ9U55gwjcOFKrgOxEdek/Sk1VfOjvS+nuM4eyEruFMfaZHzoQiuw4IqgGc45ohFH0UUyjYcuFxxDSU9lMCv8qdHKm+wnPRb0l9l5vXsCBDuhAGYD6ss+Ga+aDY6f/qXZuUCEUOH3QUNbbCUlviSz6+GiRnt1kA9N2Qachl+2yBfaqUqr8h7Z2gsx5LcIf5kYNsqJ0GavXTVyWh7PYiKX4bs354ZQLUwwa/cG++2+wNWP+HtBhVxMRNTdVhSm38AknZlD+PTAsWGu9GyLmhti2EnVwGybSD2Dxmhxk3IPCkhKAK+pl0eWYGZWG3tJ9mZ7SowcXLWDFAk0lRJnKGFMTggrWjV8GYpw5bq23VmIqqDLgkNzuoog==</div></pre></td></tr></table></figure>
+<h4 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h4><ol>
+<li>nodejs官网下载最新的版本，解压，然后将bin目录添加到 /etc/profile　文件中</li>
+<li>安装npm , <code>sudo apt-get install npm</code></li>
+<li>npm升级到最新， <code>npm i -g npm@latest</code></li>
+<li><code>npm install -g hexo-cli</code></li>
+</ol>
+<h2 id="替换hosts文件"><a href="#替换hosts文件" class="headerlink" title="替换hosts文件"></a>替换hosts文件</h2><p><a href="https://laod.cn/hosts/2017-google-hosts.html" target="_blank" rel="external">https://laod.cn/hosts/2017-google-hosts.html</a></p>
+<p>(网盘备份)</p>
+<h2 id="备份和还原Ubuntu"><a href="#备份和还原Ubuntu" class="headerlink" title="备份和还原Ubuntu"></a>备份和还原Ubuntu</h2><h4 id="备份系统"><a href="#备份系统" class="headerlink" title="备份系统"></a>备份系统</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># su root</div><div class="line"># tar cvpzf backup.tar.gz --exclude=/proc --exclude=/lost+found --exclude=/backup.tar.gz --exclude=/mnt --exclude=/sys --exclude=/media --exclude=/cdrom --exclude=/tmp  /</div></pre></td></tr></table></figure>
+<blockquote>
+<p>“tar”当然就是我们备份系统所使用的程序了。</p>
+<p>“cvpfz”是tar的选项，意思是“创建档案文件”、“保持权限”(保留所有东西原来的权限)、“使用gzip来减小文件尺寸”。</p>
+<p>“backup.tar.gz”是我们将要得到的档案文件的文件名。</p>
+<p>“/”是我们要备份的目录，在这里是整个文件系统。</p>
+<p>在 档案文件名“backup.gz”和要备份的目录名“/”之间给出了备份时必须排除在外的目录。有些目录是无用的，例如“/proc”、“/lost+ found”、“/sys”。当然，“backup.gz”这个档案文件本身必须排除在外，否则你可能会得到一些超出常理的结果。如果不把“/mnt”排 除在外，那么挂载在“/mnt”上的其它分区也会被备份。另外需要确认一下“/media”上没有挂载任何东西(例如光盘、移动硬盘)，如果有挂载东西， 必须把“/media”也排除在外。 </p>
+</blockquote>
+<h4 id="还原系统"><a href="#还原系统" class="headerlink" title="还原系统"></a>还原系统</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># su root</span></div><div class="line"><span class="comment"># tar xvpfz backup.tar.gz -C /	</span></div><div class="line"></div><div class="line"><span class="comment"># 恢复命令结束时，你的工作还没完成，别忘了重新创建那些在备份时被排除在外的目录：</span></div><div class="line"><span class="comment"># mkdir proc</span></div><div class="line"><span class="comment"># mkdir lost+found</span></div><div class="line"><span class="comment"># mkdir mnt</span></div><div class="line"><span class="comment"># mkdir sys</span></div><div class="line"><span class="comment"># mkdir media</span></div><div class="line"><span class="comment"># mkdir cdrom</span></div><div class="line"><span class="comment"># mkdir tmp</span></div></pre></td></tr></table></figure>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="http://webinglin.github.io/">webinglin.github.io</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Spring cron 表达式]]></title>
+      <url>http://webinglin.github.io/2016/03/20/Spring-cron-%E8%A1%A8%E8%BE%BE%E5%BC%8F/</url>
+      <content type="html"><![CDATA[<p>Spring Cron 表达式的格式如下：</p>
+<p><code>秒 分 时 日 月 星期</code></p>
+<pre><code>秒： 0-59
+分： 0-59
+时： 0-23
+日： 1-31
+月： 1-12
+星期：1-7 （1-星期天， 2-星期一，3-星期二，4-星期三 ... ...）
+</code></pre><a id="more"></a>
+<p>特殊字符:</p>
+<pre><code>*  表示任意值，如果放在 小时域 ，表示的就是  每一小时
+
+?  问号只能出现在星期或者日期 这两个域中，用于表示 不是明确的值。 月份中的日期和星期是两个相互排斥的元素，所以，通过问号来表明不指定其中某一个域。
+
+/ 斜杠表示增量， 如 0/5 如果放在分钟，表示 从0分钟开始，每个5分钟执行过一次。  2/10 放在分钟域表示 从2分钟开始，每隔10分钟执行一次。
+
+- 横杠表示范围， 如：  1-5 放在小时域，表示 每天的 1，2，3，4，5 这几个小时执行
+
+, 指定范围， 如： 7,8,9 放在分钟域，表示：　７，８，９　分钟执行
+</code></pre><p>例子：</p>
+<pre><code>0 0 10 * * ?     每天10点 执行
+0 5 10 * * ?     每天10点5分 执行
+0 5 10 ? * *     每天10点5分 执行
+0 5/10 5 * * ?  每天5点 5，15，25，35，45，55 这几个时间点 执行
+0 10 10 ? * 2    每个月星期一，10点10分 执行    
+0 10 10 ? * 1#3 每个月的第三个星期天 执行
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[JQuery滚动加载]]></title>
+      <url>http://webinglin.github.io/2016/01/28/JQuery%E6%BB%9A%E5%8A%A8%E5%8A%A0%E8%BD%BD/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>场景：</p>
+<p>在某系统遇到用户注册这样的功能，而注册需要将注册用户属于哪个单位也选上，以前做出的效果可能没那么理想（以前是用树形结构做的，每展开一级就加载下一级的数据。 因为数据量极大不可能一下子将所有的部门单位都加载出来）。 基于这种情况，我将其改成带搜索功能的输入选择框，并且输入某个关键字之后的弹窗里面的单位列表支持下拉滚动。同时也支持上一级单位和下一级单位的切换。 这样就解决了数据量太多导致树形控件难以使用的问题。 </p>
+</blockquote>
+<p>具体的下拉滚动代码大致如下：</p>
+<a id="more"></a>
+<pre><code>$(&quot;#deptBox&quot;).scroll(function(){
+    var liHeight = $(&quot;#deptBox&quot;).scrollHeight; // 实际内容的高度 如每一个单位由一个 li 元素组成，那么当前页加载出来的 li 元素（如每页20条记录）就是内容的高度了。 理论值 大于等于容器高度
+     var scrollHeight = $(&quot;#deptBox&quot;).scrollTop();// 页面内容往上滚出对话框的高度
+    var dialogHeight = $(&quot;#deptBox&quot;).height(); // 容器的高度
+
+    if((liHeight-scrollHeight-dialogHeight)/dialogHeight &lt; 0.02) { // (liHeight-scrollHeight-dialogHeight) 剩下的在对话框之外的还没看见页面内容 --对话框的下方，还没滚到可视区域
+
+        // 继续加载
+        var subDept = $(&quot;#deptBox&quot;).data(&quot;nodeList&quot;), index = $(&quot;#deptBox&quot;).data(&quot;index&quot;); // subDept 是当前级别的所有单位数据, index表示当前可视化区域已经遍历到第几条数据
+
+        // 已经到底了，不继续加载
+        if(subDept.length == index){
+            $(&quot;#deptBox&quot;).append(&quot;&lt;li&gt; .. 已经到底了，不能继续滚动 .. &lt;/li&gt;&quot;);
+            return false;                
+        }
+
+        var len = index + 20; // 每次下拉20条数据
+        if(len&gt;subDept.length){
+            len = subDept.length;
+        }
+        for(var i=index; i&lt;len; i++){
+            createDeptElement(subDept[i]); // subDept是一个数组，数组的每一个元素表示一个部门单位的内容，包括部门名称，id，路径等信息    
+            // createDeptElement 方法是将部门信息描绘成 li 元素，并且append到 deptBox 容器
+        }    
+        // 每次移动好了下标之后，将下标重新绑定到 deptBox 容器
+        $(&quot;#deptBox&quot;).data(&quot;index&quot;,len);
+    }
+});
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href=""></a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[window.open 窗口存在继续打开]]></title>
+      <url>http://webinglin.github.io/2016/01/28/window-open-%E7%AA%97%E5%8F%A3%E5%AD%98%E5%9C%A8%E7%BB%A7%E7%BB%AD%E6%89%93%E5%BC%80/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>场景： </p>
+<p>用JQuery模拟出类似window桌面, 当点击模拟出来的桌面上的某一个菜单图标的时候，要在浏览器上打开一个新的标签页，代表打开的那个模块， 如果再次点击刚才那个菜单，不能再另开一个标签页，而是让第一次打开的标签页获得焦点。</p>
+<p>于是，就有了下面这段代码, 代码不能直接复用，根据自己需要小小修改一下即可。</p>
+</blockquote>
+<pre><code>-- 其中 win 是全局变量， id 和 url 都是动态的，每一个菜单都有自己的一套配置，basePath 指向web应用的根路径,如： http://127.0.0.1:8080/yourweb/
+
+win = window.open(&quot;&quot;,id+&quot;_window&quot;); 
+if(win.location.href===&quot;about:blank&quot;){
+    // 窗口不存在
+    win = window.open(basePath + url, id+&quot;_window&quot;);
+} else {
+    window.focus();
+    // 如果要刷新 --&gt; win.location.href = basePath + url ;
+}
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MySQL 分区]]></title>
+      <url>http://webinglin.github.io/2016/01/28/MySQL-%E5%88%86%E5%8C%BA/</url>
+      <content type="html"><![CDATA[<h2 id="MySQL分区"><a href="#MySQL分区" class="headerlink" title="MySQL分区"></a>MySQL分区</h2><p>在mysql中如果数据量太大了，除了分表还可以分区。对于单个表进行分区。分区分为横向分区和纵向分区。</p>
+<ul>
+<li>横向分区： 切分行，将某一些行分到某一个分区中。</li>
+<li>纵向分区： 切分列，将某一些列分到某一个分区。</li>
+</ul>
+<p>目前我实践过的是横向分区。</p>
+<p>可以通过下面命令来判断当前的mysql版本支不支持分区</p>
+<p><code>mysql&gt; show variables like &quot;%part%&quot;;</code></p>
+<p>如果支持的话，变量的值是 YES</p>
+<p>分区的方式有好几种，分别是：</p>
+<a id="more"></a>
+<ul>
+<li>Range分区</li>
+<li><p>按照Range分区的话会将数据划分成一个给定的连续区间的行。</p>
+<pre><code>-- 创建Range分区
+CREATE TABLE RES_X (
+    partionKey int(2) not null,
+    val int(10)     
+) engine=MyISAM default CHARTSET=utf8 
+partition by RANGE(partionKey) (
+    partition p0 values less than (1),
+    partition p1 values less then (2),
+    partition p1 values less then (3),
+    partition p1 values less then (4),
+    partition p1 values less then (5)
+) ;
+</code></pre></li>
+</ul>
+<pre><code>-- 查看表是否使用了分区
+show table status;
+
+-- 查看表具有几个分区，分区的方式，每个分区中的记录数
+select * from information_schema.PARTITIONS WHERE TABLE_SCHEMA=schema() and table_name=&apos;RES_X&apos;
+
+-- 查看某查询语句从那个分区中查的数据，可以通过 EXPLAIN 命令
+EXPLAIN PARTITIONS ( SELECT * FROM RES_X WHERE partionKey = xx)
+</code></pre><ul>
+<li><p>list分区</p>
+<pre><code>- 创建 List 分区
+CREATE TABLE RES_X (
+    partionKey int(2) not null,
+    val int(10)     
+) engine=MyISAM default CHARTSET=utf8 
+partition by LIST(partionKey) (
+    partition p0 values in (1,2,3,4),
+    partition p1 values in (5,6,7),
+    partition p1 values in (8,9),
+    partition p1 values in (10,11,12,13),
+    partition p1 values in (14,15)
+) ;
+</code></pre></li>
+<li><p>hash分区</p>
+</li>
+</ul>
+<pre><code>-- 创建Hash分区
+CREATE TABLE RES_X (
+    partionKey int(2) not null,
+    val int(10)     
+) engine=MyISAM default CHARTSET=utf8 
+partition by HASH(partionKey) 
+partitions 4 ;
+</code></pre><ul>
+<li>key分区</li>
+</ul>
+<pre><code>-- 创建KEY分区
+CREATE TABLE RES_X (
+    partionKey int(2) not null,
+    val int(10)     
+) engine=MyISAM default CHARTSET=utf8 
+partition by KEY(partionKey) 
+partitions 4 ;
+</code></pre><p>在实践中使用的是第一种Range分区方式。后面三种分区方式应该也是大同小异，差不了太多。</p>
+<p>在上面创建分区的时候，都指定了表的引擎使用 MyISAM , 那么mysql有哪些引擎，以及各种存储引擎的区别又是什么？</p>
+<h2 id="MySQL存储引擎"><a href="#MySQL存储引擎" class="headerlink" title="MySQL存储引擎"></a>MySQL存储引擎</h2><p>在mysql客户端，通过命令：</p>
+<pre><code>mysql&gt; show engines;
+</code></pre><p>就可以看到Mysql支持的存储引擎</p>
+<h4 id="MyISAM-使用场景"><a href="#MyISAM-使用场景" class="headerlink" title="MyISAM 使用场景"></a>MyISAM 使用场景</h4><p>MyISAM表无法处理事务，所以，如果有事务要求的表不能使用MyISAM引擎。</p>
+<ol>
+<li>MyISAM存储引擎在筛选大量数据是非常迅速。</li>
+</ol>
+<h4 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h4><p>InnoDB是一个健壮的事务型存储引擎。</p>
+<ol>
+<li>要求支持事务的表</li>
+<li>支持自增属性 auto_increment</li>
+<li>更新密集的表。</li>
+<li>外键约束</li>
+</ol>
+<p>目前在应用中也就用了这两种类型的存储引擎。还有几种存储引擎<br>如： MEMORY , MERGE, ARCHIVE。</p>
+<p>通常基本上都用 InnoDB 存储引擎。默认也是这个。 当然，如果遇到数据量很大，基本上只用于查询作用，比如作为某种类型的资源库。 那么可以改用 MyISAM 存储引擎。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Mysql 查询性能优化]]></title>
+      <url>http://webinglin.github.io/2015/12/11/Mysql-%E6%9F%A5%E8%AF%A2%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</url>
+      <content type="html"><![CDATA[<p>先前写过一篇关于Mysql入库性能调优的文章，既然入库了，数据必然是要使用的，查询并以某种可视化的方式展现数据是很常见的使用方式。（如：D3.JS，Echarts，Highchart, i2 或是 其他的可视化工具）。</p>
+<p>寒天一滴水，点点在心头。这里记录下Mysql优化的一些学习笔记。</p>
+<ul>
+<li>对于查询的优化，首先应该避免全表扫描，所以在where 及 order by涉及到的列上建索引。</li>
+</ul>
+<a id="more"></a>
+<ul>
+<li><p>避免使用null值的判断，否则会导致全表扫描。应该在入库的时候设置正确的数据类型，以及默认值。 比如 <code>where col=0 ;</code> 而不应该用 <code>where col is null;</code></p>
+</li>
+<li><p>如果可以，避免使用范围查询，如： !=, &gt; ,&lt; , in , not in , between 等操作符，这些会导致查询不走索引，造成全表扫描。</p>
+</li>
+<li><p>由于Mysql索引符合最左匹配原则，所以 like ‘%str%’ 是不会走索引的。 而 like ‘str%’ 这个确实会走索引的。所以，尽量不要再mysql中做全文检索的操作，这种工作可以用solr，elasticsearch 这种搜索引擎来处理。</p>
+</li>
+<li><p>避免在 where 子句中对字段进行函数操作，这会导致放弃索引而造成全表扫描。</p>
+</li>
+<li><p>对于 in 的操作可以考虑使用 join…on 来关联查询</p>
+</li>
+<li><p>group by col 默认的情况下，group by 会对col进行排序，这就是为什么在使用 explain的时候 在extr这列会有 filesort 。 所以，如果仅仅只需要分组，而不需要排序的话，在 group by 后面加上 order by null ( 如: <code>select username , count(1) as cnt from user group by username order by null ;</code>) 。这样会快很多。因为少了filesort。 filesort是很慢的。</p>
+</li>
+<li><p>整数类型查询不使用引号 。 字符串查询加上引号，否则不会使用索引。 对于字符串的查询不合理的做法：<code>select xx from tb where str=111;</code> ； 合理的查询语句应该是： <code>select xx from tb where str=&#39;111&#39;</code></p>
+</li>
+<li><p>对于select语句，尽量是需要什么就查什么，不要一下子就习惯性的使用 <code>select * from t;</code>， 而应该只把你想要的查出来就好了。 <code>select name from t ;</code> ； 我个人还有一个习惯，在对一张未知的表进行查询之前，习惯性的会先查总数 <code>select count(1) from t;</code> ，如果总数不是太大，就可以直接查所有了。 不然就使用limit限制一下查询条数。</p>
+</li>
+<li><p>说到limit，也有一点值得说的，比如你知道某一个查询结果只会有一条记录，那么可以在查询语句上限制 <code>limit 1;</code> 。 比如在有几条记录，我们想要根据时间，取到最近的一条记录。如果不适用limit的话，我们可能会这样查:<code>select xtime from t where xtime=(select max(xtime) from t) ;</code> 。 所以，用limit的话就变成 <code>select xtime from t order by xtime limit 1 ;</code> 。响应文章开头所属的，对于order by 的列记得建个索引。建索引语法:<code>create index your_idx on tablename(colNmae) l</code></p>
+</li>
+</ul>
+<p>总结： 多用 <strong>EXPLAIN</strong> 分析查询语句</p>
+<h3 id="附-查询缓存相关的命令"><a href="#附-查询缓存相关的命令" class="headerlink" title="(附)查询缓存相关的命令"></a>(附)查询缓存相关的命令</h3><pre><code>-- 设置查询缓存:
+
+-- 查询缓存是否开启， on:表示开启， off:表示关闭
+&gt; select @@query_cache_type;
+&gt; set session query_cache_type=off;
+&gt; set session query_cache_type=on;
+
+-- 查询缓存的大小:
+&gt; select @@global.query_cache_size;
+&gt; set @@global.query_cache_size=1000000;
+
+-- 查询缓存的上限:
+&gt; select @@global.query_cache_limit;
+&gt; set @@global.query_cache_limit=5000000;
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://webinglin.github.io">http://webinglin.github.io</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Mysql 入库性能优化]]></title>
+      <url>http://webinglin.github.io/2015/12/01/Mysql-%E5%85%A5%E5%BA%93%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</url>
+      <content type="html"><![CDATA[<p>最近在开发一个数据量比较大的模块，此模块涉及到要把数据存入中间表，因为数据量太大了，无法一次性的加载到内存中分析。关键是分析的结果还要进行分页，排序，因此保存在中间表方便后续操作。曾想把中间结果存到<em>MongoDB</em>，但是数据量太大了，内存耗不起，况且<em>MongoDB</em> 比较适合存放那些原原本本的数据，查询过程中要尽量避免计算，统计等。 在我们现有的架构中，还有<em>Solr</em>和<em>Mysql</em>，但是由于<em>Solr</em>比较适合做全文检索，不适合当成数据库使用（一旦SolrQuery复杂一点，感觉Solr的查询速度相比建了索引的Mysql也是较慢的）,况且 <em>MongoDB</em> 和 <em>Solr</em>也不适合做一些复杂的统计。最终选择了<em>Mysql</em>作为存放中间数据的数据库。</p>
+<p>我们当前的架构包含了Hibernate，如果使用Hibernate的批量插入那肯定不行啦，所以，首先想到的是最原始的jdbc的批量操作。</p>
+<a id="more"></a>
+<p><strong>附 Hibernate批量操作：</strong></p>
+<pre><code>Session session = getCurrentSession();
+for(int i=0,size=datas.size(); i&lt;size; i++){
+    session.save(datas.get(i));
+    if(i%50 == 0){
+        session.flush();
+        session.clear();
+    }
+}
+session.flush();
+session.clear();
+</code></pre><p><strong>原生的JDBC批量插入</strong></p>
+<pre><code>getCurrentSession().doWork(new Work(){
+    @Override
+    public void execute(Connection conn) throws SQLException {
+        conn.setAutoCommit(false);
+        PreparedStatement pstmt = conn.prepareStatement(insetSQL);
+        try {
+            for(int i=0,size=datas.size(); i&lt;size; i++){
+                pstmt.setString(1,&quot;yourString&quot;);
+                pstmt.setString(2,&quot;yourString&quot;);
+                pstmt.setString(3,&quot;yourString&quot;);
+
+                pstmt.addBatch();
+                if(i%50){
+                    pstmt.executeBatch();
+                    conn.commit();
+                }
+            }
+            pstmt.executeBatch();
+            conn.commit();
+        } catch(Exception e){
+            logger.error(&quot;&quot;,e);
+        } finally{
+            if(pstmt!=null){
+                pstmt.close();
+                pstmt = null;
+            }
+        }
+    }
+
+});
+</code></pre><p>经过测试，原生的JDBC的批量插入方式也是很慢的，2000条每秒的速度。 如果对于一千万的数据，那得等到猴年马月。</p>
+<p>为了减少mysql的日志写，以及这样一条一条的插入。查找资料发现，如果将整个文件直接导入给mysql的话速度会快非常多。于是，就开始测试啦。</p>
+<p>先测试将数据写到临时文件，这个写入到临时文件，直接用apache的commons-io就可以啦。直接将一个List当成一个集合，使用 FileUtils.writeLines() 方法即可。速度也是比较可观的，在自己电脑上（4G,酷睿i3）可以达到 11万/每秒。</p>
+<p>接着测试将整个文件导入到数据库中，测试的结果是 5.X万/每秒。 这样的话基本上入库的话每秒可以<br>3.x万/每秒</p>
+<pre><code>load data LOCAL infile &apos;$fileName&apos; into table $tableName
+fields TERMINATED by &apos;,&apos;
+lines TERMINATED by &apos;\r\n&apos;;
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Spark Tutorials 01 : Introduce To Spark]]></title>
+      <url>http://webinglin.github.io/2015/11/07/Spark-Tutorials-01-Introduce-To-Spark/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>Spark 是一个用来实现 快速而通用 的集群计算平台。</p>
+</blockquote>
+<p>Spark由许多组件组成，包括：</p>
+<ol>
+<li>Spark Core ： Spark Core 实现了Spark的基本功能，包含任务调度，内存管理，错误恢复，与存储系统交互等模块。Spark Core 还包含了对RDD的API定义。</li>
+<li>Spark SQL ： Spark SQL 是spark用来操作结构化数据的程序包。</li>
+<li>Spark Streaming ： Spark Streaming 是Spark提供的对实时数据进行流式计算的组件。</li>
+<li>MLib ： 机器学习功能的程序库</li>
+<li>GraphX ： 用来操作图的程序库(比如社交网络的朋友关系图）</li>
+</ol>
+<p><img src="http://m1.yea.im/3Nl.png" alt=""></p>
+<a id="more"></a>
+<h2 id="Spark初始使用"><a href="#Spark初始使用" class="headerlink" title="Spark初始使用"></a>Spark初始使用</h2><p>例子中使用的是：</p>
+<ol>
+<li>JDK 1.7</li>
+<li>spark-1.4.1-bin-hadoop2.6</li>
+<li>虚拟机</li>
+</ol>
+<p>下载sparke之后，上传到虚拟机上面自己指定的目录下。<br>运行 <code>tar -zxvf spark-1.4.1-bin-hadoop2.6.tgz</code> 解压。</p>
+<p>解压之后目录结构大致如下<br><img src="http://m1.yea.im/3No.png" alt=""></p>
+<p>我们进入到Spark根目录。 并运行 bin/spark-shell<br><code>&gt;bin/spark-shell</code></p>
+<p>启动的界面大致如下图所示:<br><img src="http://m1.yea.im/3Nr.png" alt=""></p>
+<p>如果你启动的界面有很多Info的信息，那么进入到conf目录下面，编辑log4j.properties，将日志级别从INFO调成 WARN 级别。</p>
+<p>至此，Spark最简单的单击环境就搭建完成了。</p>
+<h2 id="Spark的Hello-World"><a href="#Spark的Hello-World" class="headerlink" title="Spark的Hello World"></a>Spark的Hello World</h2><p>学习一门语言最开始都是学习HelloWorld。 那在大数据方面，学习的第一个例子则是计算单词个数。</p>
+<p><img src="http://m1.yea.im/3Ns.png" alt=""></p>
+<p>现在不用明白什么是flatMap， 什么是 map。 因为这些只是Spark的一些方法而已。</p>
+<p>例子中最后求得的 counts 也是 RDD， 是一个表明 README.md 这个文件中包含的单词个数的RDD。<br>我们可以通过<code>scala&gt; counts.count()</code> 这个方法将单词个数求出。</p>
+<h3 id="RDD是什么？"><a href="#RDD是什么？" class="headerlink" title="RDD是什么？"></a>RDD是什么？</h3><p>RDD 是Spark的核心数据抽象，Resilient Distribute Dataset （弹性分布式数据集）。</p>
+<p>RDD 有两种操作，一种是转换（transformation），一种是行动（action）。 所谓的转换是将一个RDD通过一定的操作之后，返回另一个全新的RDD,而原来的RDD还保留在内存中，方便后续使用。例如上述例子中： map， flatMap 等</p>
+<p>所谓的行动则是执行实际的计算，它们会将计算所得的结果返回给驱动器程序。如上述例子中的 count。 会将RDD中包含的总数返回给spark shell。</p>
+<p>需要注意的是, RDD的转换操作是惰性求值的。惰性求值意味着当我们对RDD调用转换操作（如：map）的时候，操作不会立刻执行。同样，把数据读取到RDD的操作也是惰性的，因此，当我们调用 sc.textFile(..) 的时候，数据并没有读取进来，而是在必要的时候才会读取。 而这个必要的时候就是行动执行的时候。如： 调用 RDD的 count()方法之后，就会强制Spark执行RDD 的转换操作。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p>《OReilly.Learning.Spark.Lightning-Fast.Big.Data.Analysis》</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[SpringMVC 接收数组参数]]></title>
+      <url>http://webinglin.github.io/2015/11/01/SpringMVC-%E6%8E%A5%E6%94%B6%E6%95%B0%E7%BB%84%E5%8F%82%E6%95%B0/</url>
+      <content type="html"><![CDATA[<p>如果 JQuery 要往服务端传递一个数组参数，请求的方式如下</p>
+<pre><code>$.ajax({
+    url : ${yourURL},
+    data: {yourParam:[1,2,3,4]},
+    success:function(data){
+    }
+});
+</code></pre><p>或者：</p>
+<pre><code>$.ajax({
+    url : ${yourURL},
+    data: {&quot;yourParam[]&quot;:[1,2,3,4]},
+    success:function(data){
+    }
+});
+</code></pre><p>前端传递参数这两种写法都可以，建议写成第二种，而服务端的接收参数对应起来。</p>
+<p>那么在服务端的 Controller怎么接收这个参数？</p>
+<pre><code>@RequestMapping（&quot;/save&quot;)
+public void save(@RequestParam(value=&quot;yourParam[]&quot; String[] yourParam){
+    // do Something...
+}
+</code></pre><p>注意： @RequestParam 一定要用数组的形式 “yourParam[]” 作为接收参数， 这样的话才能够正确的接收到前端传递的数组， 如果前端的数组为空，接收到的也是空串。  比如：前端传递的参数： <code>data:{&quot;yourParam[]&quot;:[null,null,null]}</code> 那么服务端接收到的参数将会是 [“”,””,””] 无需担心空指针问题。</p>
+<p>如果不用 “yourParam[]” 作为接收参数的话，将会发生莫名的错误。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[IntelliJ IDEA14 起步]]></title>
+      <url>http://webinglin.github.io/2015/07/02/IntelliJ-IDEA14-%E8%B5%B7%E6%AD%A5/</url>
+      <content type="html"><![CDATA[<p>Myeclipse确实功能很强大，我也一直在用Myeclipse。但是Myeclipse确实太庞大了，有的没的一大堆。听闻IntelliJ IDEA非常好用，一年前就用了两个月。工作原因又回归到Myeclipse。这次再次使用IDEA的时候发现很多东西都陌生了。甚至一些IDEA基本的概念都忘却了。</p>
+<a id="more"></a>
+<h3 id="IDEA和Eclipse的一些区别"><a href="#IDEA和Eclipse的一些区别" class="headerlink" title="IDEA和Eclipse的一些区别"></a>IDEA和Eclipse的一些区别</h3><p>IDEA 的Project 对应 Eclipse 的workspace</p>
+<p>IDEA 的Module 对应 Eclipse 的Project</p>
+<p>IDEA中一个Project可以有多个Module</p>
+<p>Eclipse中一个Workspace可以包含多个Project</p>
+<h3 id="Facets-和-artifacts-的区别"><a href="#Facets-和-artifacts-的区别" class="headerlink" title="Facets 和 artifacts 的区别"></a>Facets 和 artifacts 的区别</h3><p>Facets 表示这个module有什么特征，比如 web，spring，hibernate等</p>
+<p>Artifact 是mvaen的一个概念，表示某个module要如何打包，例如：war explored、war、jar、ear等等打包方式 </p>
+<p>一个module有了 Artifacts 就可以部署到应用服务器中了。</p>
+<blockquote>
+<p>Artifact可以理解为软件开发过程中的某一个阶段的产物,工件</p>
+</blockquote>
+<p><strong>在给项目配置Artifacts的时候有好多type选项，exploed是什么意思?</strong></p>
+<p>explode在这里表示展开，不压缩的意思。也就是war，jar等产出物没压缩前的目录结构。建议在开发的时候使用这种模式，便于修改文件的效果立刻显现出来。</p>
+<p>默认情况下，IDEA的Modules和Artifacts的output目录已经设定好了，不需要改动。打包成war包的时候会自动在WEB-INF下产生classes目录。然后把编译后的文件放进去。</p>
+<h3 id="IDEA和Tomcat"><a href="#IDEA和Tomcat" class="headerlink" title="IDEA和Tomcat"></a>IDEA和Tomcat</h3><ol>
+<li><p>配置Tomcat， 通过 File-&gt; settings 找到Application Servers的配置，点击绿色按钮添加自己的tomcat版本<br><img src="http://i3.tietuku.com/38dbfcc8f479ee4b.jpg" alt=""></p>
+</li>
+<li><p>查看我们的web项目，看是否有web特性， 通过右键-&gt;Open Module Setting 或者使用快捷键 F4来打开我们的模块设置<br><img src="http://i3.tietuku.com/b123f540523c5d38.jpg" alt=""></p>
+</li>
+</ol>
+<p>根据上文提到的一些概念我们已经明白了，要部署web应用，需要给我们的模块添加Web特性。<br>所以添加了web特性的模块我们就可以用来部署了。</p>
+<p>为我们的模块添加添加web特性的时候，可以让IDEA帮我们生成web.xml，我们需要将web.xml修改成我们自己的目录结构位置。<br><img src="http://i3.tietuku.com/a4eab4a02cbb29eb.jpg" alt=""></p>
+<p>同时需要指定web应用默认的根目录。我们依旧指定（修改） 为我们自己的目录结构中的web应用根目录（Gradle，Maven中使用 src/main/webapp)<br><img src="http://i3.tietuku.com/005a51f86c1211cc.jpg" alt=""></p>
+<p>部署web应用到tomcat中，需要在Edit Configuration配置我们的tomcat，如果配置处没有找到tomcat servers，那么就是我们在清理IDEA插件的时候把Tomcat插件清楚了，去pluigns配置项里面启用即可。<br><img src="http://i3.tietuku.com/009a1b40b15a3f6b.jpg" alt=""></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://blog.csdn.net/likaihon/article/details/44174553" target="_blank" rel="external">http://blog.csdn.net/likaihon/article/details/44174553</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MyEclipse常见问题与性能优化]]></title>
+      <url>http://webinglin.github.io/2015/06/25/MyEclipse%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%8E%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</url>
+      <content type="html"><![CDATA[<p>Myeclipse是一个非常好用的IDE（集成开发环境），使用很简单，但是要驾驭它却要一个长期的使用和总结经验，之所以写这篇文章是因为今天早上我的myeclipse总是自动退出，试过很多办法都没法解决，后来我的同事（肖帅哥）问我myeclipse有没有优化，我说，是指调整内存吗？ 接着他就过来教了我几招。因此就写下此文来记录今天所学以及之前使用过程中的一些经验教训</p>
+<a id="more"></a>
+<p>平时在使用myeclipse的时候并没有过多的在意所谓的性能，基本上我的myeclipse启动起来，快捷键也基本都是用默认的，一些基本的配置会用（比如配置插件，tomcat，字体，jdk，maven等等）。其他也没有过多的考虑。很惭愧，用了myeclipse这么久，只知道启动的时候会很慢，也没想过要去对这个启动过程调优。</p>
+<h3 id="调整myeclipse的使用内存"><a href="#调整myeclipse的使用内存" class="headerlink" title="调整myeclipse的使用内存"></a>调整myeclipse的使用内存</h3><p>找到myeclipse的安装目录，在根目录下面有一个myeclipse.ini文件，打开并编辑</p>
+<pre><code>-vmargs
+-Xmx512m
+-XX:PermSize=256m
+-XX:MaxPermSize=256m
+-XX:ReservedCodeCacheSize=64m
+</code></pre><p>其中 -Xmx512m 表示给堆内存区分配最大内存512MB，而PermSize表示的是class文件存放的内存，经常出现的Perngen outof memory，类似这样的问题，解决方法之一就是调整这个内存。（导致的原因有很多，在tomcat的官网有一些关于<permgenexception> –异常名称大致是这样 的介绍）</permgenexception></p>
+<p>###优化myeclipse的启动加载项<br>打开myeclipse 找到  Window –&gt; Perferences  搜索 startup<br><img src="http://i1.tietuku.com/4b309ecd27d6c494.jpg" alt=""></p>
+<p>把自己不需要的组件全部都去勾选，这样子的话启动myeclipse会快很多。勾选完之后，点击OK 重启myeclipse即可看到效果。</p>
+<h3 id="显示对内存使用状态"><a href="#显示对内存使用状态" class="headerlink" title="显示对内存使用状态"></a>显示对内存使用状态</h3><p><img src="http://i1.tietuku.com/22c7f52014369a20.jpg" alt=""></p>
+<p>设置好之后，就可以在myeclipse的右下角看到堆内存使用状态了</p>
+<p><img src="http://i1.tietuku.com/e07f37dd51d4f4c9.jpg" alt=""></p>
+<h3 id="去掉所有的验证"><a href="#去掉所有的验证" class="headerlink" title="去掉所有的验证"></a>去掉所有的验证</h3><p>myeclipse会自己帮我们验证很多东西，js，jsp等。 这样会导致我们编译什么的都非常慢,所以我习惯性的将所有的自动验证都去掉，所有的验证都自己来。<br><img src="http://i1.tietuku.com/052e58c7bbf93241.jpg" alt=""></p>
+<h3 id="Clean技巧"><a href="#Clean技巧" class="headerlink" title="Clean技巧"></a>Clean技巧</h3><p>经常将应用部署到tomcat的时候，由于缓存的原因，自动化编译的时候不能将重新编译的class文件热部署到tomcat中。然后我们就会一直沉浸在旧代码中调试，一直疑问为什么修改了还没有效果的时候。clean或许是一种很有效的方法</p>
+<p><img src="http://i1.tietuku.com/01754870b3c4a9a4.jpg" alt=""></p>
+<p>因为工作空间的项目我都关闭了，所以 Clean…是灰色的</p>
+<h3 id="Myeclipse自动退出问题"><a href="#Myeclipse自动退出问题" class="headerlink" title="Myeclipse自动退出问题"></a>Myeclipse自动退出问题</h3><p>我遇到最尴尬的问题就是自动退出了，当我们写着代码的时候，突然输入点号（比如 a.b ) 当输入b就自动退出了，然后 点号不用输入的，而是从其他文本编辑器写好，然后复制进来，这样竟然就不会退出。非常纠结，一开始就以为内存问题，因为退出的时候会提示内存的配置信息。所以就自以为是的调整内存大小。调整来调整去也不见得啥效果，期间也试过网上说的很多办法。后来我的一个同事（蔡帅哥）说切换一下工作空间试试。这句话点醒了我，于是乎我就<strong>把workspace的metadata文件给删了，然后重启myeclipse让其重新生成metadata文件夹</strong>，这样问题就解决了。</p>
+<blockquote>
+<p><strong>如果您有更多关于myeclipse的使用技巧，或者说优化技巧，欢迎留言和我们分享~~</strong></p>
+<p>如果本文有不足之处，欢迎指正~~</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[JQuery事件 document绑定 VS ID绑定]]></title>
+      <url>http://webinglin.github.io/2015/06/24/JQuery%E4%BA%8B%E4%BB%B6-document%E7%BB%91%E5%AE%9A-VS-ID%E7%BB%91%E5%AE%9A/</url>
+      <content type="html"><![CDATA[<h4 id="document-on-39-click-39-39-id-39-function-和-39-id-39-on-39-click-39-function-到底有什么区别？"><a href="#document-on-39-click-39-39-id-39-function-和-39-id-39-on-39-click-39-function-到底有什么区别？" class="headerlink" title="$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) 和 $(&#39;#id&#39;).on(&#39;click&#39;,function(){}) 到底有什么区别？"></a><code>$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) 和 $(&#39;#id&#39;).on(&#39;click&#39;,function(){})</code> 到底有什么区别？</h4><p>这个问题在stackoverflow上面已经讨论过了，我今天也遇到这个问题。但是我在遇到该问题的时候想到的不是第一种做法，而是采用第二种在改版。后来我的同事小丸子这样写事件监听，我觉得很神奇，我就去google了。看到stackoverflow的这个答案我就明朗了。感谢小丸子！</p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><a id="more"></a>
+<p>有这样一个模块A，A模块是以前写的，A模块的所有子模块都是通过左侧菜单列表形式展现的，即一堆的&lt;li&gt;&lt;/li&gt;元素组成，这些li元素全都是通过jsp脚本语言生成的。现在需要为A模块添加另外一个子模块C，而子模块C的响应时间非常长，因此需要异步来构造。异步构造好了之后，发现新增加的子模块C没有了其他子模块的特效（因为整个页面一出来，通过jsp脚本创建的li元素都已经绑定好了事件），比如点击之后展开子模块的子模块，并改变自身的样式等等效果。此时想到的第一个问题就是，我没有为新增加的子模块C添加特效的事件监听。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
+<li>为子模块C添加事件监听。即通过<code>$(&quot;#C&quot;).off(&quot;click&quot;).on(&quot;click&quot;,function(){});</code>这样的方式来监听，添加完之后，确实可以达到我想要的效果。</li>
+<li>自以为一切尽在掌握，偏偏是人外有人，天外有天啊。看到同事小丸子的写法是<code>$(document).on(&quot;click&quot;,&quot;#C&quot;,function(){});</code>，这段是在一开始初始化的时候就监听的，动态创建的子模块就都不用再监听click事件了</li>
+</ol>
+<h2 id="document-on-39-click-39-39-id-39-function-vs-39-id-39-on-39-click-39-function-两者的区别"><a href="#document-on-39-click-39-39-id-39-function-vs-39-id-39-on-39-click-39-function-两者的区别" class="headerlink" title="$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) vs $(&#39;#id&#39;).on(&#39;click&#39;,function(){})两者的区别"></a><code>$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) vs $(&#39;#id&#39;).on(&#39;click&#39;,function(){})</code>两者的区别</h2><p>发现事情的神奇之后，我开始寻找$(document).on()来绑定事件的原因了。</p>
+<blockquote>
+<p><strong>$(document).on(“click”,”#C”,function(){}) :</strong></p>
+<p>通过将事件绑定到更高层的Dom tree上面(在这里是document对象)    这样事件处理器就会在事件到达选择器选中的元素的时候触发。（通过代理一个事件处理器这样的方式，这样的话即使元素在绑定事件的时候不存在DOM Tree上面，而是后续动态创建的，也会被执行。）</p>
+<p><strong>$(“#C).on(function(){}) :</strong></p>
+<p>如果使用这种方式，并且 #C 的元素是在绑定事件之后创建的，那么事件处理函数将永远不会被执行。使用这个方式来监听事件，你要确保在你绑定事件之前，#C元素在DOM里已经存在了。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://stackoverflow.com/questions/14879168/document-onclick-id-function-vs-id-onclick-function" target="_blank" rel="external">$(document).on(‘click’, ‘#id’, function() {}) VS $(‘#id’).on(‘click’, function(){})</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第十篇 分片集群搭建]]></title>
+      <url>http://webinglin.github.io/2015/06/10/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E5%8D%81%E7%AF%87-%E5%88%86%E7%89%87%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
+      <content type="html"><![CDATA[<p>##实验环境准备：</p>
+<p><strong>configSerer</strong></p>
+<blockquote>
+<p>192.168.236.131:27000</p>
+</blockquote>
+<p><strong>mongos</strong></p>
+<blockquote>
+<p>192.168.236.131:28000</p>
+</blockquote>
+<p><strong>shards</strong></p>
+<blockquote>
+<p>192.168.236.131:29001</p>
+<p>192.168.236.131:29002</p>
+<p>192.168.236.131:29003</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="第一步-创建分片实验需要的目录"><a href="#第一步-创建分片实验需要的目录" class="headerlink" title="第一步: 创建分片实验需要的目录"></a>第一步: 创建分片实验需要的目录</h4><pre><code>root@ubuntu:~# mkdir -p ~/mongoData/shard/s1
+root@ubuntu:~# mkdir -p ~/mongoData/shard/s2
+root@ubuntu:~# mkdir -p ~/mongoData/shard/s3
+root@ubuntu:~# mkdir -p ~/mongoData/shard/log
+root@ubuntu:~# mkdir -p ~/mongoData/shard/config
+</code></pre><h4 id="第二步：-启动configServer"><a href="#第二步：-启动configServer" class="headerlink" title="第二步： 启动configServer"></a>第二步： 启动configServer</h4><pre><code>root@ubuntu:~# mongod --configsvr --dbpath ~/mongoData/shard/config/ --fork --logpath ~/mongoData/shard/log/configsvr.log --logappend --port 27000
+</code></pre><h4 id="第三步：-启动mongos"><a href="#第三步：-启动mongos" class="headerlink" title="第三步：　启动mongos"></a>第三步：　启动mongos</h4><pre><code>root@ubuntu:~# mongos --configdb 192.168.236.131:27000 --port 28000 --fork --logpath ~/mongoData/shard/log/mongs.log
+</code></pre><h4 id="第四步：-启动所有的shard分片"><a href="#第四步：-启动所有的shard分片" class="headerlink" title="第四步： 启动所有的shard分片"></a>第四步： 启动所有的shard分片</h4><pre><code>root@ubuntu:~/mongoData# mongod --dbpath ~/mongoData/shard/s1/ --port 29001 --fork --logpath ~/mongoData/shard/log/s1.log --shardsvr --logappend    
+root@ubuntu:~/mongoData# mongod --dbpath ~/mongoData/shard/s2/ --port 29002 --fork --logpath ~/mongoData/shard/log/s2.log --shardsvr --logappend
+root@ubuntu:~/mongoData# mongod --dbpath ~/mongoData/shard/s3/ --port 29003 --fork --logpath ~/mongoData/shard/log/s3.log --shardsvr --logappend
+</code></pre><h4 id="第五步：-将shard添加到mongos中-并配置"><a href="#第五步：-将shard添加到mongos中-并配置" class="headerlink" title="第五步： 将shard添加到mongos中    并配置"></a>第五步： 将shard添加到mongos中    并配置</h4><pre><code>root@ubuntu:~/mongoData# mongo --port 28000
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:28000/test
+... ...
+mongos&gt; use admin
+switched to db admin
+mongos&gt; sh.addShard(&quot;192.168.236.131:29001&quot;)
+{ &quot;shardAdded&quot; : &quot;shard0000&quot;, &quot;ok&quot; : 1 }
+mongos&gt; sh.addShard(&quot;192.168.236.131:29002&quot;)
+{ &quot;shardAdded&quot; : &quot;shard0001&quot;, &quot;ok&quot; : 1 }
+mongos&gt; sh.addShard(&quot;192.168.236.131:29003&quot;)
+{ &quot;shardAdded&quot; : &quot;shard0002&quot;, &quot;ok&quot; : 1 }
+mongos&gt;
+</code></pre><p><br><br>使用下面两个命令来配置需要分片的数据库及集合以及对应的片键</p>
+<p>sh.enableSharding(“<database>“)</database></p>
+<p>sh.shardCollection(“<database>.<collection>“, shard-key-pattern)</collection></database></p>
+<pre><code>mongos&gt; sh.enableSharding(&quot;test&quot;)
+{ &quot;ok&quot; : 1 }
+mongos&gt; sh.shardCollection(&quot;test.users&quot;,{&quot;username&quot;:1,&quot;_id&quot;:1})
+{ &quot;collectionsharded&quot; : &quot;test.users&quot;, &quot;ok&quot; : 1 }
+mongos&gt;
+</code></pre><p>如果是添加副本集作为分片怎么处理？</p>
+<blockquote>
+<p><strong>addShard</strong></p>
+<p>The hostname and port of the mongod instance to be added as a shard. To add a replica set as a shard, specify the name of the replica set and the hostname and port of a member of the replica set.</p>
+</blockquote>
+<p>上面这段话引用自官网，也就是说，我们只需要指定副本集的名称然后再指定其中一台机器即可。</p>
+<p>比如： </p>
+<blockquote>
+<p>sh.addShard(“replicaSet0/&lt;ont host of the replica set&gt;:&lt;port&gt;”);</p>
+</blockquote>
+<h4 id="验证分片集群部署情况"><a href="#验证分片集群部署情况" class="headerlink" title="验证分片集群部署情况"></a>验证分片集群部署情况</h4><p>先往mongos插入100条数据，然后通过 db.users.stats() 查看集合的状态，发现集合被切分到三个分片中了，虽然第一个分片数据量比较多，其他两个分片数据量相对较少 （这个和片键 sharding key 的设置有关，我没有详细看官网关于shard key设置的文章，所以这里的片键设置比较简单，随意。）</p>
+<pre><code>mongos&gt; for(var i=0; i&lt;100; i++) {
+... db.users.insert({&quot;username&quot;:&quot;&quot; + i,age:i*2 , addr:&quot;ardr&quot;+i})
+... }
+WriteResult({ &quot;nInserted&quot; : 1 })
+mongos&gt; db.users.stats()
+{
+        &quot;sharded&quot; : true,
+        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+        &quot;userFlags&quot; : 1,
+        &quot;capped&quot; : false,
+        &quot;ns&quot; : &quot;test.users&quot;,
+        &quot;count&quot; : 100,
+        &quot;numExtents&quot; : 4,
+        &quot;size&quot; : 11200,
+        &quot;storageSize&quot; : 57344,
+        &quot;totalIndexSize&quot; : 49056,
+        &quot;indexSizes&quot; : {
+                &quot;_id_&quot; : 24528,
+                &quot;username_1__id_1&quot; : 24528
+        },
+        &quot;avgObjSize&quot; : 112,
+        &quot;nindexes&quot; : 2,
+        &quot;nchunks&quot; : 3,
+        &quot;shards&quot; : {
+                &quot;shard0000&quot; : {
+                        &quot;ns&quot; : &quot;test.users&quot;,
+                        &quot;count&quot; : 88,
+                        &quot;size&quot; : 9856,
+                        &quot;avgObjSize&quot; : 112,
+                        &quot;numExtents&quot; : 2,
+                        &quot;storageSize&quot; : 40960,
+                        &quot;lastExtentSize&quot; : 32768,
+                        &quot;paddingFactor&quot; : 1,
+                        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+                        &quot;userFlags&quot; : 1,
+                        &quot;capped&quot; : false,
+                        &quot;nindexes&quot; : 2,
+                        &quot;totalIndexSize&quot; : 16352,
+                        &quot;indexSizes&quot; : {
+                                &quot;_id_&quot; : 8176,
+                                &quot;username_1__id_1&quot; : 8176
+                        },
+                        &quot;ok&quot; : 1
+                },
+                &quot;shard0001&quot; : {
+                        &quot;ns&quot; : &quot;test.users&quot;,
+                        &quot;count&quot; : 11,
+                        &quot;size&quot; : 1232,
+                        &quot;avgObjSize&quot; : 112,
+                        &quot;numExtents&quot; : 1,
+                        &quot;storageSize&quot; : 8192,
+                        &quot;lastExtentSize&quot; : 8192,
+                        &quot;paddingFactor&quot; : 1,
+                        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+                        &quot;userFlags&quot; : 1,
+                        &quot;capped&quot; : false,
+                        &quot;nindexes&quot; : 2,
+                        &quot;totalIndexSize&quot; : 16352,
+                        &quot;indexSizes&quot; : {
+                                &quot;_id_&quot; : 8176,
+                                &quot;username_1__id_1&quot; : 8176
+                        },
+                        &quot;ok&quot; : 1
+                },
+                &quot;shard0002&quot; : {
+                        &quot;ns&quot; : &quot;test.users&quot;,
+                        &quot;count&quot; : 1,
+                        &quot;size&quot; : 112,
+                        &quot;avgObjSize&quot; : 112,
+                        &quot;numExtents&quot; : 1,
+                        &quot;storageSize&quot; : 8192,
+                        &quot;lastExtentSize&quot; : 8192,
+                        &quot;paddingFactor&quot; : 1,
+                        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+                        &quot;userFlags&quot; : 1,
+                        &quot;capped&quot; : false,
+                        &quot;nindexes&quot; : 2,
+                        &quot;totalIndexSize&quot; : 16352,
+                        &quot;indexSizes&quot; : {
+                                &quot;_id_&quot; : 8176,
+                                &quot;username_1__id_1&quot; : 8176
+                        },
+                        &quot;ok&quot; : 1
+                }
+        },
+        &quot;ok&quot; : 1
+}
+</code></pre><p>这时候如果用mongo客户端去连接 29001 , 29002， 29003端口，会发现只有集合的部分数据是可见的，这也证明了我们实验成功了</p>
+<pre><code>root@ubuntu:~/mongoData# mongo --port 29001
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:29001/test
+... ...
+&gt; db.users.find().count()
+88
+&gt; exit
+bye
+root@ubuntu:~/mongoData# mongo --port 29002
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:29002/test
+... ...
+&gt; db.users.find().count()
+11
+&gt; exit
+bye
+root@ubuntu:~/mongoData# mongo --port 29003
+MongoDB shell version: 3.0.3
+connecting to: 127.0.0.1:29003/test
+... ...
+&gt; db.users.find().count()
+1
+&gt; exit
+bye
+root@ubuntu:~/mongoData#
+</code></pre><p>整个分片的实验基本上已经验证成功了。</p>
+<p>如果某个集合没有进行分片，数据会存放在primary shard里面。 </p>
+<pre><code>mongos&gt; db.sites.insert({&quot;site&quot;:&quot;webinglin.github.io&quot;,&quot;author&quot;:&quot;linwenbin&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+... ...
+mongos&gt; db.sites.insert({&quot;site&quot;:&quot;webinglin.github.io&quot;,&quot;author&quot;:&quot;linwenbin&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+mongos&gt; db.sites.stats()
+{
+        &quot;sharded&quot; : false,
+        &quot;primary&quot; : &quot;shard0000&quot;,
+        &quot;ns&quot; : &quot;test.sites&quot;,
+        &quot;count&quot; : 7,
+        &quot;size&quot; : 784,
+        &quot;avgObjSize&quot; : 112,
+        &quot;numExtents&quot; : 1,
+        &quot;storageSize&quot; : 8192,
+        &quot;lastExtentSize&quot; : 8192,
+        &quot;paddingFactor&quot; : 1,
+        &quot;paddingFactorNote&quot; : &quot;paddingFactor is unused and unmaintained in 3.0. It remains hard coded to 1.0 for compatibility only.&quot;,
+        &quot;userFlags&quot; : 1,
+        &quot;capped&quot; : false,
+        &quot;nindexes&quot; : 1,
+        &quot;totalIndexSize&quot; : 8176,
+        &quot;indexSizes&quot; : {
+                &quot;_id_&quot; : 8176
+        },
+        &quot;ok&quot; : 1
+}
+mongos&gt;
+</code></pre><blockquote>
+<p>这篇文章介绍了简单的搭建分片集群的步骤。更多关于怎么选择片键（Shard Key)，参考<a href="http://docs.mongodb.org/manual/tutorial/choose-a-shard-key/" target="_blank" rel="external">这里</a>。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://docs.mongodb.org/manual/core/sharded-cluster-architectures-test/" target="_blank" rel="external">http://docs.mongodb.org/manual/core/sharded-cluster-architectures-test/</a></p>
+<p><a href="http://docs.mongodb.org/manual/reference/sharding/" target="_blank" rel="external">http://docs.mongodb.org/manual/reference/sharding/</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第九篇 分片核心概念]]></title>
+      <url>http://webinglin.github.io/2015/06/10/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E4%B9%9D%E7%AF%87-%E5%88%86%E7%89%87%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5/</url>
+      <content type="html"><![CDATA[<h2 id="分片集群的组成"><a href="#分片集群的组成" class="headerlink" title="分片集群的组成"></a>分片集群的组成</h2><p><strong>Shards</strong></p>
+<blockquote>
+<p>A shard is a MongoDB instance that holds a subset of a collection’s data. Each shard is either a single mongod instance or a replica set. In production, all shards are replica sets. </p>
+</blockquote>
+<p><strong>Config Servers</strong></p>
+<blockquote>
+<p>Each config server is a mongod instance that holds metadata about the cluster. The metadata maps chunks to shards. </p>
+</blockquote>
+<p><strong>Routing Instances</strong></p>
+<blockquote>
+<p>Each router is a mongos instance that routes the reads and writes from applications to the shards. Applications do not access the shards directly.</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="为什么使用分片"><a href="#为什么使用分片" class="headerlink" title="为什么使用分片"></a>为什么使用分片</h2><ul>
+<li>当本地磁盘不足的时候</li>
+<li>请求量巨大导致内存爆满的情况</li>
+<li>一台单独的mongod进程无法满足写的需求的情况</li>
+</ul>
+<blockquote>
+<p><strong>重要</strong></p>
+<p>部署分片集群是很花时间和资源的。如果你的系统已经能够达到或者超过了他的容量，那时候再去部署分片很难不影响到你现有的应用。</p>
+<p>所以如果你觉得你的数据库在不久的将来需要进行分片，那么不要等到你的系统超过本身的承载能力的时候再去分片。</p>
+<p>当你设计数据模型的时候，考虑分片的需求吧。</p>
+</blockquote>
+<p><img src="http://docs.mongodb.org/manual/_images/sharded-cluster.png" alt=""></p>
+<h2 id="生产环境和测试环境-架构区别"><a href="#生产环境和测试环境-架构区别" class="headerlink" title="生产环境和测试环境 架构区别"></a>生产环境和测试环境 架构区别</h2><p><strong>生产环境下</strong></p>
+<ul>
+<li><p>配置服务器：三个配置服务并且每个配置服务都在不同的机器上，这样能够确保安全，三台配置服务也不一定是replica set的形式。可以是单独的三个mongod进程组成。</p>
+</li>
+<li><p>分片：生成环境下的分片采用Replica Set的形式。至少两个分片。</p>
+</li>
+<li><p>Mongos实例：至少一个mongos进程。</p>
+</li>
+</ul>
+<p><img src="http://docs.mongodb.org/manual/_images/sharded-cluster-production-architecture.png" alt=""></p>
+<p><strong>测试环境或者开发环境</strong></p>
+<ul>
+<li>一个配置服务器（一个mongod进程）</li>
+<li>至少一个分片（分片可以是单独的mongod进程或者 replica set == 一组mongod进程）</li>
+<li>一个mongos实例（一个mongos实例最好对应一个应用容器 == 比如一台servlet容器的话，就相应的部署一个mongos实例）</li>
+</ul>
+<p><img src="http://docs.mongodb.org/manual/_images/sharded-cluster-test-architecture.png" alt=""></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://docs.mongodb.org/manual/core/sharding-introduction/" target="_blank" rel="external">http://docs.mongodb.org/manual/core/sharding-introduction/</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第八篇 Replica Set 实战]]></title>
+      <url>http://webinglin.github.io/2015/06/09/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E5%85%AB%E7%AF%87-Replica-Set-%E5%AE%9E%E6%88%98/</url>
+      <content type="html"><![CDATA[<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>Ubuntu12.0.4</li>
+<li>mongodb3.0.3</li>
+<li>三台机器，分别为： 192.168.236.131 ;  192.168.236.133 ;  192.168.236.134</li>
+</ul>
+<p>如果对于怎么安装Mongodb还不清楚的同学可以查看我之前的学习札记</p>
+<a id="more"></a>
+<p>第一步：</p>
+<p>在三台机器上分别运行（都要运行）</p>
+<pre><code>root@ubuntu:/usr/local/mongodb#    mongod --dbpath /usr/local/mongodb/data --replSet rs0
+</code></pre><p>注意这里的 –replSet 参数指定了副本集的名称，每一个副本集都有一个唯一的名称。</p>
+<p>运行之后可以看到下面这样的信息：</p>
+<pre><code>2015-06-09T17:54:20.845-0700 I JOURNAL  [initandlisten] journal dir=/usr/local/mongodb/data/journal
+2015-06-09T17:54:20.846-0700 I JOURNAL  [initandlisten] recover : no journal files present, no recovery needed
+2015-06-09T17:54:20.925-0700 I JOURNAL  [durability] Durability thread started
+2015-06-09T17:54:20.926-0700 I JOURNAL  [journal writer] Journal writer thread started
+2015-06-09T17:54:20.931-0700 I CONTROL  [initandlisten] MongoDB starting : pid=2539 port=27017 dbpath=/usr/local/mongodb/data/ 64-bit host=ubuntu
+2015-06-09T17:54:20.931-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:54:20.931-0700 I CONTROL  [initandlisten]
+2015-06-09T17:54:20.932-0700 I CONTROL  [initandlisten]
+2015-06-09T17:54:20.932-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:54:20.932-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:54:20.932-0700 I CONTROL  [initandlisten]
+2015-06-09T17:54:20.932-0700 I CONTROL  [initandlisten] db version v3.0.3
+2015-06-09T17:54:20.933-0700 I CONTROL  [initandlisten] git version: b40106b36eecd1b4407eb1ad1af6bc60593c6105
+2015-06-09T17:54:20.933-0700 I CONTROL  [initandlisten] OpenSSL version: OpenSSL 1.0.1 14 Mar 2012
+2015-06-09T17:54:20.933-0700 I CONTROL  [initandlisten] build info: Linux ip-10-216-207-166 3.2.0-36-virtual #57-Ubuntu SMP Tue Jan 8 22:04:49 UTC 2013 x86_64 BOOST_LIB_VERSION=1_49
+2015-06-09T17:54:20.933-0700 I CONTROL  [initandlisten] allocator: tcmalloc
+2015-06-09T17:54:20.933-0700 I CONTROL  [initandlisten] options: { replication: { replSet: &quot;rs0&quot; }, storage: { dbPath: &quot;/usr/local/mongodb/data/&quot; } }
+2015-06-09T17:54:20.954-0700 I NETWORK  [initandlisten] waiting for connections on port 27017
+2015-06-09T17:54:20.973-0700 W NETWORK  [ReplicationExecutor] Failed to connect to 192.168.236.134:27017, reason: errno:111 Connection refused
+2015-06-09T17:54:20.974-0700 W NETWORK  [ReplicationExecutor] Failed to connect to 192.168.236.131:27017, reason: errno:111 Connection refused
+2015-06-09T17:54:20.975-0700 I REPL     [ReplicationExecutor] New replica set config in use: { _id: &quot;rs0&quot;, version: 3, members: [ { _id: 1, host: &quot;192.168.236.133:27017&quot;, arbiterOnly: false, buildIndexes: true, hidden: false, priority: 1.0, tags: {}, slaveDelay: 0, votes: 1 }, { _id: 2, host: &quot;192.168.236.134:27017&quot;, arbiterOnly: false, buildIndexes: true, hidden: false, priority: 1.0, tags: {}, slaveDelay: 0, votes: 1 }, { _id: 3, host: &quot;192.168.236.131:27017&quot;, arbiterOnly: false, buildIndexes: true, hidden: false, priority: 1.0, tags: {}, slaveDelay: 0, votes: 1 } ], settings: { chainingAllowed: true, heartbeatTimeoutSecs: 10, getLastErrorModes: {}, getLastErrorDefaults: { w: 1, wtimeout: 0 } } }
+2015-06-09T17:54:20.975-0700 I REPL     [ReplicationExecutor] This node is 192.168.236.133:27017 in the config
+2015-06-09T17:54:20.975-0700 I REPL     [ReplicationExecutor] transition to STARTUP2
+2015-06-09T17:54:20.975-0700 I REPL     [ReplicationExecutor] Starting replication applier threads
+2015-06-09T17:54:20.977-0700 I REPL     [ReplicationExecutor] transition to RECOVERING
+2
+</code></pre><p>信息大概就是这样的，等到三台机器都启动完了之后。使用mongo客户端登录其中一台mongod服务器。这里我登录到 192.168.236.131 这台机器</p>
+<pre><code>root@ubuntu:~# mongo
+</code></pre><p>登录之后要切换到admin数据库，这样我们可以进行副本集的配置，具体怎么配置，代码如下：</p>
+<pre><code>&gt; use admin
+switched to db admin
+&gt; config = {_id:&quot;rs0&quot;,members:[
+... {_id:0,host:&quot;192.168.236.131:27017&quot;},
+... {_id:1,host:&quot;192.168.236.133:27017&quot;},
+... {_id:2,host:&quot;192.168.236.134:27017&quot;}]}
+{
+        &quot;_id&quot; : &quot;rs0&quot;,
+        &quot;members&quot; : [
+                {
+                        &quot;_id&quot; : 0,
+                        &quot;host&quot; : &quot;192.168.236.131:27017&quot;
+                },
+                {
+                        &quot;_id&quot; : 1,
+                        &quot;host&quot; : &quot;192.168.236.133:27017&quot;
+                },
+                {
+                        &quot;_id&quot; : 2,
+                        &quot;host&quot; : &quot;192.168.236.134:27017&quot;
+                }
+        ]
+}
+&gt; rs.initiate(config);
+{ &quot;ok&quot; : 1 }
+</code></pre><p>先定义 config 的配置信息， 然后通过 rs.initiate(config) 方法，将配置信息初始化。这两个步骤完成之后就表示我们的副本集配置信息初始化完成了，在这个rs0的副本集中我们定义了三台主机（注意在定义配置信息的时候指定的 _id 必须和我们启动mongod的时候指定的参数 –replSet 这个参数的值是一样的。）</p>
+<p>过一会，mongodb就会帮我们选举出Primary节点和Secondary节点了。那在mongo客户端，我们可以通过 rs.status() 来查看副本集的状态信息</p>
+<pre><code>rs0:OTHER&gt;
+rs0:PRIMARY&gt; rs.status()
+{
+        &quot;set&quot; : &quot;rs0&quot;,
+        &quot;date&quot; : ISODate(&quot;2015-06-10T00:10:06.941Z&quot;),
+        &quot;myState&quot; : 1,
+        &quot;members&quot; : [
+                {
+                        &quot;_id&quot; : 0,
+                        &quot;name&quot; : &quot;192.168.236.131:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 1,
+                        &quot;stateStr&quot; : &quot;PRIMARY&quot;,
+                        &quot;uptime&quot; : 468,
+                        &quot;optime&quot; : Timestamp(1433894773, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:06:13Z&quot;),
+                        &quot;electionTime&quot; : Timestamp(1433894777, 1),
+                        &quot;electionDate&quot; : ISODate(&quot;2015-06-10T00:06:17Z&quot;),
+                        &quot;configVersion&quot; : 1,
+                        &quot;self&quot; : true
+                },
+                {
+                        &quot;_id&quot; : 1,
+                        &quot;name&quot; : &quot;192.168.236.133:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 233,
+                        &quot;optime&quot; : Timestamp(1433894773, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:06:13Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:10:06.278Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:10:06.245Z&quot;),
+                        &quot;pingMs&quot; : 1,
+                        &quot;configVersion&quot; : 1
+                },
+                {
+                        &quot;_id&quot; : 2,
+                        &quot;name&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 233,
+                        &quot;optime&quot; : Timestamp(1433894773, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:06:13Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:10:05.943Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:10:05.890Z&quot;),
+                        &quot;pingMs&quot; : 1,
+                        &quot;configVersion&quot; : 1
+                }
+        ],
+        &quot;ok&quot; : 1
+}
+</code></pre><p>其中name表示我么你的主机， health表示主机是否健康（0/1） , state（主节点还是从节点,或者是不可达节点)</p>
+<p>如果上面信息正常显示出来说明整个副本集群已经建立起来了。这时候我们来验证一下是否是真的能够自动备份数据，是否能够自动从失败中恢复，自动选举新的Primary节点。</p>
+<p>这个实验我们这样来做： </p>
+<ol>
+<li>先往Primary节点插入数据（131那台机器）</li>
+<li>在133和134两台Secondary节点中查询数据，验证是否能够正常的同步机器。</li>
+</ol>
+<pre><code>rs0:PRIMARY&gt; use test
+switched to db test
+rs0:PRIMARY&gt; show collections
+rs0:PRIMARY&gt; db.guids.insert({&quot;name&quot;:&quot;replica set&quot;,&quot;author&quot;:&quot;webinglin&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+rs0:PRIMARY&gt; exit
+bye
+root@ubuntu:~# mongo --host 192.168.236.134
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.134:27017/test
+Server has startup warnings:
+2015-06-09T17:03:27.744-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not re                                      commended.
+2015-06-09T17:03:27.744-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten]
+rs0:SECONDARY&gt; show dbs
+2015-06-09T17:13:49.138-0700 E QUERY    Error: listDatabases failed:{ &quot;note&quot; : &quot;from execCommand&quot;, &quot;ok&quot; : 0, &quot;errmsg&quot; : &quot;not master&quot; }
+    at Error (&lt;anonymous&gt;)
+    at Mongo.getDBs (src/mongo/shell/mongo.js:47:15)
+    at shellHelper.show (src/mongo/shell/utils.js:630:33)
+    at shellHelper (src/mongo/shell/utils.js:524:36)
+    at (shellhelp2):1:1 at src/mongo/shell/mongo.js:47
+rs0:SECONDARY&gt; use test
+switched to db test
+rs0:SECONDARY&gt; db.guids.find()
+Error: error: { &quot;$err&quot; : &quot;not master and slaveOk=false&quot;, &quot;code&quot; : 13435 }
+rs0:SECONDARY&gt; rs.slaveOk()
+rs0:SECONDARY&gt; rs.slaveOk()
+rs0:SECONDARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+rs0:SECONDARY&gt; show collections()
+2015-06-09T17:14:24.219-0700 E QUERY    Error: don&apos;t know how to show [collections()]
+    at Error (&lt;anonymous&gt;)
+    at shellHelper.show (src/mongo/shell/utils.js:733:11)
+    at shellHelper (src/mongo/shell/utils.js:524:36)
+    at (shellhelp2):1:1 at src/mongo/shell/utils.js:733
+rs0:SECONDARY&gt; show collections
+guids
+system.indexes
+rs0:SECONDARY&gt; exit
+bye
+root@ubuntu:~# mongo --host 192.168.236.133
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.133:27017/test
+Server has startup warnings:
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not re                                      commended.
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten]
+rs0:SECONDARY&gt; rs.slaveOk()
+rs0:SECONDARY&gt; show dbs
+local  1.078GB
+test   0.078GB
+rs0:SECONDARY&gt; use test
+switched to db test
+rs0:SECONDARY&gt; show collections
+guids
+system.indexes
+rs0:SECONDARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+rs0:SECONDARY&gt; exit
+bye
+</code></pre><p>至此，整个验证过程说明了我们集群部署是成功的。数据能够正常同步了。那么接下来我们还要验证另一种情况，Primary异常终止之后（131），另外两个Secondary节点会不会自动选举出新的Primary节点呢？ 这个实验我们这样处理： 将131机器的mongod服务停止掉。然后再来连接133或者134任意一台机器，通过rs.status()查看集群状态。</p>
+<p>通过 ps -e | grep mongod 查看mongod服务是否开启，然后通过 killall mongod 或者 kill -15 &lt;进程号&gt;  来杀死mongod进程 </p>
+<pre><code>root@ubuntu:~# ps -e | grep mongod
+ 3279 pts/0    00:00:19 mongod
+root@ubuntu:~# killall mongod
+root@ubuntu:~# mongo --host 192.168.236.133
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.133:27017/test
+Server has startup warnings:
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten]
+rs0:SECONDARY&gt; rs.status()
+{
+        &quot;set&quot; : &quot;rs0&quot;,
+        &quot;date&quot; : ISODate(&quot;2015-06-10T00:22:40.283Z&quot;),
+        &quot;myState&quot; : 2,
+        &quot;members&quot; : [
+                {
+                        &quot;_id&quot; : 0,
+                        &quot;name&quot; : &quot;192.168.236.131:27017&quot;,
+                        &quot;health&quot; : 0,
+                        &quot;state&quot; : 8,
+                        &quot;stateStr&quot; : &quot;(not reachable/healthy)&quot;,
+                        &quot;uptime&quot; : 0,
+                        &quot;optime&quot; : Timestamp(0, 0),
+                        &quot;optimeDate&quot; : ISODate(&quot;1970-01-01T00:00:00Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:22:39.642Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:18:22.292Z&quot;),
+                        &quot;pingMs&quot; : 3,
+                        &quot;lastHeartbeatMessage&quot; : &quot;Failed attempt to connect to 192.168.236.131:27017; couldn&apos;t connect to server 192.168.236.131:27017 (192.168.236.131), connection attempt failed&quot;,
+                        &quot;configVersion&quot; : -1
+                },
+                {
+                        &quot;_id&quot; : 1,
+                        &quot;name&quot; : &quot;192.168.236.133:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 1169,
+                        &quot;optime&quot; : Timestamp(1433895342, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:15:42Z&quot;),
+                        &quot;configVersion&quot; : 1,
+                        &quot;self&quot; : true
+                },
+                {
+                        &quot;_id&quot; : 2,
+                        &quot;name&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 1,
+                        &quot;stateStr&quot; : &quot;PRIMARY&quot;,
+                        &quot;uptime&quot; : 986,
+                        &quot;optime&quot; : Timestamp(1433895342, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:15:42Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:22:38.952Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:22:38.951Z&quot;),
+                        &quot;pingMs&quot; : 6,
+                        &quot;electionTime&quot; : Timestamp(1433895503, 1),
+                        &quot;electionDate&quot; : ISODate(&quot;2015-06-10T00:18:23Z&quot;),
+                        &quot;configVersion&quot; : 1
+                }
+        ],
+        &quot;ok&quot; : 1
+}
+rs0:SECONDARY&gt; exit
+bye
+</code></pre><p>通过上面这段代码的观察，我们发现，当把原来的Primary节点停止掉后（131停止）， 那么整个mongodb的副本集群会重新选举出新的Primary节点（ 134 机器）</p>
+<p>为了验证一下新选举的Primary是否正常，我们再次验证一把数据的同步情况，先 连接到134 主节点，将原来的数据删掉，在到133进行验证，数据是否也被删除</p>
+<pre><code>root@ubuntu:~# mongo --192.168.236.134
+Error parsing command line: unknown option 192.168.236.134
+try &apos;mongo --help&apos; for more information
+root@ubuntu:~# mongo --host 192.168.236.134
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.134:27017/test
+Server has startup warnings:
+2015-06-09T17:03:27.744-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:03:27.744-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten]
+rs0:PRIMARY&gt; use test
+switched to db test
+rs0:PRIMARY&gt; show collections
+guids
+system.indexes
+rs0:PRIMARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;557781aed5ed7ed61c16abfd&quot;), &quot;name&quot; : &quot;mongodb&quot; }
+rs0:PRIMARY&gt; db.guids.remove({name:&quot;mongodb&quot;})
+WriteResult({ &quot;nRemoved&quot; : 1 })
+rs0:PRIMARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+rs0:PRIMARY&gt; exit
+bye
+root@ubuntu:~# mongo --host 192.168.236.133
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.133:27017/test
+Server has startup warnings:
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten]
+rs0:SECONDARY&gt; rs.slaveOk()
+rs0:SECONDARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+rs0:SECONDARY&gt; exit
+bye
+</code></pre><p>实践后发现，先选举的Primary节点也正常工作。我们的整个Mongodb副本集群测试完成。</p>
+<h2 id="动态添加节点，删除节点。"><a href="#动态添加节点，删除节点。" class="headerlink" title="动态添加节点，删除节点。"></a>动态添加节点，删除节点。</h2><p>在开始这个实验之前，先把131的机器重新启动，然后用mongo客户端连到131进行验证数据是否也同步了。</p>
+<p>登录131之后，我们发现数据也同步了，然后131节点变成了 Secondary节点了。</p>
+<pre><code>root@ubuntu:~# mongo
+MongoDB shell version: 3.0.3
+connecting to: test
+Server has startup warnings:
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten]
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten]
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten]
+rs0:SECONDARY&gt; rs.status()
+{
+        &quot;set&quot; : &quot;rs0&quot;,
+        &quot;date&quot; : ISODate(&quot;2015-06-10T00:25:02.631Z&quot;),
+        &quot;myState&quot; : 2,
+        &quot;syncingTo&quot; : &quot;192.168.236.133:27017&quot;,
+        &quot;members&quot; : [
+                {
+                        &quot;_id&quot; : 0,
+                        &quot;name&quot; : &quot;192.168.236.131:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 14,
+                        &quot;optime&quot; : Timestamp(1433895834, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:23:54Z&quot;),
+                        &quot;syncingTo&quot; : &quot;192.168.236.133:27017&quot;,
+                        &quot;configVersion&quot; : 1,
+                        &quot;self&quot; : true
+                },
+                {
+                        &quot;_id&quot; : 1,
+                        &quot;name&quot; : &quot;192.168.236.133:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 13,
+                        &quot;optime&quot; : Timestamp(1433895834, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:23:54Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:25:01.196Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:25:02.228Z&quot;),
+                        &quot;pingMs&quot; : 1,
+                        &quot;syncingTo&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;configVersion&quot; : 1
+                },
+                {
+                        &quot;_id&quot; : 2,
+                        &quot;name&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 1,
+                        &quot;stateStr&quot; : &quot;PRIMARY&quot;,
+                        &quot;uptime&quot; : 13,
+                        &quot;optime&quot; : Timestamp(1433895834, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:23:54Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:25:01.235Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:25:02.446Z&quot;),
+                        &quot;pingMs&quot; : 10,
+                        &quot;electionTime&quot; : Timestamp(1433895503, 1),
+                        &quot;electionDate&quot; : ISODate(&quot;2015-06-10T00:18:23Z&quot;),
+                        &quot;configVersion&quot; : 1
+                }
+        ],
+        &quot;ok&quot; : 1
+}
+rs0:SECONDARY&gt; exit
+bye
+</code></pre><p>登录到134 Primary节点，通过  rs.remove() 方法来删除副本集中的某一个节点，这里我们还是将 131删除。删除之后我们还往134主节点中加入数据.</p>
+<pre><code>rs0:PRIMARY&gt; rs.remove(&quot;192.168.236.131:27017&quot;)
+{ &quot;ok&quot; : 1 }
+rs0:PRIMARY&gt; rs.status
+function () { return db._adminCommand(&quot;replSetGetStatus&quot;); }
+rs0:PRIMARY&gt; rs.status()
+{
+        &quot;set&quot; : &quot;rs0&quot;,
+        &quot;date&quot; : ISODate(&quot;2015-06-10T00:32:15.795Z&quot;),
+        &quot;myState&quot; : 1,
+        &quot;members&quot; : [
+                {
+                        &quot;_id&quot; : 1,
+                        &quot;name&quot; : &quot;192.168.236.133:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 1562,
+                        &quot;optime&quot; : Timestamp(1433896329, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:32:09Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:32:13.909Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:32:15.633Z&quot;),
+                        &quot;pingMs&quot; : 1,
+                        &quot;syncingTo&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;configVersion&quot; : 2
+                },
+                {
+                        &quot;_id&quot; : 2,
+                        &quot;name&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 1,
+                        &quot;stateStr&quot; : &quot;PRIMARY&quot;,
+                        &quot;uptime&quot; : 1729,
+                        &quot;optime&quot; : Timestamp(1433896329, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:32:09Z&quot;),
+                        &quot;electionTime&quot; : Timestamp(1433895503, 1),
+                        &quot;electionDate&quot; : ISODate(&quot;2015-06-10T00:18:23Z&quot;),
+                        &quot;configVersion&quot; : 2,
+                        &quot;self&quot; : true
+                }
+        ],
+        &quot;ok&quot; : 1
+}
+rs0:PRIMARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+rs0:PRIMARY&gt; db.guids.insert({&quot;name&quot;:&quot;remove one node dync&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+rs0:PRIMARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;557785bcbb56172c8e069341&quot;), &quot;name&quot; : &quot;remove one node dync&quot; }
+rs0:PRIMARY&gt; exit
+bye
+</code></pre><p>删除131节点后，我们往primary节点中加入了新的数据，然后先不要将131的mongod服务停掉，我们通过mongo连接到131的mongod服务来查看数据</p>
+<pre><code>root@ubuntu:~# mongo --host 192.168.236.131
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.131:27017/test
+Server has startup warnings:
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten]
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten]
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten]
+&gt; db.guids.find()
+Error: error: { &quot;$err&quot; : &quot;not master and slaveOk=false&quot;, &quot;code&quot; : 13435 }
+&gt; db.slaveOk()
+2015-06-09T17:33:40.243-0700 E QUERY    TypeError: Property &apos;slaveOk&apos; of object test is not a function
+    at (shell):1:4
+&gt; rs.slaveOk()
+&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+&gt; exit
+bye
+</code></pre><p>实验结果可以知道，我们在134新加入的数据 {name:”remove one node dync”} 并没有同步到131（已从副本集中删除）.</p>
+<p>为了让实验结果更加确切，我们查看133是否有同步了数据:</p>
+<pre><code>root@ubuntu:~# mongo --host 192.168.236.133
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.133:27017/test
+Server has startup warnings:
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.647-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:03:11.648-0700 I CONTROL  [initandlisten]
+rs0:SECONDARY&gt; rs.slaveOk()
+rs0:SECONDARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;557785bcbb56172c8e069341&quot;), &quot;name&quot; : &quot;remove one node dync&quot; }
+rs0:SECONDARY&gt; exit
+bye
+</code></pre><p>实验数据可以看到，133同步了在134主节点中新增的文档 {“name”:”remove one node dync”}，这样就证明了动态删除副本集中的某一个节点的实验成功了。那怎么动态添加节点到副本集中呢？</p>
+<p>原理是一样的，但是调用的方法变成了    <code>rs.add(&quot;192.168.236.131:27017&quot;)</code></p>
+<pre><code>root@ubuntu:~# mongo --host 192.168.236.134
+MongoDB shell version: 3.0.3
+connecting to: 192.168.236.134:27017/test
+Server has startup warnings:
+2015-06-09T17:03:27.744-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:03:27.744-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten]
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:03:27.745-0700 I CONTROL  [initandlisten]
+rs0:PRIMARY&gt; rs.add(&quot;192.168.236.131:27017&quot;);
+{ &quot;ok&quot; : 1 }
+rs0:PRIMARY&gt; rs.status()
+{
+        &quot;set&quot; : &quot;rs0&quot;,
+        &quot;date&quot; : ISODate(&quot;2015-06-10T00:34:45.974Z&quot;),
+        &quot;myState&quot; : 1,
+        &quot;members&quot; : [
+                {
+                        &quot;_id&quot; : 1,
+                        &quot;name&quot; : &quot;192.168.236.133:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 1712,
+                        &quot;optime&quot; : Timestamp(1433896482, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:34:42Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:34:44.207Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:34:45.901Z&quot;),
+                        &quot;pingMs&quot; : 2,
+                        &quot;syncingTo&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;configVersion&quot; : 3
+                },
+                {
+                        &quot;_id&quot; : 2,
+                        &quot;name&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 1,
+                        &quot;stateStr&quot; : &quot;PRIMARY&quot;,
+                        &quot;uptime&quot; : 1879,
+                        &quot;optime&quot; : Timestamp(1433896482, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:34:42Z&quot;),
+                        &quot;electionTime&quot; : Timestamp(1433895503, 1),
+                        &quot;electionDate&quot; : ISODate(&quot;2015-06-10T00:18:23Z&quot;),
+                        &quot;configVersion&quot; : 3,
+                        &quot;self&quot; : true
+                },
+                {
+                        &quot;_id&quot; : 3,
+                        &quot;name&quot; : &quot;192.168.236.131:27017&quot;,
+                        &quot;health&quot; : 1,
+                        &quot;state&quot; : 2,
+                        &quot;stateStr&quot; : &quot;SECONDARY&quot;,
+                        &quot;uptime&quot; : 1,
+                        &quot;optime&quot; : Timestamp(1433896329, 1),
+                        &quot;optimeDate&quot; : ISODate(&quot;2015-06-10T00:32:09Z&quot;),
+                        &quot;lastHeartbeat&quot; : ISODate(&quot;2015-06-10T00:34:44.217Z&quot;),
+                        &quot;lastHeartbeatRecv&quot; : ISODate(&quot;2015-06-10T00:34:44.234Z&quot;),
+                        &quot;pingMs&quot; : 1,
+                        &quot;syncingTo&quot; : &quot;192.168.236.134:27017&quot;,
+                        &quot;configVersion&quot; : 3
+                }
+        ],
+        &quot;ok&quot; : 1
+}
+rs0:PRIMARY&gt; exit
+bye
+</code></pre><p>在rs.status()返回的结果中可以看到，131节点已经成功加入副本集中了。加入之后，理论上应该会把在134主节点加入的数据同步过来，刚才删除之后是不会同步的。那这时候重新加入副本集，应该是要同步的。下面是实验结果：</p>
+<pre><code>root@ubuntu:~# mongo
+MongoDB shell version: 3.0.3
+connecting to: test
+Server has startup warnings:
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten]
+2015-06-09T17:24:49.146-0700 I CONTROL  [initandlisten]
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten] **        We suggest setting it to &apos;never&apos;
+2015-06-09T17:24:49.147-0700 I CONTROL  [initandlisten]
+rs0:SECONDARY&gt; rs.slaveOk()
+rs0:SECONDARY&gt; db.guids.find()
+{ &quot;_id&quot; : ObjectId(&quot;557780ebd147e9391020860d&quot;), &quot;name&quot; : &quot;replica set&quot;, &quot;author&quot; : &quot;webinglin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;557785bcbb56172c8e069341&quot;), &quot;name&quot; : &quot;remove one node dync&quot; }
+rs0:SECONDARY&gt; exit
+bye
+</code></pre><p>实验结果显示，动态添加操作也正常。动态的将131节点加入到副本集中能够保证数据同步成功。</p>
+<blockquote>
+<p><strong>注意</strong></p>
+<p>在调用 rs.add(“host:ip”) 或者 rs.remove(“host:ip”) 的时候，必须要在 Primary 节点中进行。</p>
+</blockquote>
+<p>add方法可以加入一个document对象，这样就可以在指定具体的Secondary节点的更多的设置项了，比如指定为priority: 0 或 priority: 0,hidden: true 或 priority:0,hidden:true,arbiterOnly:true</p>
+<pre><code>{
+  _id: &lt;int&gt;,
+  host: &lt;string&gt;,
+  arbiterOnly: &lt;boolean&gt;,
+  buildIndexes: &lt;boolean&gt;,
+  hidden: &lt;boolean&gt;,
+  priority: &lt;number&gt;,
+  tags: &lt;document&gt;,
+  slaveDelay: &lt;int&gt;,
+  votes: &lt;number&gt;
+}
+</code></pre><p><strong>怎么对副本集进行权限验证，参考主从复制的安全部分，也是通过openssl来生成keyfile，然后再启动mongod的时候指定keyFile来设置安全的</strong></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><ul>
+<li><a href="docs.mongodb.org/manual/">《官网手册》</a></li>
+<li>《MongoDB权威指南》</li>
+</ul>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第七篇 Replica Set 核心概念]]></title>
+      <url>http://webinglin.github.io/2015/06/09/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E4%B8%83%E7%AF%87-Replica-Set-%E6%A6%82%E5%BF%B5/</url>
+      <content type="html"><![CDATA[<p>副本集是一组mongod进程组成的，提供了数据冗余和高可用性。</p>
+<h2 id="副本集的成员"><a href="#副本集的成员" class="headerlink" title="副本集的成员"></a>副本集的成员</h2><p><strong>Replica Set Primary</strong></p>
+<blockquote>
+<p>The primary is the only member of a replica set that accepts write operations.</p>
+</blockquote>
+<p><strong>Replica Set Secondary Members</strong></p>
+<blockquote>
+<p>Secondary members replicate the primary’s data set and accept read operations. If the set has no primary, a secondary <strong>can become primary.</strong></p>
+</blockquote>
+<p><strong>Priority 0 Replica Set Members</strong></p>
+<blockquote>
+<p>Priority 0 members are secondaries that <strong>cannot become the primary.</strong></p>
+</blockquote>
+<p><strong>Hidden Replica Set Members</strong></p>
+<blockquote>
+<p>Hidden members are secondaries that are invisible to applications. These members support dedicated workloads, such as reporting or <strong>backup.</strong></p>
+</blockquote>
+<p><strong>Replica Set Arbiter</strong></p>
+<blockquote>
+<p>An arbiter <strong>does not maintain a copy of the data set</strong> but participate in <strong>elections.</strong></p>
+</blockquote>
+<a id="more"></a>
+<p>观察上面提到的集中成员，归根结底就是两种 Primary和Secondary，只不过Secondary根据不用的用途再次划分了。</p>
+<blockquote>
+<p>Most deployments, however, will keep three members that store data: A primary and two secondary members.</p>
+</blockquote>
+<p>这句话说明了正常情况下，会有一个primary节点和两个secondare节点。</p>
+<p>在mongodb3.0.0以后的版本，最多可以有50个节点，但是只能有7个投票的节点</p>
+<blockquote>
+<p>Changed in version 3.0.0: A replica set can have up to 50 members but only 7 voting members</p>
+</blockquote>
+<p>那如果超过了50个节点，应该采用master-slave的模式了。但是master-slave的模式就不能自动的故障恢复了。(不能像副本集那样自动选举主节点)</p>
+<p>##Primary节点<br>primary节点是在副本集中唯一能够接受写操作的节点。Mongodb将这些写操作应用到primary节点中，然后将这些操作记录在primary节点的oplog中。 Secondary节点复制这个oplog，并将里面的操作应用到自己的数据库中。（和Redis的aop备份方式一样的道理）</p>
+<p><img src="http://docs.mongodb.org/manual/_images/replica-set-read-write-operations-primary.png" alt=""></p>
+<p>在上图中，有三个节点的副本集，primary节点接受所有的写操作。然后Secondary节点从primary节点复制oplog并应用到他们的数据集里面。</p>
+<p>所有的副本集成员都能够接受读的请求。但是默认情况下，应用程序会将读请求定向到primary节点、这个是可以修改的。</p>
+<p>一个副本集最多只能拥有一个Primary节点，一旦这个Primary节点变得不可用了，副本集就会选出一个Secondary，让它成为新的Primary节点。</p>
+<p><img src="http://docs.mongodb.org/manual/_images/replica-set-trigger-election.png" alt=""></p>
+<h2 id="Secondary节点"><a href="#Secondary节点" class="headerlink" title="Secondary节点"></a>Secondary节点</h2><p>上文中提到了，Secondary节点维护者primary节点的数据拷贝。一个副本集能够拥有一个或多个Secondary节点。</p>
+<p>尽管客户端不能往Secondary节点写入数据，但是能够从Secondary节点读取数据。</p>
+<p>一个Secondary节点也能成为primary节点，当primary节点变得不可用的时候，Replica Sets（副本集）会选举出新的Primary节点（是否是Zookeeper的master选举方式呢？还不清楚）。</p>
+<p>对于Secondary节点，我们可以根据不能的目的，将secondary节点配置成不同用途的secondary：</p>
+<ul>
+<li>Priority 0 Replica Set Members</li>
+<li>Hidden Replica Set Members.</li>
+<li>Delayed Replica Set Members.</li>
+</ul>
+<p><strong>Priority 0 Replica Set Members</strong></p>
+<blockquote>
+<p>阻止Secondary成为Primary节点，可用来让其一直处于secondar状态，只读。或者做冷备份。</p>
+<p>如果一个副本集中的机器配置都不一样的话，可以将性能不那么优秀的机器配置成priority 0 的 Secondary节点。这样的话就能够保证只有高性能机器能够成为Primary节点了。当然，这种是备份的目的，也可以考虑将这样的节点设置成Hidden节点</p>
+</blockquote>
+<p><strong>Hidden Replica Set Members</strong></p>
+<blockquote>
+<p>应用程序都无法访问的节点。可以用来做备份</p>
+<p>Hidden Member必须是priority 0 成员节点。那样才能不成为Primary节点。（对客户端都不可见，成为Primary节点太危险,太诡异）</p>
+<p>虽然Hidden节点对客户端不可见，而且不能成为Primary节点，但是当Primary节点挂掉的时候可以参与投票。</p>
+</blockquote>
+<p><strong>Delayed Replica Set Members</strong></p>
+<blockquote>
+<p>历史副本的镜像备份，具备延迟性，方便从致命性的错误中恢复回来，如：无意的删除数据库或者集合。</p>
+<p>例如，当前时间 9:50，然后delayed memeber设置一小时的延迟，那么这个delayed member的数据是8:50之前的数据。</p>
+<p>Delayed member必须是priority 0 memeber，这样不能成为primary节点。应该是hidden member，这样能够阻止应用程序访问delayed member。</p>
+</blockquote>
+<h4 id="Arbiter"><a href="#Arbiter" class="headerlink" title="Arbiter"></a>Arbiter</h4><p>一个arbiter节点不会拥有数据拷贝，也不能成为主节点。它只能在选举Primary节点的时候参与投票。而且只能投出一票。</p>
+<p>如果有有偶数台机器，那么加上一台arbiter，(arbiter也就这时候用吧？) 因为arbiter member需要很少的资源，随便再加一台普通的机子即可。</p>
+<blockquote>
+<p><strong>IMPORTANT</strong></p>
+<p>Do not run an arbiter on systems that also host the primary or the secondary members of the replica set.</p>
+<p>即Arbiter节点不要和primary或者secondar节点在同一台机器上。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="http://docs.mongodb.org/manual/core/replication/" target="_blank" rel="external">http://docs.mongodb.org/manual/core/replication/</a></p>
+<p>《MongoDB权威指南》</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第六篇 主从复制]]></title>
+      <url>http://webinglin.github.io/2015/06/08/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E5%85%AD%E7%AF%87-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</url>
+      <content type="html"><![CDATA[<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备:"></a>环境准备:</h2><ul>
+<li>ubuntu12.0.4</li>
+<li>mongodb3.0.3</li>
+</ul>
+<p>主从复制是MongoDB中最常见的复制方式。这种方式非常灵活，可用于备份，故障恢复，读扩展 等。</p>
+<p>本次试验中，我们采用一个主节点，一个从节点。</p>
+<a id="more"></a>
+<p>首先先创建master和slave的目录</p>
+<pre><code>lwb@ubuntu:~$ mkdir -p ~/mongoData/master
+lwb@ubuntu:~$ mkdir -p ~/mongoData/slave
+</code></pre><p>创建之后，启动master</p>
+<pre><code>lwb@ubuntu:~$ mongod --master --dbpath ~/mongoData/master/ --port 10000
+</code></pre><p>然后再启动slave</p>
+<pre><code>lwb@ubuntu:~$ mongod --dbpath  ~/mongoData/slave/ --port 10001 --slave --source localhost:10000
+</code></pre><p>接着，连接到master的机器，</p>
+<pre><code>lwb@ubuntu:~$ mongo --host localhost --port 10000
+</code></pre><p>往test数据库的users集合里面插入两条数据：</p>
+<pre><code>&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55763d98db85929bb8addedf&quot;), &quot;username&quot; : &quot;lwb&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;55764a694b24187a7a3c6693&quot;), &quot;username&quot; : &quot;mongodb master-slave&quot; }
+</code></pre><p>在master操作完成之后，在连接slave的mongod</p>
+<pre><code>lwb@ubuntu:~$ mongo --host localhost --port 10001
+MongoDB shell version: 3.0.3
+connecting to: localhost:10001/test
+Server has startup warnings:
+2015-06-08T19:02:31.866-0700 I CONTROL  [initandlisten]
+2015-06-08T19:02:31.866-0700 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/   mm/transparent_hugepage/defrag is &apos;always&apos;.
+2015-06-08T19:02:31.866-0700 I CONTROL  [initandlisten] **        We suggest set   ting it to &apos;never&apos;
+2015-06-08T19:02:31.866-0700 I CONTROL  [initandlisten]
+&gt;
+&gt; show dbs
+2015-06-08T19:09:17.770-0700 E QUERY    Error: listDatabases failed:{ &quot;note&quot; : &quot;   from execCommand&quot;, &quot;ok&quot; : 0, &quot;errmsg&quot; : &quot;not master&quot; }
+    at Error (&lt;anonymous&gt;)
+    at Mongo.getDBs (src/mongo/shell/mongo.js:47:15)
+    at shellHelper.show (src/mongo/shell/utils.js:630:33)
+    at shellHelper (src/mongo/shell/utils.js:524:36)
+    at (shellhelp2):1:1 at src/mongo/shell/mongo.js:47
+&gt;
+&gt; rs.slaveOk()
+&gt; 
+&gt; show dbs
+local  0.078GB
+test   0.078GB
+&gt;
+&gt; use test
+switched to db test
+&gt; show collections
+system.indexes
+users
+&gt;
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55763d98db85929bb8addedf&quot;), &quot;username&quot; : &quot;lwb&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;55764a694b24187a7a3c6693&quot;), &quot;username&quot; : &quot;mongodb master-sla   ve&quot; }
+</code></pre><h2 id="我遇到的问题及解决方法"><a href="#我遇到的问题及解决方法" class="headerlink" title="我遇到的问题及解决方法"></a>我遇到的问题及解决方法</h2><h5 id="问题一："><a href="#问题一：" class="headerlink" title="问题一："></a>问题一：</h5><blockquote>
+<p>我的主从复制实验分为两次进行，刚开始我配置的master的端口是 10000 ，salve的端口是10001 ； 后因为电脑内存使用率暴涨，90+% 。 所以关掉电脑重启。问题就出现在这里，重启之后，我指定master端口的时候指定为 27000 ， 指定slave端口为 27001 所以就出现了如下问题：terminating mongod after 30 seconds</p>
+</blockquote>
+<pre><code>2015-06-08T18:11:37.981-0700 I NETWORK  [initandlisten] waiting for connections on port 27001
+2015-06-08T18:11:38.975-0700 I REPL     [replslave] repl: --source localhost:27000 != localhost:10000 from local.sources collection
+2015-06-08T18:11:38.976-0700 I REPL     [replslave] repl: for instructions on changing this slave&apos;s source, see: 2015-06-08T18:11:38.976-0700 I REPL     [replslave] http://dochub.mongodb.org/co re/masterslave
+2015-06-08T18:11:38.976-0700 I REPL     [replslave] repl: terminating mongod after 30 seconds
+2015-06-08T18:12:08.976-0700 I CONTROL  [replslave] dbexit:  rc: 3
+</code></pre><h5 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h5><p>如果仔细观察日志的同学应该会发现：</p>
+<pre><code>2015-06-08T18:11:38.975-0700 I REPL     [replslave] repl: --source localhost:27000 != localhost:10000 from local.sources collection
+</code></pre><p>所以，在一开始的时候我们已经为slave指定了master的host和port，这个会插入到local.sources 这个集合的。所以，把master端口改成10000就可以了。 </p>
+<h5 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a>问题二</h5><blockquote>
+<p>主从启动之后，连接slave可以成功连上，但是在slave中执行 show dbs 的时候就报错了:    </p>
+</blockquote>
+<pre><code>QUERY    Error: listDatabases failed:{ &quot;note&quot; : &quot;from execCommand&quot;, &quot;ok&quot; : 0, &quot;errmsg&quot; : &quot;not master&quot; }
+</code></pre><h5 id="解决方法：-1"><a href="#解决方法：-1" class="headerlink" title="解决方法："></a>解决方法：</h5><p>在报错的slave机器上执行 rs.slaveOk()方法即可。</p>
+<pre><code>&gt; rs.slaveOk()
+&gt; show dbs
+local  0.078GB
+test   0.078GB
+&gt; use test
+switched to db test
+&gt; show collections
+system.indexes
+users
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55763d98db85929bb8addedf&quot;), &quot;username&quot; : &quot;lwb&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;55764a694b24187a7a3c6693&quot;), &quot;username&quot; : &quot;mongodb master-slave&quot; }
+</code></pre><p>具体slaveOk方法是什么意思？</p>
+<p><strong>rs.slaveOk()</strong></p>
+<blockquote>
+<p>Provides a shorthand for the following operation:</p>
+<p>db.getMongo().setSlaveOk()<br>This allows the current connection to allow read operations to run on secondary members. See the readPref() method for more fine-grained control over read preference in the mongo shell.</p>
+</blockquote>
+<h2 id="Master-Slave安全"><a href="#Master-Slave安全" class="headerlink" title="Master-Slave安全"></a>Master-Slave安全</h2><p>这个主从安全在 <a href="http://docs.mongodb.org/manual/core/master-slave/" target="_blank" rel="external">MongoDB官网</a>说的很清楚。不能和普通的mongod权限验证那样。这里除了需要加入 –auth 还需要加入 –keyFile 的验证。</p>
+<p>首先，我们生成我们的keyFile，根据官网提供的说明，这个keyfile是可以任意内容的，只要保证所有集群中的机器都拥有同样的文件即可。在linux环境下，我们通过</p>
+<pre><code>openssl rand -base64 741 &gt; /usr/localhsot/mongodb/mongo-keyfile
+</code></pre><p>这条命令来生成我们的keyFile。 生成之后就可以在启动mongod的时候指定了。</p>
+<p>首先先启动 master</p>
+<pre><code>root@ubuntu:/usr/local/mongodb# mongod --master --dbpath ~/mongoData/master/ --port 10000 --auth --keyFile /usr/local/mongodb/mongo-keyfile
+</code></pre><p>这里在启动的时候可能会遇到一些问题，我是在ubuntu环境下，所以经常操作要sudo，很繁琐。因此，让当前用户获得root权限是很有必要的。</p>
+<blockquote>
+<p>在命令行模式执行  vi etc/passwd</p>
+<p>我的用户名是 lwb ，所以将lwb所在的行改成</p>
+<p>lwb:x:0:0:Ubuntu12.04,,,:/home/lwb:/bin/bash</p>
+<p>原来的值是（将1000 改成 0 即可）：  lwb:x:1000:1000:Ubuntu12.04,,,:/home/lwb:/bin/bash</p>
+<p>修改完成之后重启登录就可以让当前用户获得root权限了。</p>
+</blockquote>
+<p>回到正题，在生成mongo-keyfile后，并指定keyFile参数来启动mongod的时候，可能还会遇到另一个问题：</p>
+<pre><code>root@ubuntu:~# mongod --master --dbpath ~/mongoData/master/ --port 10000 --auth --keyFile /usr/local/mongodb/mongo-keyfile
+2015-06-08T21:34:43.864-0700 I ACCESS   permissions on /usr/local/mongodb/mongo-keyfile are too open
+</code></pre><p>这个错误的意思是说 mongo-keyfile权限太大了，降低一下这个文件的权限。</p>
+<pre><code>root@ubuntu:/usr/local/mongodb# chmod 400 mongo-keyfile
+root@ubuntu:/usr/local/mongodb# ll
+total 84
+drwxr-xr-x  4 root root  4096 Jun  8 21:34 ./
+drwxr-xr-x 11 root root  4096 Jun  8 16:49 ../
+-rw-r--r--  1 root root 34520 Jun  6 07:24 GNU-AGPL-3.0
+-rw-r--r--  1 root root  1359 Jun  6 07:24 README
+-rw-r--r--  1 root root 22660 Jun  6 07:24 THIRD-PARTY-NOTICES
+drwxr-xr-x  2 root root  4096 Jun  6 07:24 bin/
+drwxr-xr-x  3 root root  4096 Jun  7 13:02 data/
+-r--------  1 root root  1004 Jun  8 21:34 mongo-keyfile
+</code></pre><p>重启一下mongod即可正常运行。</p>
+<p>接着启动slave</p>
+<pre><code>mongod --slave --dbpath ~/mongoData/slave/ --port 10001 --source localhost:10000 --auth --keyFile /usr/local/mongodb/mongo-keyfile
+</code></pre><p>一切都顺利的进行着。<br>使用创建的用户操作master里面的数据库以及集合都是正常的。但是使用同样的用户操作slave的时候就有不正常了。还是提示</p>
+<pre><code>QUERY    Error: listDatabases failed:{ &quot;note&quot; : &quot;from execCommand&quot;, &quot;ok&quot; : 0, &quot;errmsg&quot; : &quot;not master&quot; }
+</code></pre><p>这个错误上面已经提到了。解决方法也是一样的。 rs.slaveOk() 执行完这条语句之后既可以正常操作了。</p>
+<p>可以发现，用keyFile的方式启动mongod服务器其实和平常启动没什么区别，唯一的区别就是在启动参数中指定了 <code>--keyFile keyfile</code> 而已。</p>
+<p>具体怎么创建用户参考: <a href="http://webinglin.github.io/2015/06/05/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E4%BA%8C%E7%AF%87-mongodb%E5%AE%89%E5%85%A8/">MongoDB学习札记 第二篇 mongodb安全</a></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>MongoDB权威指南</p>
+<p><a href="http://docs.mongodb.org/manual/core/master-slave/" target="_blank" rel="external">MongoDB官网Manual手册</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第五篇 监控]]></title>
+      <url>http://webinglin.github.io/2015/06/07/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E4%BA%94%E7%AF%87-%E7%9B%91%E6%8E%A7/</url>
+      <content type="html"><![CDATA[<p>对数据库的监控对于数据库管理人员（包括开发人员排查问题也是）来说是一项很重要的工作。</p>
+<p>Mongodb提供了三种监控策略：</p>
+<ul>
+<li>mongodb提供的工具集合，实时监听数据库的活动。</li>
+<li>database commands 返回当前数据库的状态</li>
+<li>MongoDB Management Service(MMS) 提供可视化的监控结果。</li>
+</ul>
+<a id="more"></a>
+<h4 id="MongoDB-Utilities"><a href="#MongoDB-Utilities" class="headerlink" title="MongoDB Utilities"></a>MongoDB Utilities</h4><p><strong>mongostat</strong></p>
+<p>mongostat显示每秒钟插入，查询，更新，删除，连接数 的统计信息。</p>
+<pre><code>root@ubuntu:~# mongostat
+insert query update delete getmore command flushes mapped  vsize   res faults qr|qw ar|aw netIn netOut conn     time
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:15
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:16
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:17
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:18
+    *0    *0     *0     *0       0     2|0       1 160.0M 527.0M 69.0M      0   0|0   0|0  133b    10k    2 17:37:19
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:20
+    *0    *0     *0     *0       0     1|0       0 160.0M 527.0M 69.0M      0   0|0   0|0   79b    10k    2 17:37:21
+^Croot@ubuntu:~#
+</code></pre><p><strong>mongotop</strong><br>mongotop 统计当前活动的mongodb实例的集合读写时长,可以用来验证是否我们的mongodb实例还活着或者验证操作时长是否达到我们的要求。</p>
+<pre><code>root@ubuntu:~# mongotop
+2015-06-07T17:48:58.772-0700    connected to: 127.0.0.1
+                     ns    total    read    write    2015-06-07T17:52:03-07:00
+             test.pages     65ms    65ms      0ms
+     admin.system.roles      0ms     0ms      0ms
+   admin.system.version      0ms     0ms      0ms
+      local.startup_log      0ms     0ms      0ms
+   local.system.indexes      0ms     0ms      0ms
+local.system.namespaces      0ms     0ms      0ms
+   local.system.replset      0ms     0ms      0ms
+    test.system.indexes      0ms     0ms      0ms
+ test.system.namespaces      0ms     0ms      0ms
+              test.user      0ms     0ms      0ms
+</code></pre><p><strong>Http控制台</strong></p>
+<p>我用的mongodb是3.0.3版本，默认没有开启28017端口，所以你访问 <a href="http://yourhost:28017" target="_blank" rel="external">http://yourhost:28017</a> 是访问不了的， 如果要访问28017端口的应用， 需要在启动monogd的时候加入 –rest 参数<br><code>./mongod --dbpath ../data/db/ --rest</code></p>
+<h4 id="MongoDB-Command"><a href="#MongoDB-Command" class="headerlink" title="MongoDB Command"></a>MongoDB Command</h4><p><strong>db.serverStatus()</strong></p>
+<p>返回的结果是数据库的状态信息，包含磁盘，内存的使用情况，连接数，索引访问情况等。 db.serverStatus()返回结果非常快速，并不会影响到mongoDB的性能。</p>
+<pre><code>&gt; db.serverStatus()
+{
+        &quot;host&quot; : &quot;ubuntu&quot;,
+        &quot;version&quot; : &quot;3.0.3&quot;,
+        &quot;process&quot; : &quot;mongod&quot;,
+        &quot;pid&quot; : NumberLong(2354),
+        &quot;uptime&quot; : 13191,
+
+        ... ...
+
+        &quot;ok&quot; : 1
+}
+</code></pre><p><strong>db.stats()</strong></p>
+<p>返回当前数据库的存储的内存大小，集合数量，索引占用内存大小等情况。</p>
+<pre><code>&gt; db.stats()
+{
+        &quot;db&quot; : &quot;test&quot;,
+        &quot;collections&quot; : 4,
+        &quot;objects&quot; : 42,
+        &quot;avgObjSize&quot; : 67.80952380952381,
+        &quot;dataSize&quot; : 2848,
+        &quot;storageSize&quot; : 28672,
+        &quot;numExtents&quot; : 4,
+        &quot;indexes&quot; : 2,
+        &quot;indexSize&quot; : 16352,
+
+        ... ...
+
+        &quot;ok&quot; : 1
+}
+</code></pre><p><strong>db.collection.stats()</strong></p>
+<p>相对于db.stats()，db.collection.stats()返回的是集合的统计信息。</p>
+<pre><code>&gt; db.pages.stats()
+{
+        &quot;ns&quot; : &quot;test.pages&quot;,
+        &quot;count&quot; : 30,
+        &quot;size&quot; : 1440,
+        &quot;avgObjSize&quot; : 48,
+        &quot;numExtents&quot; : 1,
+        &quot;storageSize&quot; : 8192,
+        &quot;lastExtentSize&quot; : 8192,
+        &quot;paddingFactor&quot; : 1,
+
+        ... ...
+
+        &quot;ok&quot; : 1
+}
+&gt;
+</code></pre><h4 id="其他工具"><a href="#其他工具" class="headerlink" title="其他工具"></a>其他工具</h4><p>来源官网manual手册</p>
+<blockquote>
+<p>Third Party Tools<br>A number of third party monitoring tools have support for MongoDB, either directly, or through their own plugins.</p>
+<p>Self Hosted Monitoring Tools<br>These are monitoring tools that you must install, configure and maintain on your own servers. Most are open source.<br><img src="http://i1.tietuku.com/ee8766835a8adf00.jpg" alt=""></p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3><h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><p><a href="http://docs.mongodb.org/manual/administration/monitoring/" target="_blank" rel="external">http://docs.mongodb.org/manual/administration/monitoring/</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第四篇 Query]]></title>
+      <url>http://webinglin.github.io/2015/06/07/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E5%9B%9B%E7%AF%87-Query/</url>
+      <content type="html"><![CDATA[<h2 id="查询条件"><a href="#查询条件" class="headerlink" title="查询条件"></a>查询条件</h2><p>首先往数据库集合里面插入几条数据。<br>测试数据：</p>
+<pre><code>&gt; db.users.insert({username:&quot;mongo&quot;, url:&quot;webinglin.github.io&quot;, tags:[&quot;mongodb&quot;, database&quot;,&quot;nosql&quot;],likes:999, author:&quot;linwenbin&quot;})
+&gt; db.users.insert({username:&quot;redis&quot;, url:&quot;webinglin.github.io&quot;, tags:[&quot;redis&quot;,&quot;database&quot;,&quot;nosql&quot;],likes:888, author:&quot;linwenbin&quot;})
+&gt; db.users.insert({username:&quot;spring&quot;, url:&quot;webinglin.github.io&quot;, tags:[&quot;spring&quot;,&quot;framework&quot;],likes:777, author:&quot;linwenbin&quot;})
+</code></pre><a id="more"></a>
+<p><br></p>
+<pre><code>&gt; db.users.find().pretty()
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;),
+        &quot;username&quot; : &quot;mongo&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;mongodb&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 999,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;),
+        &quot;username&quot; : &quot;redis&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;redis&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 888,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;),
+        &quot;username&quot; : &quot;spring&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;spring&quot;,
+                &quot;framework&quot;
+        ],
+        &quot;likes&quot; : 777,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+</code></pre><p>pretty() 方法是对查询结果进行格式化</p>
+<p>查询的时候可以带上查询条件,那具体的查询条件怎么使用？</p>
+<h4 id="等于"><a href="#等于" class="headerlink" title="等于"></a>等于</h4><p>等于操作直接使用 {key:value} 这样的文档形式即可</p>
+<pre><code>&gt; db.users.find({username:&quot;mongo&quot;})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+&gt;
+</code></pre><h4 id="大于"><a href="#大于" class="headerlink" title="大于"></a>大于</h4><p>语法： {key : {$gt:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$gt:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+&gt;
+</code></pre><h4 id="大于等于"><a href="#大于等于" class="headerlink" title="大于等于"></a>大于等于</h4><p>语法： {key : {$gte:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$gte:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="小于"><a href="#小于" class="headerlink" title="小于"></a>小于</h4><p>语法：　{key : {$lt:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$lt:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;), &quot;username&quot; : &quot;spring&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;spring&quot;, &quot;framework&quot; ], &quot;likes&quot; : 777, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="小于等于"><a href="#小于等于" class="headerlink" title="小于等于"></a>小于等于</h4><p>语法：　{key : {$lte:value}}</p>
+<pre><code>&gt; db.users.find({likes:{$lte:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;), &quot;username&quot; : &quot;spring&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;spring&quot;, &quot;framework&quot; ], &quot;likes&quot; : 777, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="不等于"><a href="#不等于" class="headerlink" title="不等于"></a>不等于</h4><p>语法：  {key : {$ne:value} }</p>
+<pre><code>&gt; db.users.find({likes:{$ne:888}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;), &quot;username&quot; : &quot;spring&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;spring&quot;, &quot;framework&quot; ], &quot;likes&quot; : 777, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="且操作-AND"><a href="#且操作-AND" class="headerlink" title="且操作 AND"></a>且操作 AND</h4><p>语法： {key1:value1, key2:value2, key3:value3 …}</p>
+<pre><code>&gt; db.users.find({likes:{$gt:777},username:&quot;mongo&quot;})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+
+&gt; db.users.find({likes:{$gt:777}})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="或操作-OR"><a href="#或操作-OR" class="headerlink" title="或操作 OR"></a>或操作 OR</h4><p>语法： { $or: [ {key1: value1}, {key2:value2} ]  } 将or条件的所有 {key:value} 都放在 $or 的value中（数组）</p>
+<pre><code>&gt; db.users.find({$or:[{username:&quot;mongo&quot;},{username:&quot;redis&quot;}]})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;), &quot;username&quot; : &quot;redis&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;redis&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 888, &quot;author&quot; : &quot;linwenbin&quot; }
+</code></pre><h4 id="复杂条件查询"><a href="#复杂条件查询" class="headerlink" title="复杂条件查询"></a>复杂条件查询</h4><p>如何将所有的条件都连起来用呢？</p>
+<p>比如我们想要这样查询 like&gt;=888 &amp;&amp; (username=”mongo” or username=”spring”)<br>由于上面的数据只有三条， 我们知道 like&gt;=888 只有 mongo 和 redis 这两条数据满足条件， 后面的username=”mongo” or username=”spring” 又有 mongo和 spring 满足条件， 这两个and操作之后 就只剩下 mongo 这条数据满足条件了。 所以最终应该查出一条mongo的Document.</p>
+<pre><code>&gt; db.users.find({likes:{$gte:888},$or:[{username:&quot;mongo&quot;},{username:&quot;spring&quot;}]})
+{ &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;), &quot;username&quot; : &quot;mongo&quot;, &quot;url&quot; : &quot;webinglin.github.io&quot;, &quot;tags&quot; : [ &quot;mongodb&quot;, &quot;database&quot;, &quot;nosql&quot; ], &quot;likes&quot; : 999, &quot;author&quot; : &quot;linwenbin&quot; }
+&gt;
+</code></pre><h2 id="find-其他用法"><a href="#find-其他用法" class="headerlink" title="find() 其他用法"></a>find() 其他用法</h2><h4 id="Projection"><a href="#Projection" class="headerlink" title="Projection"></a>Projection</h4><p>mongodb中 projection 意味着显示你希望看到的字段而非所有的字段都显示,这是什么意思呢？</p>
+<p>比如： 我们的测试数据里面有那么多的字段: username,likes,tags,author,url 而我们经常要用到的就只有 username 和 likes 那么就显示这两个字段就好了，其他的字段就别显示出来了。</p>
+<p>find({},{KEY:1/0}) find的第二个参数，KEY为要显示或隐藏的字段，value为1表示显示，0表示隐藏，看着也很简单，试一下吧</p>
+<pre><code>&gt; db.users.find({},{_id:0,url:0,tags:0,author:0})
+{ &quot;username&quot; : &quot;mongo&quot;, &quot;likes&quot; : 999 }
+{ &quot;username&quot; : &quot;redis&quot;, &quot;likes&quot; : 888 }
+{ &quot;username&quot; : &quot;spring&quot;, &quot;likes&quot; : 777 }
+&gt;
+</code></pre><h2 id="limit-skip-sort"><a href="#limit-skip-sort" class="headerlink" title="limit, skip, sort"></a>limit, skip, sort</h2><p>为了更好的测试分页的效果，新建一个集合，并插入30条数据</p>
+<pre><code>&gt; for(var i=0; i&lt;30; i++){
+... db.pages.insert({&quot;val&quot;:i});
+... }
+WriteResult({ &quot;nInserted&quot; : 1 })
+&gt; db.pages.find()
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e37f&quot;), &quot;val&quot; : 0 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e380&quot;), &quot;val&quot; : 1 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e381&quot;), &quot;val&quot; : 2 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e382&quot;), &quot;val&quot; : 3 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e383&quot;), &quot;val&quot; : 4 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e384&quot;), &quot;val&quot; : 5 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e385&quot;), &quot;val&quot; : 6 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e386&quot;), &quot;val&quot; : 7 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e387&quot;), &quot;val&quot; : 8 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e388&quot;), &quot;val&quot; : 9 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e389&quot;), &quot;val&quot; : 10 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38a&quot;), &quot;val&quot; : 11 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38b&quot;), &quot;val&quot; : 12 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38c&quot;), &quot;val&quot; : 13 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38d&quot;), &quot;val&quot; : 14 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38e&quot;), &quot;val&quot; : 15 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38f&quot;), &quot;val&quot; : 16 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e390&quot;), &quot;val&quot; : 17 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+Type &quot;it&quot; for more
+</code></pre><p><br></p>
+<pre><code>&gt; db.pages.find().limit(5)
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e37f&quot;), &quot;val&quot; : 0 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e380&quot;), &quot;val&quot; : 1 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e381&quot;), &quot;val&quot; : 2 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e382&quot;), &quot;val&quot; : 3 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e383&quot;), &quot;val&quot; : 4 }
+</code></pre><p>可以发现，如果使用 limit方法的话会显示整个集合的所有文档。 指定了 limit 之后， 显示具体的条数，上文中，limit(5) 表示， 显示5条文档。</p>
+<p>limit方法除外，还有一个 skip 方法，skip也是接受一个整型的参数，表示查询结果跳过多少个文档。</p>
+<p>例如上面插入的30条记录中，我们要显示18-22条记录，那么就应该使用<br><code>db.pages.find().skip(18).limit(5)</code></p>
+<pre><code>&gt; db.pages.find().skip(18).limit(5)
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e393&quot;), &quot;val&quot; : 20 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e394&quot;), &quot;val&quot; : 21 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e395&quot;), &quot;val&quot; : 22 }
+</code></pre><p>skip和limit的组合就能做到分页的功能了。但是如果数据量很大，理论上分页就会变得很慢了，比如有一亿条数据，要拿最后一页。那skip的数据量就很多很多了。这样就会变得比较慢。话说回来，有谁会看数据看到最后的几页？正常都是看前面几页数据，所以，skip和limit实现分页是可以接受的。</p>
+<p>在mongodb中，如果要对查询结果排序，那么需要使用sort方法。sort方法接收一个文档参数。也就是{key:value}的形式。其中，key表示要排序的字段，value的可取值为 1 / -1 。1表示升序asc，-1表示降序desc。话不多说，直接上例子：</p>
+<pre><code>&gt; db.pages.find().sort({val:-1})
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e39c&quot;), &quot;val&quot; : 29 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e39b&quot;), &quot;val&quot; : 28 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e39a&quot;), &quot;val&quot; : 27 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e399&quot;), &quot;val&quot; : 26 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e398&quot;), &quot;val&quot; : 25 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e397&quot;), &quot;val&quot; : 24 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e396&quot;), &quot;val&quot; : 23 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e395&quot;), &quot;val&quot; : 22 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e394&quot;), &quot;val&quot; : 21 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e393&quot;), &quot;val&quot; : 20 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e390&quot;), &quot;val&quot; : 17 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38f&quot;), &quot;val&quot; : 16 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38e&quot;), &quot;val&quot; : 15 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38d&quot;), &quot;val&quot; : 14 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38c&quot;), &quot;val&quot; : 13 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38b&quot;), &quot;val&quot; : 12 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38a&quot;), &quot;val&quot; : 11 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e389&quot;), &quot;val&quot; : 10 }
+Type &quot;it&quot; for more
+</code></pre><p>这个是对val这个key进行逆序排序，所以value取值为-1。 那value值为1的话，就变成升序了。</p>
+<pre><code>&gt; db.pages.find().sort({val:1})
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e37f&quot;), &quot;val&quot; : 0 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e380&quot;), &quot;val&quot; : 1 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e381&quot;), &quot;val&quot; : 2 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e382&quot;), &quot;val&quot; : 3 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e383&quot;), &quot;val&quot; : 4 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e384&quot;), &quot;val&quot; : 5 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e385&quot;), &quot;val&quot; : 6 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e386&quot;), &quot;val&quot; : 7 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e387&quot;), &quot;val&quot; : 8 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e388&quot;), &quot;val&quot; : 9 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e389&quot;), &quot;val&quot; : 10 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38a&quot;), &quot;val&quot; : 11 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38b&quot;), &quot;val&quot; : 12 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38c&quot;), &quot;val&quot; : 13 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38d&quot;), &quot;val&quot; : 14 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38e&quot;), &quot;val&quot; : 15 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e38f&quot;), &quot;val&quot; : 16 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e390&quot;), &quot;val&quot; : 17 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e391&quot;), &quot;val&quot; : 18 }
+{ &quot;_id&quot; : ObjectId(&quot;5574ca7b192e9dda0925e392&quot;), &quot;val&quot; : 19 }
+Type &quot;it&quot; for more
+&gt;
+</code></pre><p>那如果要对多个值进行组合排序呢？ 就好比如对于我们最初的例子 users 集合。 要对users集合进行排序。其中 按照likes升序， 按照username降序。为了达到我们的效果，我们再往users集合里面插入两条数据</p>
+<pre><code>&gt; db.users.insert({username:&quot;mongodb&quot;,likes:999})
+&gt; db.users.insert({username:&quot;springMVC&quot;,likes:888})
+</code></pre><p>下面是运行结果，注意观察 likes为888的两个文档。发现username逆序排序了。至此，说明我们的sort实验成功了。</p>
+<pre><code>&gt; db.users.find().sort({likes:1,username:-1}).pretty()
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdf3c705777157a515ac&quot;),
+        &quot;username&quot; : &quot;spring&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;spring&quot;,
+                &quot;framework&quot;
+        ],
+        &quot;likes&quot; : 777,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574cefa192e9dda0925e39e&quot;),
+        &quot;username&quot; : &quot;springMVC&quot;,
+        &quot;likes&quot; : 888
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdd2c705777157a515ab&quot;),
+        &quot;username&quot; : &quot;redis&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;redis&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 888,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574cef5192e9dda0925e39d&quot;),
+        &quot;username&quot; : &quot;mongodb&quot;,
+        &quot;likes&quot; : 999
+}
+{
+        &quot;_id&quot; : ObjectId(&quot;5574bdabc705777157a515aa&quot;),
+        &quot;username&quot; : &quot;mongo&quot;,
+        &quot;url&quot; : &quot;webinglin.github.io&quot;,
+        &quot;tags&quot; : [
+                &quot;mongodb&quot;,
+                &quot;database&quot;,
+                &quot;nosql&quot;
+        ],
+        &quot;likes&quot; : 999,
+        &quot;author&quot; : &quot;linwenbin&quot;
+}
+&gt;
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Markdown简明语法]]></title>
+      <url>http://webinglin.github.io/2015/06/06/Markdown%E7%AE%80%E6%98%8E%E8%AF%AD%E6%B3%95/</url>
+      <content type="html"><![CDATA[<h1 id="Markdown-标记语言"><a href="#Markdown-标记语言" class="headerlink" title="Markdown 标记语言"></a>Markdown 标记语言</h1><p>HTML语言已经很方便了，但是Html主要是用来发布的，而Markdown是为了更方便的写，读，改</p>
+<p>本文组织方式为</p>
+<pre><code>源代码的展示
+</code></pre><p>对应的效果</p>
+<p>分割线<br><a id="more"></a></p>
+<hr>
+<p>正文开始</p>
+<p>标题的写法: </p>
+<pre><code>标题的写法 H1~H6 对应的是 一个# 到 六个######  
+# 标题一 对应一个# 
+## 标题二 对应两个## 
+## 标题三 对应三个### 以此类推
+</code></pre><h1 id="标题一-对应一个"><a href="#标题一-对应一个" class="headerlink" title="标题一 对应一个"></a>标题一 对应一个</h1><h2 id="标题二-对应两个"><a href="#标题二-对应两个" class="headerlink" title="标题二 对应两个"></a>标题二 对应两个</h2><h2 id="标题三-对应三个-以此类推"><a href="#标题三-对应三个-以此类推" class="headerlink" title="标题三 对应三个### 以此类推"></a>标题三 对应三个### 以此类推</h2><hr>
+<pre><code>&gt; 这是引用，来之wiki吗？ 使用 &gt; 表示引用
+</code></pre><blockquote>
+<p>这是引用，来之wiki吗？ 使用 &gt; 表示引用</p>
+</blockquote>
+<hr>
+<pre><code>使用三个 --- 来表示分割线 
+</code></pre><hr>
+<hr>
+<pre><code>&gt; 1. 有序列表
+&gt;&gt; 2. 引用中使用有序列表
+&gt;&gt; 3. 有序列表
+</code></pre><blockquote>
+<ol>
+<li>有序列表<blockquote>
+<ol>
+<li>引用中使用有序列表</li>
+<li>有序列表</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+</blockquote>
+<hr>
+<pre><code>* A
+* B
++ E
++ F
+- H
+- I
+</code></pre><ul>
+<li>A</li>
+<li>B</li>
+</ul>
+<ul>
+<li>E</li>
+<li>F</li>
+</ul>
+<ul>
+<li>H</li>
+<li>I</li>
+</ul>
+<hr>
+<pre><code>斜体和加粗： hello *world* , **JAVA**
+</code></pre><p>斜体和加粗： hello <em>world</em> , <strong>JAVA</strong></p>
+<hr>
+<pre><code>通过 `` 符号引起来一段代码来达到引用代码的意思
+`println &quot;hello,groovy&quot;`
+</code></pre><p><code>println &quot;hello,groovy&quot;</code></p>
+<hr>
+<pre><code>通过 Tab符号来达到表达一段代码的意思    这段代码之前都用tab缩进
+    public class exmap {
+        public static void main(String[] args){
+            System.out.println(&quot;hello&quot;);
+        }    
+    }
+</code></pre><p><br></p>
+<pre><code>public class exmap {
+    public static void main(String[] args){
+        System.out.println(&quot;hello&quot;);
+    }    
+}
+</code></pre><hr>
+<pre><code>链接和图片
+[百度](www.baidu.com)
+![百度](http://img1.bdstatic.com/static/common/widget/search_box_home/logo/home_white_logo_0ddf152.png)
+</code></pre><p><a href="www.baidu.com">百度</a><br><img src="http://img1.bdstatic.com/static/common/widget/search_box_home/logo/home_white_logo_0ddf152.png" alt="百度"></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Ubuntu桌面操作系统札记]]></title>
+      <url>http://webinglin.github.io/2015/06/06/Ubuntu%E6%A1%8C%E9%9D%A2%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9C%AD%E8%AE%B0/</url>
+      <content type="html"><![CDATA[<h2 id="Linux文件系统"><a href="#Linux文件系统" class="headerlink" title="Linux文件系统"></a>Linux文件系统</h2><p>Linux文件系统被组织成一个有层次的树形结构。文件系统的最上层是 /  ,被称为根目录。按照目录组织形式的约定，linux各个目录的含义如下：</p>
+<pre><code>/bin    重要的二进制应用程序
+/boot    启动配置文件
+/dev    设备文件
+/etc    配置文件、启动脚本等
+/home    用户主目录
+/lib    系统库文件
+/lost+fount    在根目录下提供一个遗失+查找系统
+/media    挂载可移动介质（media）如CD、数码相机等
+/mnt    挂载文件系统
+/opt    提供可选的应用程序安装目录
+/proc    特殊的动态目录，用来维护系统信息和状态，包括当前运行中进程信息
+/sbin    重要的系统二进制文件
+/sys    系统文件
+/tmp    临时文件
+/usr    包含绝大部分所有用户能够访问的应用程序和文件
+/var    经常变化的文件系统，如日志或者数据库等
+</code></pre><a id="more"></a>
+<p>通过对上面目录的了解，那怎么进行分区？</p>
+<p>根目录 / 一个分区，/usr 一个分区， /boot 一个分区， /opt 一个分区， /var 一个分区， /home一个分区</p>
+<blockquote>
+<p>具体每个分区应该分配多大空间，这个待实践，如有更好建议欢迎指出</p>
+</blockquote>
+<h2 id="Ubuntu常规命令"><a href="#Ubuntu常规命令" class="headerlink" title="Ubuntu常规命令"></a>Ubuntu常规命令</h2><p>启动终端的方式：</p>
+<ol>
+<li>应用程序-&gt;附件-&gt;终端 </li>
+<li>快捷键: Ctrl + Alt + T</li>
+</ol>
+<p>常用命令：<br>​<br>    ls    查看目录<br>    mkdir &lt;目录&gt;     创建目录<br>    cd &lt;目录&gt;     切换目录<br>    cp &lt;源文件&gt; &lt;目标文件&gt; 复制文件/目录<br>    cp -r &lt;源文件&gt; &lt;目标文件&gt;     复制文件/目录 包含子目录和文件</p>
+<pre><code>rm &lt;文件&gt;     删除文件/目录
+rm -rf &lt;文件&gt;     删除目录、文件 包含子目录和文件
+
+mv &lt;源&gt; &lt;目标&gt;     移动,重命名文件/目录
+pwd    显示当前目录    print working directory
+</code></pre><p>df -h 显示文件系统空间信息，一下是我安装在虚拟机上的ubuntu的磁盘信息，只有一个SCSI硬盘，挂载根目录。</p>
+<pre><code>root@ubuntu:~# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        19G  3.3G   15G  19% /
+udev            649M  4.0K  649M   1% /dev
+tmpfs           263M  844K  262M   1% /run
+none            5.0M     0  5.0M   0% /run/lock
+none            658M  8.0K  658M   1% /run/shm
+</code></pre><p>那如果要查看某一个目录的空间使用信息怎么查看？<br><code># du -sh /home</code></p>
+<pre><code>root@ubuntu:~# du -sh /home
+54M     /home
+</code></pre><p>ifconfig    显示系统的网络配置信息<br>​<br>    root@ubuntu:~# ifconfig<br>    eth0      Link encap:Ethernet  HWaddr 00:0c:29:fe:de:dc<br>              inet addr:192.168.236.131  Bcast:192.168.236.255  Mask:255.255.255.0<br>              inet6 addr: fe80::20c:29ff:fefe:dedc/64 Scope:Link<br>              UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1<br>              RX packets:28200 errors:0 dropped:0 overruns:0 frame:0<br>              TX packets:18942 errors:0 dropped:0 overruns:0 carrier:0<br>              collisions:0 txqueuelen:1000<br>              RX bytes:32072835 (32.0 MB)  TX bytes:1307988 (1.3 MB)</p>
+<pre><code>lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:952 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:952 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:185168 (185.1 KB)  TX bytes:185168 (185.1 KB)
+</code></pre><p>如果进入系统后是命令行模式，那通过 startx  命令 可以进入桌面系统</p>
+<h2 id="添加、删除和更新应用程序"><a href="#添加、删除和更新应用程序" class="headerlink" title="添加、删除和更新应用程序"></a>添加、删除和更新应用程序</h2><p>待续…</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第三篇 JAVA-DRIVER]]></title>
+      <url>http://webinglin.github.io/2015/06/06/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E4%B8%89%E7%AF%87-JAVA-DRIVER/</url>
+      <content type="html"><![CDATA[<p>环境准备：</p>
+<ol>
+<li>mongo能够正常运行，可参考第一篇文章的介绍</li>
+<li><p>如果已经有demo数据库了，建议删除，确保数据干净。 </p>
+<blockquote>
+<p>use demo<br> switched to db demo<br>db.dropDatabase()<br> { “dropped” : “demo”, “ok” : 1 }</p>
+</blockquote>
+</li>
+</ol>
+<a id="more"></a>
+<p>本文并没有开启用户认证，直接操作。使用gradle来构建工程。(Gradle怎么使用，参考我的关于gradle介绍的文章)</p>
+<p>创建项目 mongo ，并在根目录下面创建 build.gradle 文件</p>
+<pre><code>apply plugin:&quot;java&quot;
+apply plugin:&quot;eclipse&quot;
+
+repositories{
+    mavenCentral()
+}
+
+dependencies{
+    compile &apos;org.mongodb:mongo-java-driver:3.0.2&apos;
+}
+</code></pre><p>此外，还要创建和maven那样约定好的源文件，暂不用test的目录</p>
+<pre><code>└─src
+   └─main
+       ├─java
+       └─resources
+</code></pre><p>那么我们以后的源代码会放在java目录底下，资源文件会放到resources目录底下。</p>
+<p>下面我们就开始我们的mongo-java之旅了。</p>
+<p>我们在mongo项目根路径 运行 <code>&gt; gradle cleanEclipse eclipse</code> 来生成Eclipse的java项目。然后通过Eclipse的Import… 功能来引入我们的mongo项目，如图</p>
+<pre><code>D:\workspace_myeclipse\mongo&gt;gradle cleanEclipse eclipse
+</code></pre><p><img src="http://i1.tietuku.com/9cbe5670da9ecdf4.jpg" alt=""></p>
+<p>HelloMongo.java的源码如下：</p>
+<pre><code>package com.piedra.mongo;
+
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.lte;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.Block;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+
+/**
+ * HelloMongo 
+ * 参考: http://mongodb.github.io/mongo-java-driver/3.0/driver/getting-started/quick-tour/
+ * @author LINWENBIN
+ * @since 2015-6-6
+ */
+public class HelloMongo {
+
+    /**
+     * 往集合里面插入一条数据
+     * @param coll
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void insertOne(MongoCollection&lt;Document&gt; coll){
+        /*
+        {
+           &quot;name&quot; : &quot;MongoDB&quot;,
+           &quot;type&quot; : &quot;database&quot;,
+           &quot;count&quot; : 1,
+           &quot;info&quot; : {
+                       x : 203,
+                       y : 102
+                     }
+        }
+        */
+        System.out.println(&quot;insertOne 插入记录之前 users集合的数量:&quot; + coll.count());
+
+        Document doc = new Document(&quot;name&quot;,&quot;MongoDB&quot;)
+        .append(&quot;type&quot;,&quot;database&quot;).append(&quot;count&quot;, 1).append(&quot;info&quot;, new Document(&quot;x&quot;,&quot;203&quot;).append(&quot;y&quot;,&quot;102&quot;));
+
+        coll.insertOne(doc);
+
+        System.out.println(&quot;insertOne 插入记录之后 users集合的数量:&quot; + coll.count());
+    }
+
+    /**
+     * 插入多条数据
+     * @param coll
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void insertMany(MongoCollection&lt;Document&gt; coll){
+        /*
+         * 循环插入 {&quot;i&quot; : i}的document
+         */
+        List&lt;Document&gt; docs = new ArrayList&lt;Document&gt;();
+        for(int i=0; i&lt;10; i++){
+            docs.add(new Document(&quot;i&quot;,i));
+        }
+
+        coll.insertMany(docs);
+
+        System.out.println(&quot;insertMany 插入10条 {i:i} 记录之后 users集合的数量:&quot; + coll.count());        
+    }
+
+    /**
+     * 查询集合coll中的所有数据
+     * @param coll
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void findAll(MongoCollection&lt;Document&gt; coll){
+        MongoCursor&lt;Document&gt; cursor = coll.find().iterator();
+        try {
+            System.out.println(&quot;findAll 打印结果：&quot;);
+            while(cursor.hasNext()){
+                System.out.println(cursor.next().toJson());
+            }
+        } finally {
+            cursor.close();
+        }
+    }
+
+    /**
+     * 查询满足条件的第一条数据
+     * @param coll
+     * @param filter
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void findSpecifyDoc(MongoCollection&lt;Document&gt; coll, Bson filter){
+        System.out.println(&quot;findSpecifyDoc 打印结果：&quot;);
+        System.out.println(coll.find(filter).first().toJson());
+    }
+
+    /**
+     * 查询满足条件的文档集合
+     * @param coll
+     * @param filter
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void findDocs(MongoCollection&lt;Document&gt; coll, Bson filter){
+        Block&lt;Document&gt; printBlock = new Block&lt;Document&gt;() {
+             @Override
+             public void apply(final Document document) {
+                 System.out.println(document.toJson());
+             }
+        };
+        System.out.println(&quot;findDocs 打印结果：&quot;);
+        coll.find(filter).forEach(printBlock);
+    }
+
+    /**
+     * 更新文档属性
+     * @param coll        要操作的集合
+     * @param criteria    要更新的文档过滤条件
+     * @param newDoc    新的文档属性
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void update(MongoCollection&lt;Document&gt; coll, Bson criteria, Document newDoc){
+        coll.updateMany(criteria, new Document(&quot;$set&quot;,newDoc));
+    }
+
+    /**
+     * 删除文档
+     * @param coll
+     * @param criteria
+     * @since 2015-6-6
+     * @author LINWENBIN
+     */
+    public void delete(MongoCollection&lt;Document&gt; coll, Bson criteria){
+        coll.deleteMany(criteria);
+    }
+
+    public static void main(String[] args) {
+        HelloMongo helloMongo = new HelloMongo();
+
+        //mongoClient实例本身代表着数据库的连接池
+        MongoClient mongoClient = new MongoClient(&quot;127.0.0.1&quot;, 27017);
+        /**
+         * Calling the getDatabase() on MongoClient does not create a database. 
+         * Only when a database is written to will a database be created
+         */
+        MongoDatabase db = mongoClient.getDatabase(&quot;demo&quot;);
+        MongoCollection&lt;Document&gt; users = db.getCollection(&quot;users&quot;);
+
+
+        helloMongo.insertOne(users);
+        helloMongo.insertMany(users);
+        helloMongo.findAll(users);
+        helloMongo.findSpecifyDoc(users, eq(&quot;i&quot;,5));
+        helloMongo.findDocs(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+
+        helloMongo.update(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)), new Document(&quot;ii&quot;,99));
+        helloMongo.findDocs(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+
+        helloMongo.delete(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+        helloMongo.findDocs(users, and(gt(&quot;i&quot;,6),lte(&quot;i&quot;,8)));
+
+        //销毁
+        mongoClient.dropDatabase(&quot;demo&quot;);
+        //关闭数据库连接
+        mongoClient.close();
+    }
+}
+</code></pre><p>打印结果：</p>
+<pre><code>insertOne 插入记录之前 users集合的数量:0
+insertOne 插入记录之后 users集合的数量:1
+insertMany 插入10条 {i:i} 记录之后 users集合的数量:11
+findAll 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bd8&quot; }, &quot;name&quot; : &quot;MongoDB&quot;, &quot;type&quot; : &quot;database&quot;, &quot;count&quot; : 1, &quot;info&quot; : { &quot;x&quot; : &quot;203&quot;, &quot;y&quot; : &quot;102&quot; } }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bd9&quot; }, &quot;i&quot; : 0 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bda&quot; }, &quot;i&quot; : 1 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdb&quot; }, &quot;i&quot; : 2 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdc&quot; }, &quot;i&quot; : 3 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdd&quot; }, &quot;i&quot; : 4 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bde&quot; }, &quot;i&quot; : 5 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bdf&quot; }, &quot;i&quot; : 6 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be0&quot; }, &quot;i&quot; : 7 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be1&quot; }, &quot;i&quot; : 8 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be2&quot; }, &quot;i&quot; : 9 }
+findSpecifyDoc 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42bde&quot; }, &quot;i&quot; : 5 }
+findDocs 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be0&quot; }, &quot;i&quot; : 7 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be1&quot; }, &quot;i&quot; : 8 }
+findDocs 打印结果：
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be0&quot; }, &quot;i&quot; : 7, &quot;ii&quot; : 99 }
+{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5572841e0ef45c0bf0e42be1&quot; }, &quot;i&quot; : 8, &quot;ii&quot; : 99 }
+findDocs 打印结果：
+</code></pre><p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第二篇 mongodb安全]]></title>
+      <url>http://webinglin.github.io/2015/06/05/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E4%BA%8C%E7%AF%87-mongodb%E5%AE%89%E5%85%A8/</url>
+      <content type="html"><![CDATA[<p>要开启mongodb的安全认证，在mongod服务启动的时候需要指定 –auth 参数，用来表示开启安全认证</p>
+<p><code>&gt; mongod --auth</code></p>
+<p>开启之后，在通过客户端连接,虽然可以连接上，但是无法操作<br><a id="more"></a><br>    G:\JavaData\mongoDB\bin&gt;mongo<br>    MongoDB shell version: 2.6.3<br>    connecting to: test</p>
+<pre><code>&gt; show collections
+2015-06-05T20:10:51.608+0800 error: {
+        &quot;$err&quot; : &quot;not authorized for query on test.system.namespaces&quot;,
+        &quot;code&quot; : 13
+} at src/mongo/shell/query.js:131
+&gt;
+</code></pre><p>根据提示，我们知道出错原因是没有认证、</p>
+<p>切换到admin这个数据库，添加用户。创建用户的语法如下</p>
+<pre><code>db.createUser({
+    user:&quot;username&quot;,
+    pwd:&quot;password&quot;,
+    customData:{any info},
+    roles:[{role:&quot;&lt;role&gt;&quot;,db:&quot;&lt;db&gt;&quot;},{role:&quot;&lt;role&gt;&quot;,db:&quot;&lt;db&gt;&quot;}]
+})
+</code></pre><p>其中mongodb内建的角色: read, readWrite, dbAdmin, dbOwner, userAdmin，dbAdminAnyDatabase，userAdminAnyDatabase，readWriteAnyDatabase，readAnyDatabase，clusterAdmin</p>
+<p>在我们的例子中，我们通过如下语句为demo这个数据库创建 lwb 用户，并且只具备读的权限</p>
+<pre><code>&gt; db.createUser({user:&quot;lwb&quot;,pwd:&quot;lwb&quot;,roles:[{role:&quot;read&quot;,db:&quot;demo&quot;}]})
+Successfully added user: {
+        &quot;user&quot; : &quot;lwb&quot;,
+        &quot;roles&quot; : [
+                {
+                        &quot;role&quot; : &quot;read&quot;,
+                        &quot;db&quot; : &quot;demo&quot;
+                }
+        ]
+}
+&gt; db
+demo
+</code></pre><p>通过命令 <code>db.auth(&quot;lwb&quot;,&quot;lwb&quot;)</code> 来认证</p>
+<pre><code>&gt; use demo
+switched to db demo
+&gt; show collections
+2015-06-05T20:31:15.034+0800 error: {
+        &quot;$err&quot; : &quot;not authorized for query on demo.system.namespaces&quot;,
+        &quot;code&quot; : 13
+} at src/mongo/shell/query.js:131
+&gt; db.auth(&quot;lwb&quot;,&quot;lwb&quot;)
+1
+&gt; show collections
+system.indexes
+users
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+</code></pre><p>查看的认证已经可以了，但是我们指定的是read的权限，所以，我们需要测试一下是否可以插入数据</p>
+<pre><code>&gt; db.users.insert({username:&apos;abc&apos;})
+WriteResult({
+        &quot;writeError&quot; : {
+                &quot;code&quot; : 13,
+                &quot;errmsg&quot; : &quot;not authorized on demo to execute command { insert: \&quot;users\&quot;, documents: [ { _id: ObjectId(&apos;557196b2e661d1419e528fbb&apos;), username: \
+&quot;abc\&quot; } ], ordered: true }&quot;
+        }
+})
+&gt;
+</code></pre><p>可以观察到，认证失败。说明我们的lwb用户不能像demo这个数据库的users集合插入数据</p>
+<p>为了形成对比，我们在插入一个用户 rwu （read write user） 并让这个用户具备 readWrite权限。</p>
+<pre><code>&gt; use admin
+switched to db admin
+&gt; db.auth(&quot;admin&quot;,&quot;admin&quot;)
+1
+&gt;  db.createUser({user:&quot;rwu&quot;,pwd:&quot;rwu&quot;,roles:[{role:&quot;readWrite&quot;,db:&quot;demo&quot;}]})
+Successfully added user: {
+        &quot;user&quot; : &quot;rwu&quot;,
+        &quot;roles&quot; : [
+                {
+                        &quot;role&quot; : &quot;readWrite&quot;,      //具备 读写 权限
+                        &quot;db&quot; : &quot;demo&quot;                 //针对 demo这个数据库的 读写 权限
+                }
+        ]
+}
+&gt; use demo
+switched to db demo
+&gt; show collections
+system.indexes
+users
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+&gt; db.users.save({username:&quot;rwu&quot;,pwd:&quot;rwu&quot;}) //插入一条数据，插入成功表示授权成功
+WriteResult({ &quot;nInserted&quot; : 1 })
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;557198f5e661d1419e528fbc&quot;), &quot;username&quot; : &quot;rwu&quot;, &quot;pwd&quot; : &quot;rwu&quot; }
+&gt;
+</code></pre><p>通过上面你的观察， 我们发现了创建的新用户 rwu 具有 readWrite权限后，可以往demo数据库的users集合插入数据了。</p>
+<p>权限讲解至此。更多详细内容参考<a href="http://docs.mongodb.org/manual/" target="_blank" rel="external">mongodb的anual文档</a>。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MongoDB学习札记 第一篇]]></title>
+      <url>http://webinglin.github.io/2015/06/05/MongoDB%E5%AD%A6%E4%B9%A0%E6%9C%AD%E8%AE%B0-%E7%AC%AC%E4%B8%80%E7%AF%87/</url>
+      <content type="html"><![CDATA[<h2 id="安装MongoDB"><a href="#安装MongoDB" class="headerlink" title="安装MongoDB"></a>安装MongoDB</h2><p>我选择的是windows平台的mongodb安装方式，也很简单，只需要 <a href="http://www.mongodb.org/downloads?_ga=1.48317733.2007152124.1433483686#windows" target="_blank" rel="external">下载</a> 对应操作系统版本的Mongodb即可。（建议下载ZIP的安装包）</p>
+<a id="more"></a>
+<h5 id="怎么验证我们的mongodb已经可以使用了？"><a href="#怎么验证我们的mongodb已经可以使用了？" class="headerlink" title="怎么验证我们的mongodb已经可以使用了？"></a>怎么验证我们的mongodb已经可以使用了？</h5><ol>
+<li>通过命令行切换到mongodb的安装目录， 我的目录为 G:\JavaData\mongoDB\bin</li>
+<li>命令行执行 mongod –dbpath  G:\JavaData\mongoDBDATA<br><code>G:\JavaData\mongoDB\bin&gt;mongod --dbpath G:\JavaData\mongoDBDATA</code></li>
+<li>执行之后，可以观察到 <code>waiting for connections on port 27017</code> 表示mongodb已经启动成功了</li>
+</ol>
+<h2 id="MongoDB常规操作"><a href="#MongoDB常规操作" class="headerlink" title="MongoDB常规操作"></a>MongoDB常规操作</h2><p>Mongodb服务启动成功后，我们就可以使用客户端工具来连接mongodb了。 这里我们使用的是mongo提供的客户端工具，在我们刚才安装的mongodb目录下bin目录底下</p>
+<p>同样的进入到我们的mongodb的bin目录，执行 mongo命令 </p>
+<pre><code>G:\JavaData\mongoDB\bin&gt;mongo
+MongoDB shell version: 2.6.3
+connecting to: test
+&gt;
+</code></pre><p>当然，如果你已经将 G:\JavaData\mongoDB\bin 加入到环境变量中，你就可以不需要切换目录了，直接执行mongo即可看到效果。</p>
+<p>通过上面的客户端连接结果可以看到，默认情况下会连接到 test这个数据库 。 如果我们想要知道mongodb现在有多少数据库，可以通过命令 </p>
+<pre><code>&gt; show dbs
+admin   (empty)
+foobar  0.203GB
+local   0.078GB
+piedra  0.078GB
+&gt;
+</code></pre><p>如果想要知道当前是哪个数据库，使用 <code>db</code> 命令</p>
+<pre><code>&gt; db
+test
+</code></pre><p>如果想要切换到其他的数据库， 使用命令  <code>user &lt;your-dbname&gt;</code></p>
+<pre><code>&gt; use piedra
+switched to db piedra
+</code></pre><p>显示当前数据库有哪一些集合 <code>show collections</code></p>
+<pre><code>&gt; show collections
+system.indexes
+users
+</code></pre><p>当然，如果你第一次使用运行 show collection ，结果是空的，但是当你往集合里面插入数据后，就可以看到集合以及对应的数据库都会被创建。</p>
+<pre><code>&gt; show dbs
+admin   (empty)
+foobar  0.203GB
+local   0.078GB
+piedra  0.078GB
+&gt; use demo
+switched to db demo
+&gt; show collections
+&gt; db.users.insert({username:&quot;linwenbin&quot;,pwd:&quot;1234&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;username&quot; : &quot;linwenbin&quot;, &quot;pwd&quot; : &quot;1234&quot; }
+&gt;
+</code></pre><p>在上面的操作中，我们切换到demo数据库，并且创建了users这个集合，还往users集合插入一条数据。</p>
+<blockquote>
+<p>mongodb中的集合和mysql，Oracle中的table是一样的概念。</p>
+</blockquote>
+<h6 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h6><p>在mongodb中，插入数据使用命令  db.collectionName.insert({data})  或者 db.collectionName.save({data})<br>这两个方法都可以正常工作。 对于 insert方法在上文中已经提到，这里演示save方法的使用。</p>
+<pre><code>&gt; db
+demo
+&gt; show collections
+system.indexes
+users
+&gt;
+&gt; db.users.save({username:&quot;saveMethod&quot;,pwd:&quot;123&quot;}) 
+WriteResult({ &quot;nInserted&quot; : 1 })
+</code></pre><p>需要注意的是 save 方法在没有指定 _id的时候，工作方式和insert是一样的，但是如果指定了 _id 那么如果集合中已经有对应的_id了，就会用新的文档覆盖掉旧的文档。</p>
+<h6 id="修改数据"><a href="#修改数据" class="headerlink" title="修改数据"></a>修改数据</h6><p>要修改数据，也有两种方式，一个是修改整个文档，一个是修改部分。首先先介绍修改整个文档的做法， 我们先把usres这个集合的数据都查询出来，方便和修改操作后的对比</p>
+<pre><code>&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;username&quot; : &quot;linwenbin&quot;, &quot;pwd&quot; : &quot;1234&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;123&quot; }
+&gt;
+</code></pre><p>第一种方式： db.collectionName.update({criteria},{data});  这个方法会替换整个文档。</p>
+<pre><code>&gt; db.users.update({username:&quot;linwenbin&quot;},{age:22})
+WriteResult({ &quot;nMatched&quot; : 1, &quot;nUpserted&quot; : 0, &quot;nModified&quot; : 1 })
+&gt; db.users.find({username:&apos;linwenbin&apos;})
+&gt;
+</code></pre><p>可以发现，当我们修改完之后，再去查找username为’linwenbin’的数据就不存在了。</p>
+<p>第二种方式： db.collectionName.update({criteria},{$set:{newData}});  现在我们对另一条数据进行 $set的修改操作</p>
+<pre><code>&gt; db.users.update({username:&quot;saveMethod&quot;},{$set:{pwd:&quot;9999&quot;}})
+WriteResult({ &quot;nMatched&quot; : 1, &quot;nUpserted&quot; : 0, &quot;nModified&quot; : 1 })
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;age&quot; : 22 }
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+&gt;
+</code></pre><p>可以观察到，username为 saveMethod的那条数据的pwd已经被成功修改为 ‘9999’了，而且其他属性并没有被新数据覆盖掉。</p>
+<h6 id="查询数据"><a href="#查询数据" class="headerlink" title="查询数据"></a>查询数据</h6><p>mongodb的查询方法就是find方法了，上文中已经提到多次， db.collectionName.find({criteria})</p>
+<pre><code>&gt; db.users.find({age:22})
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;age&quot; : 22 }
+&gt;
+</code></pre><p>如果都不指定find方法的条件，那么就是查询所有的数据了。</p>
+<p>我们还可以通过指定查询结果显示哪一些字段，这个请查阅mongodb的manual手册。</p>
+<h6 id="删除数据"><a href="#删除数据" class="headerlink" title="删除数据"></a>删除数据</h6><p>如果要删除某一个集合，可以通过  db.collectionName.drop(); 来删除。</p>
+<p>如果删除某一个集合内的数据，则通过 db.collectionName.remove({criteria});<br>我们在上面操作的基础上，将 {age:22} 这条数据删除</p>
+<pre><code>&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;age&quot; : 22 }
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+&gt; db.users.remove({age:22})
+WriteResult({ &quot;nRemoved&quot; : 1 })
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+&gt;
+</code></pre><h2 id="MongoDB索引"><a href="#MongoDB索引" class="headerlink" title="MongoDB索引"></a>MongoDB索引</h2><h5 id="什么是索引？"><a href="#什么是索引？" class="headerlink" title="什么是索引？"></a>什么是索引？</h5><p>索引是创建在表格之上的，对用户来说不可见。索引加快了查找的速度，但是会增加额外的空间，所以创建所以要谨慎，mongodb也对每一个Collection的索引个数有限制。</p>
+<p>简单的说: 索引就是提供了一个能够更快的定位到数据的方法</p>
+<h5 id="mongodb怎么查询索引"><a href="#mongodb怎么查询索引" class="headerlink" title="mongodb怎么查询索引"></a>mongodb怎么查询索引</h5><p>要查看当前集合有哪些索引，可以通过命令 db.collectionName.getIndexes(); </p>
+<pre><code>&gt; db.users.getIndexes()
+[
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;_id&quot; : 1
+                },
+                &quot;name&quot; : &quot;_id_&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        }
+]
+&gt;
+</code></pre><p>key为 _id 为默认的主键索引，创建集合的时候mongodb自动为我们创建。</p>
+<h5 id="mongodb怎么创建索引"><a href="#mongodb怎么创建索引" class="headerlink" title="mongodb怎么创建索引"></a>mongodb怎么创建索引</h5><p>那如果此时我们想要对users这个集合的 username创建索引，应该怎么操作？</p>
+<pre><code>&gt; db.users.ensureIndex({username:1})
+{
+        &quot;createdCollectionAutomatically&quot; : false,
+        &quot;numIndexesBefore&quot; : 1,
+        &quot;numIndexesAfter&quot; : 2,
+        &quot;ok&quot; : 1
+}
+</code></pre><p>这样就表示我们创建索引成功了，在来看看usres集合的索引。</p>
+<pre><code>&gt; db.users.getIndexes()
+[
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;_id&quot; : 1
+                },
+                &quot;name&quot; : &quot;_id_&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        },
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;username&quot; : 1
+                },
+                &quot;name&quot; : &quot;username_1&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        }
+]
+&gt;
+</code></pre><p>我们发现，多了一个key为 username的索引。 其中创建索引 db.users.ensuerIndex({username:1})  中的1 表示正序索引， -1表示逆序索引</p>
+<h5 id="mongodb怎么删除索引"><a href="#mongodb怎么删除索引" class="headerlink" title="mongodb怎么删除索引"></a>mongodb怎么删除索引</h5><p>要删除索引通过 db.collectionName.dropIndex(column) 来删除</p>
+<pre><code>&gt; db.users.dropIndex({username:1})
+{ &quot;nIndexesWas&quot; : 2, &quot;ok&quot; : 1 }
+&gt; db.users.getIndexes()
+[
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;_id&quot; : 1
+                },
+                &quot;name&quot; : &quot;_id_&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        }
+]
+&gt;
+</code></pre><p>至此，简单的索引操作也记录完成了。</p>
+<blockquote>
+<p>本篇文章目的为了快速上手MongoDB，若要了解更详细资料，读者可自行参考官网的Manual文档。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Logback 学习笔记]]></title>
+      <url>http://webinglin.github.io/2015/06/04/Logback-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+      <content type="html"><![CDATA[<h2 id="Logback背景"><a href="#Logback背景" class="headerlink" title="Logback背景"></a>Logback背景</h2><p>Logback是一个开源的日志组件，是log4j的作者开发的用来替代log4j的。</p>
+<p>logback由三个部分组成，logback-core, logback-classic, logback-access。其中logback-core是其他两个模块的基础。</p>
+<p>slf4j 定义日志接口及基本实现，而具体的实现由其他日志组件提供</p>
+<ol>
+<li>log4j</li>
+<li>commons-logging</li>
+<li>logback</li>
+</ol>
+<p>因此，如果想替换成其他的日志组件，只需要替换jar包即可。</p>
+<a id="more"></a>
+<h4 id="logback中三个重要概念：-Logger-Appender-Layout"><a href="#logback中三个重要概念：-Logger-Appender-Layout" class="headerlink" title="logback中三个重要概念： Logger,Appender,Layout"></a>logback中三个重要概念： Logger,Appender,Layout</h4><p>Logger: 日志记录器，把它关联到应用对应的context上后，主要用于存放日志对象，定义日志类型，级别。</p>
+<p>Appender：　指定日志输出的目的地，目的地可以是控制台，文件，或者数据库等</p>
+<p>Layout: 负责把事件转换成字符串，格式化日志信息的输出</p>
+<h4 id="寻找logback-xml"><a href="#寻找logback-xml" class="headerlink" title="寻找logback.xml"></a>寻找logback.xml</h4><ol>
+<li>logback首先在classpath寻找logback.groovy文件，</li>
+<li>如果没找到，继续寻找logback-test.xml文件</li>
+<li>如果没找到，继续寻找logback.xml文件</li>
+<li>如果仍然没找到，则使用默认配置（打印到控制台）</li>
+</ol>
+<h2 id="为什么使用Logback"><a href="#为什么使用Logback" class="headerlink" title="为什么使用Logback"></a>为什么使用Logback</h2><p><a href="http://www.cnblogs.com/yuanermen/archive/2012/02/13/2348942.html" target="_blank" rel="external">为什么要使用logback引用博客园的一段话，如下</a> </p>
+<blockquote>
+<p>1、更快的实现  Logback的内核重写了，在一些关键执行路径上性能提升10倍以上。而且logback不仅性能提升了，初始化内存加载也更小了。</p>
+<p>2、非常充分的测试  Logback经过了几年，数不清小时的测试。Logback的测试完全不同级别的。在作者的观点，这是简单重要的原因选择logback而不是log4j。</p>
+<p>3、Logback-classic非常自然实现了SLF4j    Logback-classic实现了 SLF4j。在使用SLF4j中，你都感觉不到logback-classic。而且因为logback-classic非常自然地实现了SLF4J，  所 以切换到log4j或者其他，非常容易，只需要提供成另一个jar包就OK，根本不需要去动那些通过SLF4JAPI实现的代码。</p>
+<p>4、非常充分的文档  官方网站有两百多页的文档。</p>
+<p>5、自动重新加载配置文件  当配置文件修改了，Logback-classic能自动重新加载配置文件。扫描过程快且安全，它并不需要另外创建一个扫描线程。这个技术充分保证了应用程序能跑得很欢在JEE环境里面。</p>
+<p>6、Lilith   Lilith是log事件的观察者，和log4j的chainsaw类似。而lilith还能处理大数量的log数据 。</p>
+<p>7、谨慎的模式和非常友好的恢复  在谨慎模式下，多个FileAppender实例跑在多个JVM下，能 够安全地写道同一个日志文件。RollingFileAppender会有些限制。Logback的FileAppender和它的子类包括 RollingFileAppender能够非常友好地从I/O异常中恢复。</p>
+<p>8、配置文件可以处理不同的情况   开发人员经常需要判断不同的Logback配置文件在不同的环境下（开发，测试，生产）。而这些配置文件仅仅只有一些很小的不同，可以通过,和来实现，这样一个配置文件就可以适应多个环境。</p>
+<p>9、Filters（过滤器）  有些时候，需要诊断一个问题，需要打出日志。在log4j，只有降低日志级别，不过这样会打出大量的日志，会影响应用性能。在Logback，你可以继续 保持那个日志级别而除掉某种特殊情况，如alice这个用户登录，她的日志将打在DEBUG级别而其他用户可以继续打在WARN级别。要实现这个功能只需 加4行XML配置。可以参考MDCFIlter 。</p>
+<p>10、SiftingAppender（一个非常多功能的Appender）  它可以用来分割日志文件根据任何一个给定的运行参数。如，SiftingAppender能够区别日志事件跟进用户的Session，然后每个用户会有一个日志文件。</p>
+<p>11、自动压缩已经打出来的log  RollingFileAppender在产生新文件的时候，会自动压缩已经打出来的日志文件。压缩是个异步过程，所以甚至对于大的日志文件，在压缩过程中应用不会受任何影响。</p>
+<p>12、堆栈树带有包版本  Logback在打出堆栈树日志时，会带上包的数据。</p>
+<p>13、自动去除旧的日志文件  通过设置TimeBasedRollingPolicy或者SizeAndTimeBasedFNATP的maxHistory属性，你可以控制已经产生日志文件的最大数量。如果设置maxHistory 12，那那些log文件超过12个月的都会被自动移除。</p>
+<p>总之，logback比log4j太优秀了，让我们的应用全部建立logback上吧 ！</p>
+</blockquote>
+<h2 id="Logback配置文件及实例解读"><a href="#Logback配置文件及实例解读" class="headerlink" title="Logback配置文件及实例解读"></a>Logback配置文件及实例解读</h2><p>这个logback的实例会这样展开：</p>
+<ul>
+<li>项目结构</li>
+<li>项目中使用到的类和配置文件</li>
+<li>根据源码对logback.xml这个配置文件进行解释</li>
+</ul>
+<p><img src="http://i1.tietuku.com/74a637c058273d01.jpg" alt=""></p>
+<p>其中Test.java<br>    package com.piedra.logback;</p>
+<pre><code>import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Test {
+    private final static Logger logger = LoggerFactory.getLogger(Test.class);
+
+    public static void main(String[] args) {
+        logger.info(&quot;logback {}&quot;,&quot;INFO ( TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR )&quot;);
+        logger.error(&quot;logback {}&quot;,&quot;ERROR ( TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR )&quot;);
+    }
+}
+</code></pre><p>logback.xml:</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;configuration debug=&quot;false&quot;&gt;
+    &lt;contextName&gt;Logback Demo&lt;/contextName&gt;
+
+    &lt;property name=&quot;LOG_HOME&quot; value=&quot;logs&quot; /&gt;  
+
+    &lt;!-- 控制台输出 --&gt;
+    &lt;appender name=&quot;STDOUT&quot; class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;
+        &lt;!-- encoder默认配置为PartternLayoutEncoder    --&gt;
+        &lt;encoder class=&quot;ch.qos.logback.classic.encoder.PatternLayoutEncoder&quot;&gt;
+            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+    &lt;/appender&gt;
+
+    &lt;appender name=&quot;FILE&quot; class=&quot;ch.qos.logback.core.FileAppender&quot;&gt;
+        &lt;file&gt;${LOG_HOME}/myLog.log&lt;/file&gt;
+        &lt;encoder&gt;
+            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+    &lt;/appender&gt;
+
+    &lt;!-- 按照每天生成日志文件 --&gt;
+    &lt;appender name=&quot;ROLLINGFILE&quot;  class=&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;
+        &lt;rollingPolicy class=&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;
+            &lt;!--日志文件输出的文件名--&gt;
+            &lt;FileNamePattern&gt;${LOG_HOME}/%d{yyyy-MM-dd}.log&lt;/FileNamePattern&gt;
+            &lt;!--日志文件保留天数--&gt;
+            &lt;MaxHistory&gt;30&lt;/MaxHistory&gt;
+        &lt;/rollingPolicy&gt;
+        &lt;encoder class=&quot;ch.qos.logback.classic.encoder.PatternLayoutEncoder&quot;&gt;
+            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+        &lt;!--日志文件最大的大小--&gt;
+       &lt;triggeringPolicy class=&quot;ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy&quot;&gt;
+         &lt;MaxFileSize&gt;10MB&lt;/MaxFileSize&gt;
+       &lt;/triggeringPolicy&gt;
+    &lt;/appender&gt;
+
+    &lt;logger name=&quot;org.hibernate.engine.query.HQLQueryPlan&quot; level=&quot;DEBUG&quot; additivity=&quot;false&quot; /&gt; 
+    &lt;logger name=&quot;com.piedra.logback&quot; level=&quot;WARN&quot;&gt;
+        &lt;appender-ref ref=&quot;FILE&quot;/&gt;
+    &lt;/logger&gt;
+
+    &lt;root level=&quot;ERROR&quot;&gt;
+        &lt;appender-ref ref=&quot;STDOUT&quot; /&gt;
+        &lt;appender-ref ref=&quot;ROLLINGFILE&quot; /&gt;
+    &lt;/root&gt;
+&lt;/configuration&gt;
+</code></pre><p>build.gradle</p>
+<pre><code>apply plugin:&quot;java&quot;
+apply plugin:&quot;eclipse&quot;
+
+repositories{
+    mavenCentral()
+}
+
+dependencies{
+    compile &quot;ch.qos.logback:logback-classic:1.1.2&quot;
+}
+</code></pre><p>至此，已经将项目的源码和目录结构都截图说明了，接下来根据Test.java来对logback.xml文件进行解释说明。</p>
+<pre><code>configuration: 为logback.xml配置文件的根节点,具有属性 scan,scanPeriod,debug
+scan:    当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。
+scanPeriod: 设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。
+debug: 当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false
+</code></pre><ul>
+<li><p>contextName 表示工程的名称，唯一值</p>
+</li>
+<li><p>property 节点用来定义变量值，具有两个属性，name和value，后续的配置中可以通过 ${var} 来引用在property中定义的变量</p>
+</li>
+<li><p>appender 是<configuration>的子节点，负责写日志的组件，具备如下属性:</configuration></p>
+<pre><code>name: appender的名称
+class: appender全限定名
+</code></pre></li>
+</ul>
+<hr>
+<p><em>具体的Appender分类</em></p>
+<ul>
+<li><p>ConsoleAppender 子节点：</p>
+<pre><code>encoder: 对日志进行格式化
+target: System.out 或者 System.err默认为System.out
+</code></pre></li>
+<li><p>FileAppender    将日志文件写到文件中</p>
+<pre><code>file: 被写入的文件名，相对目录或者绝对目录，如果上级目录不存在会自动创建，无默认值
+append: 如果为true，末尾追加。  如果为false，清空现有文件
+encoder: 格式化
+prudent: 如果为true，日志会被安全的写入文件，效率低   默认为false
+</code></pre></li>
+<li><p>RollingFileAppender  滚动记录文件，先将日志记录到指定的文件，当符合某个调价你的时候，将日志记录到其他文件。有以下子节点：</p>
+<pre><code>file: 被写入的文件名
+append: true表示追加  默认为true
+encoder:　格式化
+rollingPolicy:
+triggeringPolicy
+prudent:
+</code></pre></li>
+</ul>
+<hr>
+<ul>
+<li><p>logger 用来设置某一个包或者某一个类的日志打印级别，以及指定<appender></appender></p>
+<pre><code>name: 用来指定受此logger约束的某一个包或者某一个类
+level: 用来设定打印机别. TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR
+   additivity: 默认为true，将此loger的打印信息向上级传递；
+&lt;logger&gt;可以包含0到多个 &lt;appender-ref&gt;
+</code></pre></li>
+</ul>
+<p>对于</p>
+<pre><code>&lt;logger name=&quot;com.piedra.logback&quot; level=&quot;WARN&quot;&gt;
+    &lt;appender-ref ref=&quot;FILE&quot;/&gt;
+&lt;/logger&gt;
+</code></pre><p>这个logger来说，指定了com.piedra.logback这个包的日志级别为WARN，appender-ref为FILE，并且additivity默认为true，表示向上级传递。所以，当Test类记录日志的时候，调用error方法的日志会被输出到FILE的Appender中，并且向上传递到root logger。因为root logger为ERROR的日志级别，所以，也会将信息输出到STDOUT和ROLLINGFILE这两个Appender中。</p>
+<ul>
+<li><p>root 也是<logger>元素,但是它是根logger。只有一个level属性。因为已经被命名为为root</logger></p>
+<pre><code>参数参考&lt;logger&gt;元素的相关说明
+</code></pre></li>
+</ul>
+<h2 id="多项目依赖"><a href="#多项目依赖" class="headerlink" title="多项目依赖"></a>多项目依赖</h2><p>如果日志模块单独出一个项目，比如上面的例子，单独出一个logback模块，那么另外一个项目A引用这个模块，如果说项目A没有任何logback.xml 或者 logback-test.xml配置文件的话，就会采用引入的子模块logback中的配置文件来输出日志信息。</p>
+<p>如果项目A中定义了自己的logback.xml配置文件，那么就使用项目A自己的配置。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3><h3 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h3><ol>
+<li><a href="http://logback.qos.ch/documentation.html" target="_blank" rel="external">Logback官方文档</a></li>
+<li><a href="http://aub.iteye.com/blog/1110008" target="_blank" rel="external">logback.xml常用配置</a></li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Linux 硬盘分区与目录结构]]></title>
+      <url>http://webinglin.github.io/2015/05/18/Linux-%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E4%B8%8E%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84/</url>
+      <content type="html"><![CDATA[<p><em>事出必有因，这段时间在家里笔记本没带回来。使用家里的台式电脑，也算老古董了。要在linux下面实验点什么，又得安装虚拟机，一运行，机子就死在那儿了。于是乎，就萌生了安装一个linux的操作系统的念头。但是windows下面常用的软件，有一些是没有linux版本的，比如:印象笔记，百度云管家等</em></p>
+<hr>
+<p>都知道，硬盘刚买来的时候还不能用。我们要先对其进行分区，分区之后进行格式化，最后才是安装操作系统。那么</p>
+<p>什么是硬盘分区，为什么要进行分区？</p>
+<a id="more"></a>
+<blockquote>
+<p>分区和操作系统没有任何关系，因为分区是在安装操作系统之前进行的。我们可以简单的认识，分区就是将硬盘分割成不同的区域。</p>
+<p>硬盘为什么要分区？因为操作系统在启动的时候会通过MBR来获得操作系统文件所在的分区，所以一个可引导分区是不可缺少的。这也就是为什么新买的硬盘不能直接用的原因。而且进行多个分区是为了提高管理效率，所有东西放在一个分区，OS管理起来效率比较低，因为每次要检索的东西太多了。</p>
+</blockquote>
+<p>最多能划分多少个分区？</p>
+<blockquote>
+<p>由于磁盘分区表只能保留四条记录，所以一个磁盘的主分区+扩展分区最多只能有四个。</p>
+</blockquote>
+<p>上面提到了格式化，那什么是格式化？</p>
+<blockquote>
+<p>格式化就是对某一个分区建立文件系统。比如windows的 FAT32,NTFS。 Linux的ext2,ext3,ext4等</p>
+</blockquote>
+<p>文件系统又是什么呢？</p>
+<blockquote>
+<p>文件系统就是指明要怎么组织数据到硬盘分区上，以及要怎么操作硬盘上的数据。（说白了就是一套API接口了，对于操作系统来说，只管调用文件系统的一些接口来存储和读取数据，而不用关系文件系统怎么组织数据）</p>
+</blockquote>
+<p>明白了分区和格式化等几个简单概念之后，我们继续了解一下windows和linux磁盘分区的区别。</p>
+<blockquote>
+<p>Windows下的磁盘分区相对linux来说比较简单，windows下面一个磁盘分区对应着一个磁盘符号。比如系统盘对应的盘符是C，其他扩展分区或者逻辑分区对应的盘符为 E , F , L 之类的。很好理解。那要是我们重装系统的话，只需要对C盘进行格式化重装系统，而D,E,F之类的盘符对应的分区上的数据没有被格式化，所以那些数据得以保留。</p>
+<p>Linux下面就不像window那样直白了，在linux下，所有的磁盘，设备，都会当成一个文件或目录。<br><img src="http://img.ddvip.com/2013/0912/201309120206429219.gif" alt=""></p>
+<p>然后我们需要将我们的磁盘分区和linux下面的目录连接起来（类似windows的分区和盘符对应起来），分区和目录之间的连接称为挂载。安装linux系统的时候，我们需要将存放系统文件的分区挂载在根目录( / ) 下面。 linux存放数据到哪个磁盘的规则是这样的： 从当前目录往上级目录找，如果父目录没有挂载磁盘分区，继续往父级目录的父目录再找，直到最后将数据存放在和根目录同一个磁盘分区。</p>
+<p>这样的话，我们就可以将磁盘分区挂载到其他的目录， 比如我们将sda3挂载到/home目录 , sda6挂载/usr/local目录。那这样的话我们在/home下面创建的文档,就会保存在sda3这块分区。在/usr/local目录下面安装的软件就会保存在sda6这块分区。这样就形成了好像windows的D盘，E盘。只不过window访问E盘对应的磁盘分区的内容是通过明确指定盘符，比如 E:/a.txt 。 而在linux下面所有的文件都是相对于根目录的。比如 /home/xxx/a.txt。</p>
+</blockquote>
+<p>上文提到了挂载的概念，那什么是挂载？</p>
+<blockquote>
+<p>挂载简单的说就是将一个目录和一个磁盘分区连接到一起，对这个目录的数据操作，都是对对应磁盘分区的操作。</p>
+</blockquote>
+<p>上文中还提到了sda3，sda6。这几个字符串代表什么？</p>
+<blockquote>
+<p>sd代表的是硬盘的类型，它代表的是SCSI硬盘。如果是IDE硬盘，那就用hd表示。当然，还有诸如固态硬盘之类的（<em>题外话：固态硬盘目前价格挺贵的，前些时间查了一下，笔记本使用混合硬盘的大部分是在神州系列，而且价格都挺贵的。而挺火的联想Y50系列的都没使用固态硬盘。固态硬盘比普通的硬盘快很多。网上有人说普通硬盘开机40秒，用固态硬盘十几秒。这个没亲测过。</em>）<br>sd后面的a表示的是盘号。第一块硬盘用a表示（基本盘)，第二块用b(基本从属盘)，以此类推。而最后面的数字则表示分区，上文我们提到过，主分区和扩展分区最多只能有四个。所以 1…4 就表示主分区和扩展分区。 5 以后的数字就表示逻辑分区了。 上文中的 sda3 就表示: 第一块SCSI硬盘的第三个分区。 sda6 表示: 第一块SCSI硬盘的第二个逻辑分区（逻辑分区从5开始，6就表示第二个逻辑分区了）</p>
+</blockquote>
+<p>更多关于怎么分区，每个分区应该分配多大内存，目前我没有具体实践过，大家可以百度一下相关资料。</p>
+<p><em>能力有限，水平一般，有不足之处还望多多指正。谢谢阅读~</em></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3><h3 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h3><p><a href="http://teliute.org/linux/Ubsetup/index.html" target="_blank" rel="external">http://teliute.org/linux/Ubsetup/index.html</a></p>
+<p><a href="http://blog.csdn.net/cc_net/article/details/2894510" target="_blank" rel="external">http://blog.csdn.net/cc_net/article/details/2894510</a></p>
+<p><a href="http://www.cnblogs.com/Athrun/archive/2008/08/04/1260350.html" target="_blank" rel="external">http://www.cnblogs.com/Athrun/archive/2008/08/04/1260350.html</a><br>等</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Gradle无秘密之Dependencies]]></title>
+      <url>http://webinglin.github.io/2015/05/13/Gradle%E6%97%A0%E7%A7%98%E5%AF%86%E4%B9%8BDependencies/</url>
+      <content type="html"><![CDATA[<p>java插件的引入了一些依赖配置项，这些配置项在gradle的configuration阶段会被分配到特定的任务上面，比如compileJava或者test。 这些配置项有:</p>
+<a id="more"></a>
+<pre><code>compile
+runtime
+testCompile
+testRuntime
+archives
+default
+</code></pre><p>compile表示 编译期间的依赖<br>runtime表示 运行期间的依赖</p>
+<p>我们通过一张图，来了解这些依赖配置都是被那些java plugin的任务所使用。<br><img src="http://i1.tietuku.com/b0e613f21c67ebb0.png" alt=""><br>我们通过这图发现，我们的compile配置项是指派给compileJava这个任务的，那么compile配置的的所有jar包是就会被compileJava这个任务使用的~（即 在编译源代码的时候会使用这些jar包。） 同样的testCompile这个配置也是一样的道理~</p>
+<p>通过 Gradle无秘密之SourceSet 这篇博文中我们已经知道，当我们添加一个sourceSet的时候java plugin会自动添加三个任务， compileSourceSet 、processSourceSetResource、sourceSetClasses。同样的，也会为我们增加两个依赖配置项，分别是：srouceSetCompile和sourceSetRuntime，意思是说。在依赖配置中，soruceSetCompile配置的所有jar包会被compileSourceSet这个任务所使用。</p>
+<p>再附上一张官方文档中的一张图，通过这张图，我们可以很清晰的知道各个任务的依赖关系，通过这张图，我们就可以知道为什么当我们执行 <code>&gt;gradle build</code> 的时候，gradle会编译源文件，拷贝资源文件，以及对我们的工程打成一个jar包，并放置在build目录下面<br><img src="http://i1.tietuku.com/4f2df90fc6bc3b59.png" alt=""></p>
+<p>上面所提到的所有依赖配置，都是基于Java Plugin的。当然其他的plugin中的dependencies management也是一样的道理。比如：对于war Plugin，它就添加了两个配置providedCompile和providedRuntime这两个依赖配置项。这两个其实和java plugin的compile和testCompile配置项是一样的意思，只不过war plugin的配置的jar包不会被打进war包中。</p>
+<p>举个例子，比如对于 servlet 的api。servlet-api.jar这个包已经存在于tomcat的lib目录下了。那如果我们在dependencies里面用compile这个配置项类来配置 servlet-api.jar的话，这个就会被打包到war包中，发布到tomcat的时候就会发生两个servlet-api包的情况，所以，我们将servlet-api放到providedCompile这个配置项里面，表示我们只需要在编译阶段使用，同时不会打包进war包，即不会再web应用的WEB-INF/lib目录下面。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Gradle无秘密之SourceSet]]></title>
+      <url>http://webinglin.github.io/2015/05/13/Gradle%E6%97%A0%E7%A7%98%E5%AF%86%E4%B9%8BSourceSet/</url>
+      <content type="html"><![CDATA[<h2 id="java插件"><a href="#java插件" class="headerlink" title="java插件"></a>java插件</h2><p>在讲source set之前，不得不提一下java插件，因为source set这个概念是由java插件引进的。那当然，要使用java插件很简单，只需要在build.gradle文件中 使用<code>apply plugin:&quot;java&quot;</code> 引入java插件即可<br><a id="more"></a></p>
+<h2 id="Source-Sets"><a href="#Source-Sets" class="headerlink" title="Source Sets"></a>Source Sets</h2><p>source set说白了就是一组源文件放在一起，这样能够一起编译和执行。而源文件包含了java的源文件（即.java文件）和资源文件（如: <em>.cfg, </em>.properties）</p>
+<p>Java Plugin定义了两个标准的source sets。 main 和 test。main这个source set包含了我们的java源代码，我们可以将这个source set里面的文件编译成JAR包。 而 test source set包含了测试的代码，我们可以使用junit来编译和执行。</p>
+<p>默认的项目结构<br>​<br>    src/main/java            production java srouce<br>    src/main/resources        production resources<br>    src/test/java            test java srouces<br>    src/test/resources        test resources</p>
+<p>那么如何修改我们的项目结构呢？ 还有，如果想要自定义source set的时候，那应该要怎么做呢？</p>
+<h5 id="修改项目结构"><a href="#修改项目结构" class="headerlink" title="修改项目结构"></a>修改项目结构</h5><p>在build.gradle 添加如下配置既可以修改默认的source set </p>
+<pre><code>srouceSets {
+    main{
+        java{ 
+            srcDir &apos;src/java&apos;
+        }
+        resources{
+            srcDir &apos;src/resources&apos;
+        }
+    }
+}    
+</code></pre><p>这样子的话，项目的结构就会变成</p>
+<pre><code>src/java
+src/resource
+</code></pre><p>而不再是原来的</p>
+<pre><code>src/main/java
+src/main/resource
+</code></pre><h5 id="自定义srouce-set"><a href="#自定义srouce-set" class="headerlink" title="自定义srouce set"></a>自定义srouce set</h5><pre><code>srouceSets {
+    mySourceSet{
+        java{ 
+            srcDir &apos;src/mySourceSet/java&apos;
+        }
+        resources{
+            srcDir &apos;src/mySourceSet/resources&apos;
+        }
+    }
+}
+</code></pre><p>在这里我们自定义了我们的srouce set名唤 mySourceSet，因此我们项目的结构就会变成</p>
+<pre><code>src/main/java
+src/main/resources
+src/test/java
+src/test/resources
+src/mySourceSet/java
+src/mySourceSte/resources
+</code></pre><p>每当我们自定义了srouceSet之后，java plugin就会自动添加一些编译任务</p>
+<ul>
+<li>compileSourceSetJava</li>
+<li>compileSourceSetResources</li>
+<li>sourceSetClasses</li>
+</ul>
+<p>类似的，如果我们想要编译我们自定义的源目录下面的源文件的话，我们需要使用<br>compileSourceSetJava这个任务~ 而不是简单的compile任务（compile任务是 main 这个source set的编译任务~ ~~ testCompile是test 这个source set的编译任务~ ）</p>
+<p>同样，对于资源文件的拷贝和classes及资源文件的集聚的任务都和main,test这两个source set对应的任务一样对应~~</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[为什么选择Gradle]]></title>
+      <url>http://webinglin.github.io/2015/05/13/%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9Gradle/</url>
+      <content type="html"><![CDATA[<p>什么是Gradle，Gradle是一种自动化构建工具。</p>
+<p>那什么是自动化构建工具，自动化构建工具就是利用程序帮我们做一些事情，比如创建目标文件，编译代码，打jar包等等。这样的工具就是自动化构建工具。</p>
+<p>那么自动化构建工具已经有Ant,Maven了 为什么还要用Gradle。而这个就是本文要讨论的内容了。<br><a id="more"></a></p>
+<h2 id="Ant-解说"><a href="#Ant-解说" class="headerlink" title="Ant 解说"></a>Ant 解说</h2><p>Ant是通过XML的形式，让开发者自己定义一堆的任务，非常灵活。使用者能够像写代码一样编写ant的build.xml文件。build.xml文件类似这样子的：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project name=&quot;project&quot; default=&quot;build&quot;&gt;
+    &lt;property name=&quot;src.dir&quot; value=&quot;src&quot; /&gt;
+    &lt;property name=&quot;lib.dir&quot; value=&quot;libs&quot; /&gt;
+    &lt;property name=&quot;build.dir&quot; value=&quot;build&quot; /&gt;
+
+    &lt;target name=&quot;build&quot;&gt;
+        &lt;mkdir dir=&quot;${build.dir}&quot; /&gt;
+        &lt;javac srcdir=&quot;${src.dir}&quot; destdir=&quot;${build.dir}&quot;&gt;
+            &lt;classpath&gt;
+                &lt;fileset dir=&quot;${lib.dir}&quot;&gt;
+                    &lt;include name=&quot;**/*.jar&quot; /&gt;
+                &lt;/fileset&gt;
+            &lt;/classpath&gt;
+        &lt;/javac&gt;
+    &lt;/target&gt;
+&lt;/project&gt;
+</code></pre><p>这段代码并不难，它的意思是，这是一个Project,默认的target是build。那么当执行ant来构建项目的时候，就会执行build这个target，这个target会帮我们做什么事情呢？它会帮我们创建一个build的目录，然后调用javac命令来编译我们的源代码。</p>
+<p>就是这么简单的过程，我们要写很多这么些个代码。如果使用过ant的同学应该明白，在使用ant的时候，我们还要自己处理一序列的jar包依赖。这也就算了，如果我们还使用svn，提交代码的时候还要提交这一大堆的jar包。这样子的话，有新的开发成员加入，要从svn上面下载代码的同时还要下载这些个jar包。太累人了。况且svn是版本管理工具，是管理代码的，不是管理jar包的。因此ant没落了。</p>
+<h2 id="Maven-解说"><a href="#Maven-解说" class="headerlink" title="Maven 解说"></a>Maven 解说</h2><p>Mavne的兴起就是因为ant的没落，maven有一个非常好的理念。 </p>
+<blockquote>
+<p>Convention Over Configuration</p>
+</blockquote>
+<p>约定由于配置，也就是说像上面ant的那些个创建目录和拷贝文件的操作都可以不用我们自己写了。直接交给maven就可以了。maven默认的目录结构</p>
+<pre><code>----mvnProject
+    ----------pom.xml
+    ----------src
+              ----------main
+                        ----------java
+                        ----------webapp
+                        ----------resources
+              ----------test
+                        ----------java
+                        ----------resources
+</code></pre><p>其中java目录是放我们java源代码的，webapp是放置web应用相关文件，resources放置资源文件，如配置文件等。<br>故名思议，test目录放置的就是我们测试相关的测试用例。<br>那么，还有一个pom.xml文件，这个文件是干什么用的呢？ 这个文件就是maven的配置文件，它配置着我们仓库，依赖，插件等</p>
+<pre><code>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;  xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+      &lt;groupId&gt;tw.com.codedata&lt;/groupId&gt;
+      &lt;artifactId&gt;helloworld&lt;/artifactId&gt;
+      &lt;packaging&gt;jar&lt;/packaging&gt;
+      &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+      &lt;name&gt;helloworld&lt;/name&gt;
+      &lt;url&gt;http://maven.apache.org&lt;/url&gt;
+     &lt;dependencies&gt;
+           &lt;dependency&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+            &lt;version&gt;3.8.1&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre><p>比如这样的一个配置文件，其他的就不说了，就看dependencies。maven的依赖确实好用，它能够很方便的帮我们引入我们需要的jar包，还会帮我们把这些jar包所依赖的其他jar包也一起引入到我们的项目中，非常方便。但是依赖的传递性问题还是比较烦人的，考虑这样的一个情况.A 依赖于B1 ，C依赖于 B2。 但是A,C 又被D依赖，那么D里面就会间接依赖B1,B2 那么到底依赖于哪一个？ 比如这样的问题。（Gradle取版本最新的,也可以明确指定版本）</p>
+<h6 id="maven生命周期"><a href="#maven生命周期" class="headerlink" title="maven生命周期"></a>maven生命周期</h6><p>说了这么些maven不好的东西，也来说说maven的一些好的方面，maven的生命周期非常值得学习。maven有三个内置的生命周期（default，test，site）。每一个生命周期又是由一个个的阶段（phase）组成，每一个Phase又绑定着0…n个的目标（Goal）。而Goal又属于Plugin。<br>然后maven的执行可以执行某一个phase，也可以执行特定的goal。所以当我们执行<br><code>&gt; mvn compile</code> 的时候会将compile之前的每一个阶段上面过的属于某个Plugin的Goal都执行一边，比如执行到Compile这个阶段，就会把compile这个插件上面的compile这个goal执行一下。或者我们可以直接执行某一个插件上面的goal。比如： <code>&gt; mvn compile:compile</code></p>
+<h2 id="Gradle-解说"><a href="#Gradle-解说" class="headerlink" title="Gradle 解说"></a>Gradle 解说</h2><p>在看maven的解说这段，我们应该能够看出maven的一些不足。</p>
+<ol>
+<li>由于约定由于配置的关系，目录结构固定了，这个改不了（~我也不建议改）</li>
+<li>当我们依赖的包很多的时候，dependencies里面的内容会变得非常多。配置不够雅观</li>
+</ol>
+<p>而Gradle就不会有这样的问题了。Gradle和Maven最大的区别是在于使用的配置文件不一样，Maven和Ant都是采用xml的形式来写配置文件的，这样的配置文件容易变得很庞大。毕竟xml是描述数据结构的东西(这就是为什么我们传输数据喜欢用JSON了)~ 而Gradle是基于Groovy语言来编写配置文件的，对于什么是Groovy语言，大家可以不用管。不会Groovy也能够实用Gradle。</p>
+<p>Gradle的配置文件是build.gradle</p>
+<pre><code>apply plugin: &apos;java&apos;
+apply plugin: &apos;war&apos;
+apply plugin: &apos;eclipse-wtp&apos;
+
+version = &apos;1.0&apos;
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile &apos;ch.qos.logback:logback-classic:1.1.2&apos;
+    compile &apos;org.springframework:spring-webmvc:4.0.6.RELEASE&apos;
+    compile &apos;jstl:jstl:1.2&apos;
+    providedCompile &apos;javax.servlet:servlet-api:2.5&apos;
+}
+</code></pre><p>关注denpendencies这块，我们发现内容明显少了好多。而且看起来也很容易理解。依赖的包的格式是     <code>GROUP:NAME:VERSION</code> 这样的形式。</p>
+<h4 id="怎么理解gradle的配置文件？"><a href="#怎么理解gradle的配置文件？" class="headerlink" title="怎么理解gradle的配置文件？"></a>怎么理解gradle的配置文件？</h4><p>在理解build.gradle这个配置文件之前，我们需要了解几个重要的概念。Project，task，Plugin</p>
+<h6 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h6><p>Porject和build.gradle是一对一的关系，意思就是说我们的一个基于gradle构建的项目必须要有一个build.gradle配置文件，而配置文件对应的又是一个Project对象。</p>
+<p>Task就是我们具体的动作了（任务）。比如我们要编译，拷贝文件，打jar包 … 等等都是任务。</p>
+<p>Plugin：plugin其实就是封装一些可以重用的task，然后提供给Gradle做扩展，让我们可以很轻松的使用某一个具体的任务，比如compileJava这个任务就是属于java插件的。</p>
+<h6 id="Gradle生命周期"><a href="#Gradle生命周期" class="headerlink" title="Gradle生命周期"></a>Gradle生命周期</h6><blockquote>
+<p>A Gradle build has three distinct phases.</p>
+<p><strong>Initialization</strong><br>Gradle supports single and multi-project builds. During the initialization phase, Gradle determines which projects are going to take part in the build, and creates a Project instance for each of these projects. </p>
+<p><strong>Configuration</strong><br>During this phase the project objects are configured. The build scripts of   projects which are part of the all build are executed. Gradle 1.4 introduced an opt-in feature called configuration on demand. In this mode, Gradle configures only relevant projects</p>
+<p><strong>Execution</strong><br>Gradle determines the subset of the tasks, created and configured during the configuration phase, to be executed. The subset is determined by the task name arguments passed to the command and the gradle current directory. Gradle then executes each of the selected tasks.</p>
+</blockquote>
+<p>这个是官网对gradle生命周期的解释，gradle分为三个阶段，分别是初始化，配置，执行。其中，初始化阶段就是确认有多少个项目要参与构建，并在这个阶段为每一个要参与构建的项目都创建一个Project对象。 配置阶段简单的说就是将我们的build.gradle的配置内容都设置到相关的project对象中去（初始化阶段创建的）。 而执行阶段简单说就是决定哪一些任务参与执行。这些参与执行的任务是在配置阶段配置的。并且由命令行参数决定要执行的具体任务。</p>
+<p>这也就是说，gradle并没有像maven那样，在每一个阶段绑定了一些plugin的goal。而是通过配置文件和参数来决定哪一些任务应该被执行。</p>
+<p>Gradle是通过Task之间的依赖来构成整个类似于maven的生命周期的。当你执行 <code>&gt;gradle build</code> 其实他会执行如下一序列的任务</p>
+<pre><code>:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:jar
+:assemble
+:compileTestJava UP-TO-DATE
+:processTestResources UP-TO-DATE
+:testClasses UP-TO-DATE
+:test UP-TO-DATE
+:check UP-TO-DATE
+:build
+</code></pre><p>其实就是 build任务依赖于check，check依赖于test 如此下去，构成了类似maven的那样的生命周期。</p>
+<h6 id="怎么定义一个Task"><a href="#怎么定义一个Task" class="headerlink" title="怎么定义一个Task"></a>怎么定义一个Task</h6><p>通过上文我们理解了task是gradle重要的概念，那么怎么定义task呢？我们通过如下例子来说明task。首先是我们的build.gradle文件</p>
+<pre><code>task hello1 {
+    println &quot;hello1&quot;
+}
+
+task hello2 {
+    doLast{
+        println &quot;hello2&quot;
+    }
+}
+
+task(&quot;hello3&quot;) {
+    println &quot;hello3&quot;
+}
+
+task hello4  &lt;&lt; {
+    println &apos;Hello4&apos;    
+}
+</code></pre><p>然后我们执行<code>&gt; gradle hello1</code> 看下结果</p>
+<pre><code>hello1
+hello3
+:hello1 UP-TO-DATE
+
+BUILD SUCCESSFUL
+</code></pre><p>注意，这里把hello3也打印出来了。继续执行    <code>&gt; gradle hello2</code> 和 <code>&gt; gradle hello4</code></p>
+<p>hell2执行结果</p>
+<pre><code>hello1
+hello3
+:hello2
+hello2
+
+BUILD SUCCESSFUL
+</code></pre><p>hello4执行结果</p>
+<pre><code>hello1
+hello3
+:hello4
+Hello4
+
+BUILD SUCCESSFUL
+</code></pre><p>很神奇，执行hello2和hello4的时候为什么hello1和hello3这两个任务会被执行呢？而执行hello1的时候，hello3也被执行了呢？查阅api我们可以发现</p>
+<blockquote>
+<p>Task task(Map<string,?> args, String name, Closure configureClosure)</string,?></p>
+<p>Creates a Task with the given name and adds it to this project. <strong>Before the task is returned, the given closure is executed to configure the task.</strong> A map of creation options can be passed to this method to control how the task is created. </p>
+</blockquote>
+<p>我标记了粗体部分，也就是说，在Task创建完成后，在返回Task对象之前，就会执行配置的Closure，而不是等到Task被返回后，在执行Task的时候才去执行Closure。而对于hello2和hello4这两个任务为什么不会出现直接执行closure的的情况呢？ 再来看另一段Gradle的API解释：</p>
+<blockquote>
+<p>Groovy closures can also be used to provide a task action. When the action is executed, the closure is called with the task as parameter. You can add action closures to a task by calling doFirst(groovy.lang.Closure) or doLast(groovy.lang.Closure) or using the left-shift &lt;&lt; operator.</p>
+</blockquote>
+<p>也就是说hello2和hello4的Closure是一种action closure。而不是普通的Closure。那么要把普通的Closure声明成Action Closure通过调用doFirst和doLast或者使用 &lt;&lt; left-shift操作符。再来看left-sheft的api说明</p>
+<blockquote>
+<p>Task leftShift(Closure action)</p>
+<p>Adds the given closure to the end of this task’s action list. The closure is passed this task as a parameter when executed. You can call this method from your build script using the &lt;&lt; left shift operator.</p>
+</blockquote>
+<p>所以对于hello4来说</p>
+<pre><code>task hello4  &lt;&lt; {
+    println &apos;Hello4&apos;    
+}
+</code></pre><p>在定义hello4的时候使用 &lt;&lt; 操作方将后面的Closure参数当成一个action Closure，这样的话，在创建hello4这个任务的时候就会调用一个参数的构造方法，然后将Closure添加到Task的action列表。当task被执行的时候，就会被当成一个参数传递给task,再执行。</p>
+<h6 id="读懂build-gradle"><a href="#读懂build-gradle" class="headerlink" title="读懂build.gradle"></a>读懂build.gradle</h6><p>build.gradle这是一个配置文件，那么我就应该用配置的眼光来看待这个文件，比如</p>
+<p><code>apply plugin:&#39;java&#39;</code> 这个的意思是为 apply方法配置map参数 plugin:’java’</p>
+<p><code>repositories { mavenCentral()}</code> 其实就是为repositories方法配置一个Closue参数</p>
+<p>那为什么会是这样的，有什么凭证吗？ 我们通过gradle的文档，我们可以了解到，在build.gradle中定义的任务,如果在当前作用于找不到所属者，就会代理给Project对象，因此，我们在Project对象的api说明中可以看到如 repositories这样的方法</p>
+<pre><code>void repositories(Closure configureClosure)
+Configures the repositories for this project.
+
+This method executes the given closure against the RepositoryHandler for this project. The RepositoryHandler is passed to the closure as the closure&apos;s delegate.
+
+Parameters:
+configureClosure - the closure to use to configure the repositories.
+</code></pre><p>可以看到repositories的方法参数是一个Closure，这个Closure就是我们配置的<br><code>{mavenCentral()}</code> 。那Closure又是什么东西呢？Clousre其实就是匿名的代码块，这个代码块可以接收参数，可以返回结果，可以定义变量。它的语法<code>{ [closureParameters -&gt; ] statements }</code> 这里就不往下介绍Groovy。我们只需要知道他可以向方法一样被执行，Groovy和java一样都是一种JVM语言，但是和java相比，写起来比java简洁好多~</p>
+<p>兴趣者可以前往<a href="http://www.groovy-lang.org/documentation.html" target="_blank" rel="external">Groovy官网</a>查看。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<p><em>如有写的不对的地方欢迎指正，谢谢阅读~</em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[TortoiseGit基本操作]]></title>
+      <url>http://webinglin.github.io/2015/05/10/TortoiseGit%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/</url>
+      <content type="html"><![CDATA[<h3 id="命令行的操作参考："><a href="#命令行的操作参考：" class="headerlink" title="命令行的操作参考："></a>命令行的操作参考：</h3><p><a href="http://rogerdudler.github.io/git-guide/index.zh.html" target="_blank" rel="external">http://rogerdudler.github.io/git-guide/index.zh.html</a></p>
+<ol>
+<li><p>下载安装 msysgit (我分享失败, 自行到网上找一个) 和 <a href="http://pan.baidu.com/s/1sjx95Pb" target="_blank" rel="external">TortoiseGit</a></p>
+</li>
+<li><p>安装完成后，通过<a id="more"></a> 桌面-&gt;右键 查看是否有 Git Bash 和 Git Clone等菜单，如果有，表示Git安装成功了。如下图：<br><img src="http://i1.tietuku.com/ed0cc2518a40e385.png" alt=""></p>
+</li>
+<li><p>配置我们在GitHub注册的用户名和邮箱，通过右键的TortoiseGit -&gt; Settings ，并选择 Git 菜单， 如下图:<br><img src="http://i1.tietuku.com/ec8250bb4c3c7c44.png" alt=""></p>
+</li>
+<li><p>配置好用户名和邮箱之后，我们就可以正常使用我们的TortoiseGit了，如果我们本地已经创建好了一个项目的话，我们就可以在此项目的根目录地下初始化我们的git仓库。然后将我们的项目提交（此处初始化的仓库也就是我们的本地仓库） 流程如下:</p>
+<ul>
+<li><p>首先我们在E盘创建 git/DEMO 这样的文件夹，并在文件夹新建demo.txt文件，在demo.txt中随便写入点什么。</p>
+<p>  <img src="http://i1.tietuku.com/10d453afe008e767.png" alt=""></p>
+</li>
+<li>在项目Demo的根目录空白处右键，创建仓库(等同于命令Git init)</li>
+<li><p>在弹出来的对话框中，不要勾选Make it Bare，直接点击OK就好了。如果勾选了那么久不会出现.git文件夹了，而是会把所有的git相关的文件直接放到当前的项目根目录底下</p>
+<p>  <img src="http://i1.tietuku.com/a2703c4a510f3e98.png" alt=""></p>
+</li>
+</ul>
+</li>
+<li><p>相对于第四步，如果我们本地没有任何项目，而是要从远程Clone项目下来，那么需要采用的是Git Clone命令。 比如我们要在 E:/git 目录下面将github上面托管的tests项目Clone下来，那么 在git目录空白处 右键-&gt;Git Clone 然后直接OK即可<br><img src="http://i1.tietuku.com/e7a4af896c5677a6.png" alt=""><br>Clone 之后， 我们的E:/git目录就会多出一个tests文件夹，而文件夹的名称tests就是我们的项目名称</p>
+<p> <img src="http://i1.tietuku.com/3db9c073c5bf0bc9.png" alt=""></p>
+</li>
+</ol>
+<blockquote>
+<p>TortoiseGit的其他操作，比如 提交，更新，编辑冲突，创建分支 此篇文章不多做介绍。<br>这一篇博文仅为练习markdown语法以及提供最基础的git操作。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>]]></content>
+    </entry>
+    
+  
+  
+</search>

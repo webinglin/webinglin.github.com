@@ -1,0 +1,332 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spark Tutorials 01 : Introduce To Spark | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="spark tutorials">
+  
+  <meta name="keywords" content="Spark，Spark Tutorials">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Spark Tutorials 01 : Introduce To Spark"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Spark Tutorials 01 : Introduce To Spark</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>spark tutorials</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <blockquote>
+<p>Spark 是一个用来实现 快速而通用 的集群计算平台。</p>
+</blockquote>
+<p>Spark由许多组件组成，包括：</p>
+<ol>
+<li>Spark Core ： Spark Core 实现了Spark的基本功能，包含任务调度，内存管理，错误恢复，与存储系统交互等模块。Spark Core 还包含了对RDD的API定义。</li>
+<li>Spark SQL ： Spark SQL 是spark用来操作结构化数据的程序包。</li>
+<li>Spark Streaming ： Spark Streaming 是Spark提供的对实时数据进行流式计算的组件。</li>
+<li>MLib ： 机器学习功能的程序库</li>
+<li>GraphX ： 用来操作图的程序库(比如社交网络的朋友关系图）</li>
+</ol>
+<p><img src="http://m1.yea.im/3Nl.png" alt=""></p>
+<a id="more"></a>
+<h2 id="Spark初始使用"><a href="#Spark初始使用" class="headerlink" title="Spark初始使用"></a>Spark初始使用</h2><p>例子中使用的是：</p>
+<ol>
+<li>JDK 1.7</li>
+<li>spark-1.4.1-bin-hadoop2.6</li>
+<li>虚拟机</li>
+</ol>
+<p>下载sparke之后，上传到虚拟机上面自己指定的目录下。<br>运行 <code>tar -zxvf spark-1.4.1-bin-hadoop2.6.tgz</code> 解压。</p>
+<p>解压之后目录结构大致如下<br><img src="http://m1.yea.im/3No.png" alt=""></p>
+<p>我们进入到Spark根目录。 并运行 bin/spark-shell<br><code>&gt;bin/spark-shell</code></p>
+<p>启动的界面大致如下图所示:<br><img src="http://m1.yea.im/3Nr.png" alt=""></p>
+<p>如果你启动的界面有很多Info的信息，那么进入到conf目录下面，编辑log4j.properties，将日志级别从INFO调成 WARN 级别。</p>
+<p>至此，Spark最简单的单击环境就搭建完成了。</p>
+<h2 id="Spark的Hello-World"><a href="#Spark的Hello-World" class="headerlink" title="Spark的Hello World"></a>Spark的Hello World</h2><p>学习一门语言最开始都是学习HelloWorld。 那在大数据方面，学习的第一个例子则是计算单词个数。</p>
+<p><img src="http://m1.yea.im/3Ns.png" alt=""></p>
+<p>现在不用明白什么是flatMap， 什么是 map。 因为这些只是Spark的一些方法而已。</p>
+<p>例子中最后求得的 counts 也是 RDD， 是一个表明 README.md 这个文件中包含的单词个数的RDD。<br>我们可以通过<code>scala&gt; counts.count()</code> 这个方法将单词个数求出。</p>
+<h3 id="RDD是什么？"><a href="#RDD是什么？" class="headerlink" title="RDD是什么？"></a>RDD是什么？</h3><p>RDD 是Spark的核心数据抽象，Resilient Distribute Dataset （弹性分布式数据集）。</p>
+<p>RDD 有两种操作，一种是转换（transformation），一种是行动（action）。 所谓的转换是将一个RDD通过一定的操作之后，返回另一个全新的RDD,而原来的RDD还保留在内存中，方便后续使用。例如上述例子中： map， flatMap 等</p>
+<p>所谓的行动则是执行实际的计算，它们会将计算所得的结果返回给驱动器程序。如上述例子中的 count。 会将RDD中包含的总数返回给spark shell。</p>
+<p>需要注意的是, RDD的转换操作是惰性求值的。惰性求值意味着当我们对RDD调用转换操作（如：map）的时候，操作不会立刻执行。同样，把数据读取到RDD的操作也是惰性的，因此，当我们调用 sc.textFile(..) 的时候，数据并没有读取进来，而是在必要的时候才会读取。 而这个必要的时候就是行动执行的时候。如： 调用 RDD的 count()方法之后，就会强制Spark执行RDD 的转换操作。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p>《OReilly.Learning.Spark.Lightning-Fast.Big.Data.Analysis》</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/12/01/Mysql-入库性能优化/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/11/01/SpringMVC-接收数组参数/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/11/07/Spark-Tutorials-01-Introduce-To-Spark/" data-title="Spark Tutorials 01 : Introduce To Spark" data-url="http://webinglin.github.io/2015/11/07/Spark-Tutorials-01-Introduce-To-Spark/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-11-07 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Spark/">Spark<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

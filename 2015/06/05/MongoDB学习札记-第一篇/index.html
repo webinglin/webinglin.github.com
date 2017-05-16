@@ -1,0 +1,457 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MongoDB学习札记 第一篇 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="MongoDB">
+  
+  <meta name="keywords" content="mongo,mongodb,mongoDB,index">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MongoDB学习札记 第一篇"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> MongoDB学习札记 第一篇</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>MongoDB</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <h2 id="安装MongoDB"><a href="#安装MongoDB" class="headerlink" title="安装MongoDB"></a>安装MongoDB</h2><p>我选择的是windows平台的mongodb安装方式，也很简单，只需要 <a href="http://www.mongodb.org/downloads?_ga=1.48317733.2007152124.1433483686#windows" target="_blank" rel="external">下载</a> 对应操作系统版本的Mongodb即可。（建议下载ZIP的安装包）</p>
+<a id="more"></a>
+<h5 id="怎么验证我们的mongodb已经可以使用了？"><a href="#怎么验证我们的mongodb已经可以使用了？" class="headerlink" title="怎么验证我们的mongodb已经可以使用了？"></a>怎么验证我们的mongodb已经可以使用了？</h5><ol>
+<li>通过命令行切换到mongodb的安装目录， 我的目录为 G:\JavaData\mongoDB\bin</li>
+<li>命令行执行 mongod –dbpath  G:\JavaData\mongoDBDATA<br><code>G:\JavaData\mongoDB\bin&gt;mongod --dbpath G:\JavaData\mongoDBDATA</code></li>
+<li>执行之后，可以观察到 <code>waiting for connections on port 27017</code> 表示mongodb已经启动成功了</li>
+</ol>
+<h2 id="MongoDB常规操作"><a href="#MongoDB常规操作" class="headerlink" title="MongoDB常规操作"></a>MongoDB常规操作</h2><p>Mongodb服务启动成功后，我们就可以使用客户端工具来连接mongodb了。 这里我们使用的是mongo提供的客户端工具，在我们刚才安装的mongodb目录下bin目录底下</p>
+<p>同样的进入到我们的mongodb的bin目录，执行 mongo命令 </p>
+<pre><code>G:\JavaData\mongoDB\bin&gt;mongo
+MongoDB shell version: 2.6.3
+connecting to: test
+&gt;
+</code></pre><p>当然，如果你已经将 G:\JavaData\mongoDB\bin 加入到环境变量中，你就可以不需要切换目录了，直接执行mongo即可看到效果。</p>
+<p>通过上面的客户端连接结果可以看到，默认情况下会连接到 test这个数据库 。 如果我们想要知道mongodb现在有多少数据库，可以通过命令 </p>
+<pre><code>&gt; show dbs
+admin   (empty)
+foobar  0.203GB
+local   0.078GB
+piedra  0.078GB
+&gt;
+</code></pre><p>如果想要知道当前是哪个数据库，使用 <code>db</code> 命令</p>
+<pre><code>&gt; db
+test
+</code></pre><p>如果想要切换到其他的数据库， 使用命令  <code>user &lt;your-dbname&gt;</code></p>
+<pre><code>&gt; use piedra
+switched to db piedra
+</code></pre><p>显示当前数据库有哪一些集合 <code>show collections</code></p>
+<pre><code>&gt; show collections
+system.indexes
+users
+</code></pre><p>当然，如果你第一次使用运行 show collection ，结果是空的，但是当你往集合里面插入数据后，就可以看到集合以及对应的数据库都会被创建。</p>
+<pre><code>&gt; show dbs
+admin   (empty)
+foobar  0.203GB
+local   0.078GB
+piedra  0.078GB
+&gt; use demo
+switched to db demo
+&gt; show collections
+&gt; db.users.insert({username:&quot;linwenbin&quot;,pwd:&quot;1234&quot;})
+WriteResult({ &quot;nInserted&quot; : 1 })
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;username&quot; : &quot;linwenbin&quot;, &quot;pwd&quot; : &quot;1234&quot; }
+&gt;
+</code></pre><p>在上面的操作中，我们切换到demo数据库，并且创建了users这个集合，还往users集合插入一条数据。</p>
+<blockquote>
+<p>mongodb中的集合和mysql，Oracle中的table是一样的概念。</p>
+</blockquote>
+<h6 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h6><p>在mongodb中，插入数据使用命令  db.collectionName.insert({data})  或者 db.collectionName.save({data})<br>这两个方法都可以正常工作。 对于 insert方法在上文中已经提到，这里演示save方法的使用。</p>
+<pre><code>&gt; db
+demo
+&gt; show collections
+system.indexes
+users
+&gt;
+&gt; db.users.save({username:&quot;saveMethod&quot;,pwd:&quot;123&quot;}) 
+WriteResult({ &quot;nInserted&quot; : 1 })
+</code></pre><p>需要注意的是 save 方法在没有指定 _id的时候，工作方式和insert是一样的，但是如果指定了 _id 那么如果集合中已经有对应的_id了，就会用新的文档覆盖掉旧的文档。</p>
+<h6 id="修改数据"><a href="#修改数据" class="headerlink" title="修改数据"></a>修改数据</h6><p>要修改数据，也有两种方式，一个是修改整个文档，一个是修改部分。首先先介绍修改整个文档的做法， 我们先把usres这个集合的数据都查询出来，方便和修改操作后的对比</p>
+<pre><code>&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;username&quot; : &quot;linwenbin&quot;, &quot;pwd&quot; : &quot;1234&quot; }
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;123&quot; }
+&gt;
+</code></pre><p>第一种方式： db.collectionName.update({criteria},{data});  这个方法会替换整个文档。</p>
+<pre><code>&gt; db.users.update({username:&quot;linwenbin&quot;},{age:22})
+WriteResult({ &quot;nMatched&quot; : 1, &quot;nUpserted&quot; : 0, &quot;nModified&quot; : 1 })
+&gt; db.users.find({username:&apos;linwenbin&apos;})
+&gt;
+</code></pre><p>可以发现，当我们修改完之后，再去查找username为’linwenbin’的数据就不存在了。</p>
+<p>第二种方式： db.collectionName.update({criteria},{$set:{newData}});  现在我们对另一条数据进行 $set的修改操作</p>
+<pre><code>&gt; db.users.update({username:&quot;saveMethod&quot;},{$set:{pwd:&quot;9999&quot;}})
+WriteResult({ &quot;nMatched&quot; : 1, &quot;nUpserted&quot; : 0, &quot;nModified&quot; : 1 })
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;age&quot; : 22 }
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+&gt;
+</code></pre><p>可以观察到，username为 saveMethod的那条数据的pwd已经被成功修改为 ‘9999’了，而且其他属性并没有被新数据覆盖掉。</p>
+<h6 id="查询数据"><a href="#查询数据" class="headerlink" title="查询数据"></a>查询数据</h6><p>mongodb的查询方法就是find方法了，上文中已经提到多次， db.collectionName.find({criteria})</p>
+<pre><code>&gt; db.users.find({age:22})
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;age&quot; : 22 }
+&gt;
+</code></pre><p>如果都不指定find方法的条件，那么就是查询所有的数据了。</p>
+<p>我们还可以通过指定查询结果显示哪一些字段，这个请查阅mongodb的manual手册。</p>
+<h6 id="删除数据"><a href="#删除数据" class="headerlink" title="删除数据"></a>删除数据</h6><p>如果要删除某一个集合，可以通过  db.collectionName.drop(); 来删除。</p>
+<p>如果删除某一个集合内的数据，则通过 db.collectionName.remove({criteria});<br>我们在上面操作的基础上，将 {age:22} 这条数据删除</p>
+<pre><code>&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717e7ae25992bae59cca65&quot;), &quot;age&quot; : 22 }
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+&gt; db.users.remove({age:22})
+WriteResult({ &quot;nRemoved&quot; : 1 })
+&gt; db.users.find()
+{ &quot;_id&quot; : ObjectId(&quot;55717fd5e25992bae59cca66&quot;), &quot;username&quot; : &quot;saveMethod&quot;, &quot;pwd&quot; : &quot;9999&quot; }
+&gt;
+</code></pre><h2 id="MongoDB索引"><a href="#MongoDB索引" class="headerlink" title="MongoDB索引"></a>MongoDB索引</h2><h5 id="什么是索引？"><a href="#什么是索引？" class="headerlink" title="什么是索引？"></a>什么是索引？</h5><p>索引是创建在表格之上的，对用户来说不可见。索引加快了查找的速度，但是会增加额外的空间，所以创建所以要谨慎，mongodb也对每一个Collection的索引个数有限制。</p>
+<p>简单的说: 索引就是提供了一个能够更快的定位到数据的方法</p>
+<h5 id="mongodb怎么查询索引"><a href="#mongodb怎么查询索引" class="headerlink" title="mongodb怎么查询索引"></a>mongodb怎么查询索引</h5><p>要查看当前集合有哪些索引，可以通过命令 db.collectionName.getIndexes(); </p>
+<pre><code>&gt; db.users.getIndexes()
+[
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;_id&quot; : 1
+                },
+                &quot;name&quot; : &quot;_id_&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        }
+]
+&gt;
+</code></pre><p>key为 _id 为默认的主键索引，创建集合的时候mongodb自动为我们创建。</p>
+<h5 id="mongodb怎么创建索引"><a href="#mongodb怎么创建索引" class="headerlink" title="mongodb怎么创建索引"></a>mongodb怎么创建索引</h5><p>那如果此时我们想要对users这个集合的 username创建索引，应该怎么操作？</p>
+<pre><code>&gt; db.users.ensureIndex({username:1})
+{
+        &quot;createdCollectionAutomatically&quot; : false,
+        &quot;numIndexesBefore&quot; : 1,
+        &quot;numIndexesAfter&quot; : 2,
+        &quot;ok&quot; : 1
+}
+</code></pre><p>这样就表示我们创建索引成功了，在来看看usres集合的索引。</p>
+<pre><code>&gt; db.users.getIndexes()
+[
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;_id&quot; : 1
+                },
+                &quot;name&quot; : &quot;_id_&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        },
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;username&quot; : 1
+                },
+                &quot;name&quot; : &quot;username_1&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        }
+]
+&gt;
+</code></pre><p>我们发现，多了一个key为 username的索引。 其中创建索引 db.users.ensuerIndex({username:1})  中的1 表示正序索引， -1表示逆序索引</p>
+<h5 id="mongodb怎么删除索引"><a href="#mongodb怎么删除索引" class="headerlink" title="mongodb怎么删除索引"></a>mongodb怎么删除索引</h5><p>要删除索引通过 db.collectionName.dropIndex(column) 来删除</p>
+<pre><code>&gt; db.users.dropIndex({username:1})
+{ &quot;nIndexesWas&quot; : 2, &quot;ok&quot; : 1 }
+&gt; db.users.getIndexes()
+[
+        {
+                &quot;v&quot; : 1,
+                &quot;key&quot; : {
+                        &quot;_id&quot; : 1
+                },
+                &quot;name&quot; : &quot;_id_&quot;,
+                &quot;ns&quot; : &quot;demo.users&quot;
+        }
+]
+&gt;
+</code></pre><p>至此，简单的索引操作也记录完成了。</p>
+<blockquote>
+<p>本篇文章目的为了快速上手MongoDB，若要了解更详细资料，读者可自行参考官网的Manual文档。</p>
+</blockquote>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/05/MongoDB学习札记-第二篇-mongodb安全/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/06/04/Logback-学习笔记/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/06/05/MongoDB学习札记-第一篇/" data-title="MongoDB学习札记 第一篇" data-url="http://webinglin.github.io/2015/06/05/MongoDB学习札记-第一篇/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-06-05 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/MongoDB/">MongoDB<span>10</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

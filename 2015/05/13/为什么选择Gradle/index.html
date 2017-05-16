@@ -1,0 +1,480 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>为什么选择Gradle | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="为什么选择Gradle">
+  
+  <meta name="keywords" content="Gradle,maven,ant,为什么,选择gradle">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="为什么选择Gradle"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 为什么选择Gradle</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>为什么选择Gradle</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p>什么是Gradle，Gradle是一种自动化构建工具。</p>
+<p>那什么是自动化构建工具，自动化构建工具就是利用程序帮我们做一些事情，比如创建目标文件，编译代码，打jar包等等。这样的工具就是自动化构建工具。</p>
+<p>那么自动化构建工具已经有Ant,Maven了 为什么还要用Gradle。而这个就是本文要讨论的内容了。<br><a id="more"></a></p>
+<h2 id="Ant-解说"><a href="#Ant-解说" class="headerlink" title="Ant 解说"></a>Ant 解说</h2><p>Ant是通过XML的形式，让开发者自己定义一堆的任务，非常灵活。使用者能够像写代码一样编写ant的build.xml文件。build.xml文件类似这样子的：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project name=&quot;project&quot; default=&quot;build&quot;&gt;
+    &lt;property name=&quot;src.dir&quot; value=&quot;src&quot; /&gt;
+    &lt;property name=&quot;lib.dir&quot; value=&quot;libs&quot; /&gt;
+    &lt;property name=&quot;build.dir&quot; value=&quot;build&quot; /&gt;
+
+    &lt;target name=&quot;build&quot;&gt;
+        &lt;mkdir dir=&quot;${build.dir}&quot; /&gt;
+        &lt;javac srcdir=&quot;${src.dir}&quot; destdir=&quot;${build.dir}&quot;&gt;
+            &lt;classpath&gt;
+                &lt;fileset dir=&quot;${lib.dir}&quot;&gt;
+                    &lt;include name=&quot;**/*.jar&quot; /&gt;
+                &lt;/fileset&gt;
+            &lt;/classpath&gt;
+        &lt;/javac&gt;
+    &lt;/target&gt;
+&lt;/project&gt;
+</code></pre><p>这段代码并不难，它的意思是，这是一个Project,默认的target是build。那么当执行ant来构建项目的时候，就会执行build这个target，这个target会帮我们做什么事情呢？它会帮我们创建一个build的目录，然后调用javac命令来编译我们的源代码。</p>
+<p>就是这么简单的过程，我们要写很多这么些个代码。如果使用过ant的同学应该明白，在使用ant的时候，我们还要自己处理一序列的jar包依赖。这也就算了，如果我们还使用svn，提交代码的时候还要提交这一大堆的jar包。这样子的话，有新的开发成员加入，要从svn上面下载代码的同时还要下载这些个jar包。太累人了。况且svn是版本管理工具，是管理代码的，不是管理jar包的。因此ant没落了。</p>
+<h2 id="Maven-解说"><a href="#Maven-解说" class="headerlink" title="Maven 解说"></a>Maven 解说</h2><p>Mavne的兴起就是因为ant的没落，maven有一个非常好的理念。 </p>
+<blockquote>
+<p>Convention Over Configuration</p>
+</blockquote>
+<p>约定由于配置，也就是说像上面ant的那些个创建目录和拷贝文件的操作都可以不用我们自己写了。直接交给maven就可以了。maven默认的目录结构</p>
+<pre><code>----mvnProject
+    ----------pom.xml
+    ----------src
+              ----------main
+                        ----------java
+                        ----------webapp
+                        ----------resources
+              ----------test
+                        ----------java
+                        ----------resources
+</code></pre><p>其中java目录是放我们java源代码的，webapp是放置web应用相关文件，resources放置资源文件，如配置文件等。<br>故名思议，test目录放置的就是我们测试相关的测试用例。<br>那么，还有一个pom.xml文件，这个文件是干什么用的呢？ 这个文件就是maven的配置文件，它配置着我们仓库，依赖，插件等</p>
+<pre><code>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;  xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+      &lt;groupId&gt;tw.com.codedata&lt;/groupId&gt;
+      &lt;artifactId&gt;helloworld&lt;/artifactId&gt;
+      &lt;packaging&gt;jar&lt;/packaging&gt;
+      &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+      &lt;name&gt;helloworld&lt;/name&gt;
+      &lt;url&gt;http://maven.apache.org&lt;/url&gt;
+     &lt;dependencies&gt;
+           &lt;dependency&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+            &lt;version&gt;3.8.1&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre><p>比如这样的一个配置文件，其他的就不说了，就看dependencies。maven的依赖确实好用，它能够很方便的帮我们引入我们需要的jar包，还会帮我们把这些jar包所依赖的其他jar包也一起引入到我们的项目中，非常方便。但是依赖的传递性问题还是比较烦人的，考虑这样的一个情况.A 依赖于B1 ，C依赖于 B2。 但是A,C 又被D依赖，那么D里面就会间接依赖B1,B2 那么到底依赖于哪一个？ 比如这样的问题。（Gradle取版本最新的,也可以明确指定版本）</p>
+<h6 id="maven生命周期"><a href="#maven生命周期" class="headerlink" title="maven生命周期"></a>maven生命周期</h6><p>说了这么些maven不好的东西，也来说说maven的一些好的方面，maven的生命周期非常值得学习。maven有三个内置的生命周期（default，test，site）。每一个生命周期又是由一个个的阶段（phase）组成，每一个Phase又绑定着0…n个的目标（Goal）。而Goal又属于Plugin。<br>然后maven的执行可以执行某一个phase，也可以执行特定的goal。所以当我们执行<br><code>&gt; mvn compile</code> 的时候会将compile之前的每一个阶段上面过的属于某个Plugin的Goal都执行一边，比如执行到Compile这个阶段，就会把compile这个插件上面的compile这个goal执行一下。或者我们可以直接执行某一个插件上面的goal。比如： <code>&gt; mvn compile:compile</code></p>
+<h2 id="Gradle-解说"><a href="#Gradle-解说" class="headerlink" title="Gradle 解说"></a>Gradle 解说</h2><p>在看maven的解说这段，我们应该能够看出maven的一些不足。</p>
+<ol>
+<li>由于约定由于配置的关系，目录结构固定了，这个改不了（~我也不建议改）</li>
+<li>当我们依赖的包很多的时候，dependencies里面的内容会变得非常多。配置不够雅观</li>
+</ol>
+<p>而Gradle就不会有这样的问题了。Gradle和Maven最大的区别是在于使用的配置文件不一样，Maven和Ant都是采用xml的形式来写配置文件的，这样的配置文件容易变得很庞大。毕竟xml是描述数据结构的东西(这就是为什么我们传输数据喜欢用JSON了)~ 而Gradle是基于Groovy语言来编写配置文件的，对于什么是Groovy语言，大家可以不用管。不会Groovy也能够实用Gradle。</p>
+<p>Gradle的配置文件是build.gradle</p>
+<pre><code>apply plugin: &apos;java&apos;
+apply plugin: &apos;war&apos;
+apply plugin: &apos;eclipse-wtp&apos;
+
+version = &apos;1.0&apos;
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile &apos;ch.qos.logback:logback-classic:1.1.2&apos;
+    compile &apos;org.springframework:spring-webmvc:4.0.6.RELEASE&apos;
+    compile &apos;jstl:jstl:1.2&apos;
+    providedCompile &apos;javax.servlet:servlet-api:2.5&apos;
+}
+</code></pre><p>关注denpendencies这块，我们发现内容明显少了好多。而且看起来也很容易理解。依赖的包的格式是     <code>GROUP:NAME:VERSION</code> 这样的形式。</p>
+<h4 id="怎么理解gradle的配置文件？"><a href="#怎么理解gradle的配置文件？" class="headerlink" title="怎么理解gradle的配置文件？"></a>怎么理解gradle的配置文件？</h4><p>在理解build.gradle这个配置文件之前，我们需要了解几个重要的概念。Project，task，Plugin</p>
+<h6 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h6><p>Porject和build.gradle是一对一的关系，意思就是说我们的一个基于gradle构建的项目必须要有一个build.gradle配置文件，而配置文件对应的又是一个Project对象。</p>
+<p>Task就是我们具体的动作了（任务）。比如我们要编译，拷贝文件，打jar包 … 等等都是任务。</p>
+<p>Plugin：plugin其实就是封装一些可以重用的task，然后提供给Gradle做扩展，让我们可以很轻松的使用某一个具体的任务，比如compileJava这个任务就是属于java插件的。</p>
+<h6 id="Gradle生命周期"><a href="#Gradle生命周期" class="headerlink" title="Gradle生命周期"></a>Gradle生命周期</h6><blockquote>
+<p>A Gradle build has three distinct phases.</p>
+<p><strong>Initialization</strong><br>Gradle supports single and multi-project builds. During the initialization phase, Gradle determines which projects are going to take part in the build, and creates a Project instance for each of these projects. </p>
+<p><strong>Configuration</strong><br>During this phase the project objects are configured. The build scripts of   projects which are part of the all build are executed. Gradle 1.4 introduced an opt-in feature called configuration on demand. In this mode, Gradle configures only relevant projects</p>
+<p><strong>Execution</strong><br>Gradle determines the subset of the tasks, created and configured during the configuration phase, to be executed. The subset is determined by the task name arguments passed to the command and the gradle current directory. Gradle then executes each of the selected tasks.</p>
+</blockquote>
+<p>这个是官网对gradle生命周期的解释，gradle分为三个阶段，分别是初始化，配置，执行。其中，初始化阶段就是确认有多少个项目要参与构建，并在这个阶段为每一个要参与构建的项目都创建一个Project对象。 配置阶段简单的说就是将我们的build.gradle的配置内容都设置到相关的project对象中去（初始化阶段创建的）。 而执行阶段简单说就是决定哪一些任务参与执行。这些参与执行的任务是在配置阶段配置的。并且由命令行参数决定要执行的具体任务。</p>
+<p>这也就是说，gradle并没有像maven那样，在每一个阶段绑定了一些plugin的goal。而是通过配置文件和参数来决定哪一些任务应该被执行。</p>
+<p>Gradle是通过Task之间的依赖来构成整个类似于maven的生命周期的。当你执行 <code>&gt;gradle build</code> 其实他会执行如下一序列的任务</p>
+<pre><code>:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:jar
+:assemble
+:compileTestJava UP-TO-DATE
+:processTestResources UP-TO-DATE
+:testClasses UP-TO-DATE
+:test UP-TO-DATE
+:check UP-TO-DATE
+:build
+</code></pre><p>其实就是 build任务依赖于check，check依赖于test 如此下去，构成了类似maven的那样的生命周期。</p>
+<h6 id="怎么定义一个Task"><a href="#怎么定义一个Task" class="headerlink" title="怎么定义一个Task"></a>怎么定义一个Task</h6><p>通过上文我们理解了task是gradle重要的概念，那么怎么定义task呢？我们通过如下例子来说明task。首先是我们的build.gradle文件</p>
+<pre><code>task hello1 {
+    println &quot;hello1&quot;
+}
+
+task hello2 {
+    doLast{
+        println &quot;hello2&quot;
+    }
+}
+
+task(&quot;hello3&quot;) {
+    println &quot;hello3&quot;
+}
+
+task hello4  &lt;&lt; {
+    println &apos;Hello4&apos;    
+}
+</code></pre><p>然后我们执行<code>&gt; gradle hello1</code> 看下结果</p>
+<pre><code>hello1
+hello3
+:hello1 UP-TO-DATE
+
+BUILD SUCCESSFUL
+</code></pre><p>注意，这里把hello3也打印出来了。继续执行    <code>&gt; gradle hello2</code> 和 <code>&gt; gradle hello4</code></p>
+<p>hell2执行结果</p>
+<pre><code>hello1
+hello3
+:hello2
+hello2
+
+BUILD SUCCESSFUL
+</code></pre><p>hello4执行结果</p>
+<pre><code>hello1
+hello3
+:hello4
+Hello4
+
+BUILD SUCCESSFUL
+</code></pre><p>很神奇，执行hello2和hello4的时候为什么hello1和hello3这两个任务会被执行呢？而执行hello1的时候，hello3也被执行了呢？查阅api我们可以发现</p>
+<blockquote>
+<p>Task task(Map<string,?> args, String name, Closure configureClosure)</string,?></p>
+<p>Creates a Task with the given name and adds it to this project. <strong>Before the task is returned, the given closure is executed to configure the task.</strong> A map of creation options can be passed to this method to control how the task is created. </p>
+</blockquote>
+<p>我标记了粗体部分，也就是说，在Task创建完成后，在返回Task对象之前，就会执行配置的Closure，而不是等到Task被返回后，在执行Task的时候才去执行Closure。而对于hello2和hello4这两个任务为什么不会出现直接执行closure的的情况呢？ 再来看另一段Gradle的API解释：</p>
+<blockquote>
+<p>Groovy closures can also be used to provide a task action. When the action is executed, the closure is called with the task as parameter. You can add action closures to a task by calling doFirst(groovy.lang.Closure) or doLast(groovy.lang.Closure) or using the left-shift &lt;&lt; operator.</p>
+</blockquote>
+<p>也就是说hello2和hello4的Closure是一种action closure。而不是普通的Closure。那么要把普通的Closure声明成Action Closure通过调用doFirst和doLast或者使用 &lt;&lt; left-shift操作符。再来看left-sheft的api说明</p>
+<blockquote>
+<p>Task leftShift(Closure action)</p>
+<p>Adds the given closure to the end of this task’s action list. The closure is passed this task as a parameter when executed. You can call this method from your build script using the &lt;&lt; left shift operator.</p>
+</blockquote>
+<p>所以对于hello4来说</p>
+<pre><code>task hello4  &lt;&lt; {
+    println &apos;Hello4&apos;    
+}
+</code></pre><p>在定义hello4的时候使用 &lt;&lt; 操作方将后面的Closure参数当成一个action Closure，这样的话，在创建hello4这个任务的时候就会调用一个参数的构造方法，然后将Closure添加到Task的action列表。当task被执行的时候，就会被当成一个参数传递给task,再执行。</p>
+<h6 id="读懂build-gradle"><a href="#读懂build-gradle" class="headerlink" title="读懂build.gradle"></a>读懂build.gradle</h6><p>build.gradle这是一个配置文件，那么我就应该用配置的眼光来看待这个文件，比如</p>
+<p><code>apply plugin:&#39;java&#39;</code> 这个的意思是为 apply方法配置map参数 plugin:’java’</p>
+<p><code>repositories { mavenCentral()}</code> 其实就是为repositories方法配置一个Closue参数</p>
+<p>那为什么会是这样的，有什么凭证吗？ 我们通过gradle的文档，我们可以了解到，在build.gradle中定义的任务,如果在当前作用于找不到所属者，就会代理给Project对象，因此，我们在Project对象的api说明中可以看到如 repositories这样的方法</p>
+<pre><code>void repositories(Closure configureClosure)
+Configures the repositories for this project.
+
+This method executes the given closure against the RepositoryHandler for this project. The RepositoryHandler is passed to the closure as the closure&apos;s delegate.
+
+Parameters:
+configureClosure - the closure to use to configure the repositories.
+</code></pre><p>可以看到repositories的方法参数是一个Closure，这个Closure就是我们配置的<br><code>{mavenCentral()}</code> 。那Closure又是什么东西呢？Clousre其实就是匿名的代码块，这个代码块可以接收参数，可以返回结果，可以定义变量。它的语法<code>{ [closureParameters -&gt; ] statements }</code> 这里就不往下介绍Groovy。我们只需要知道他可以向方法一样被执行，Groovy和java一样都是一种JVM语言，但是和java相比，写起来比java简洁好多~</p>
+<p>兴趣者可以前往<a href="http://www.groovy-lang.org/documentation.html" target="_blank" rel="external">Groovy官网</a>查看。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<p><em>如有写的不对的地方欢迎指正，谢谢阅读~</em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/05/13/Gradle无秘密之SourceSet/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/05/10/TortoiseGit基本操作/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/05/13/为什么选择Gradle/" data-title="为什么选择Gradle" data-url="http://webinglin.github.io/2015/05/13/为什么选择Gradle/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-05-13 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Gradle/">Gradle<span>3</span></a></li> <li><a href="/tags/Maven/">Maven<span>1</span></a></li> <li><a href="/tags/Ant/">Ant<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

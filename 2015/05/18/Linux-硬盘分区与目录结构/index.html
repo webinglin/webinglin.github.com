@@ -1,0 +1,339 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux 硬盘分区与目录结构 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="Linux 硬盘分区与目录结构">
+  
+  <meta name="keywords" content="linux,磁盘分区,目录结构">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux 硬盘分区与目录结构"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> Linux 硬盘分区与目录结构</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>Linux 硬盘分区与目录结构</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <p><em>事出必有因，这段时间在家里笔记本没带回来。使用家里的台式电脑，也算老古董了。要在linux下面实验点什么，又得安装虚拟机，一运行，机子就死在那儿了。于是乎，就萌生了安装一个linux的操作系统的念头。但是windows下面常用的软件，有一些是没有linux版本的，比如:印象笔记，百度云管家等</em></p>
+<hr>
+<p>都知道，硬盘刚买来的时候还不能用。我们要先对其进行分区，分区之后进行格式化，最后才是安装操作系统。那么</p>
+<p>什么是硬盘分区，为什么要进行分区？</p>
+<a id="more"></a>
+<blockquote>
+<p>分区和操作系统没有任何关系，因为分区是在安装操作系统之前进行的。我们可以简单的认识，分区就是将硬盘分割成不同的区域。</p>
+<p>硬盘为什么要分区？因为操作系统在启动的时候会通过MBR来获得操作系统文件所在的分区，所以一个可引导分区是不可缺少的。这也就是为什么新买的硬盘不能直接用的原因。而且进行多个分区是为了提高管理效率，所有东西放在一个分区，OS管理起来效率比较低，因为每次要检索的东西太多了。</p>
+</blockquote>
+<p>最多能划分多少个分区？</p>
+<blockquote>
+<p>由于磁盘分区表只能保留四条记录，所以一个磁盘的主分区+扩展分区最多只能有四个。</p>
+</blockquote>
+<p>上面提到了格式化，那什么是格式化？</p>
+<blockquote>
+<p>格式化就是对某一个分区建立文件系统。比如windows的 FAT32,NTFS。 Linux的ext2,ext3,ext4等</p>
+</blockquote>
+<p>文件系统又是什么呢？</p>
+<blockquote>
+<p>文件系统就是指明要怎么组织数据到硬盘分区上，以及要怎么操作硬盘上的数据。（说白了就是一套API接口了，对于操作系统来说，只管调用文件系统的一些接口来存储和读取数据，而不用关系文件系统怎么组织数据）</p>
+</blockquote>
+<p>明白了分区和格式化等几个简单概念之后，我们继续了解一下windows和linux磁盘分区的区别。</p>
+<blockquote>
+<p>Windows下的磁盘分区相对linux来说比较简单，windows下面一个磁盘分区对应着一个磁盘符号。比如系统盘对应的盘符是C，其他扩展分区或者逻辑分区对应的盘符为 E , F , L 之类的。很好理解。那要是我们重装系统的话，只需要对C盘进行格式化重装系统，而D,E,F之类的盘符对应的分区上的数据没有被格式化，所以那些数据得以保留。</p>
+<p>Linux下面就不像window那样直白了，在linux下，所有的磁盘，设备，都会当成一个文件或目录。<br><img src="http://img.ddvip.com/2013/0912/201309120206429219.gif" alt=""></p>
+<p>然后我们需要将我们的磁盘分区和linux下面的目录连接起来（类似windows的分区和盘符对应起来），分区和目录之间的连接称为挂载。安装linux系统的时候，我们需要将存放系统文件的分区挂载在根目录( / ) 下面。 linux存放数据到哪个磁盘的规则是这样的： 从当前目录往上级目录找，如果父目录没有挂载磁盘分区，继续往父级目录的父目录再找，直到最后将数据存放在和根目录同一个磁盘分区。</p>
+<p>这样的话，我们就可以将磁盘分区挂载到其他的目录， 比如我们将sda3挂载到/home目录 , sda6挂载/usr/local目录。那这样的话我们在/home下面创建的文档,就会保存在sda3这块分区。在/usr/local目录下面安装的软件就会保存在sda6这块分区。这样就形成了好像windows的D盘，E盘。只不过window访问E盘对应的磁盘分区的内容是通过明确指定盘符，比如 E:/a.txt 。 而在linux下面所有的文件都是相对于根目录的。比如 /home/xxx/a.txt。</p>
+</blockquote>
+<p>上文提到了挂载的概念，那什么是挂载？</p>
+<blockquote>
+<p>挂载简单的说就是将一个目录和一个磁盘分区连接到一起，对这个目录的数据操作，都是对对应磁盘分区的操作。</p>
+</blockquote>
+<p>上文中还提到了sda3，sda6。这几个字符串代表什么？</p>
+<blockquote>
+<p>sd代表的是硬盘的类型，它代表的是SCSI硬盘。如果是IDE硬盘，那就用hd表示。当然，还有诸如固态硬盘之类的（<em>题外话：固态硬盘目前价格挺贵的，前些时间查了一下，笔记本使用混合硬盘的大部分是在神州系列，而且价格都挺贵的。而挺火的联想Y50系列的都没使用固态硬盘。固态硬盘比普通的硬盘快很多。网上有人说普通硬盘开机40秒，用固态硬盘十几秒。这个没亲测过。</em>）<br>sd后面的a表示的是盘号。第一块硬盘用a表示（基本盘)，第二块用b(基本从属盘)，以此类推。而最后面的数字则表示分区，上文我们提到过，主分区和扩展分区最多只能有四个。所以 1…4 就表示主分区和扩展分区。 5 以后的数字就表示逻辑分区了。 上文中的 sda3 就表示: 第一块SCSI硬盘的第三个分区。 sda6 表示: 第一块SCSI硬盘的第二个逻辑分区（逻辑分区从5开始，6就表示第二个逻辑分区了）</p>
+</blockquote>
+<p>更多关于怎么分区，每个分区应该分配多大内存，目前我没有具体实践过，大家可以百度一下相关资料。</p>
+<p><em>能力有限，水平一般，有不足之处还望多多指正。谢谢阅读~</em></p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely！"><a href="#Sincerely！" class="headerlink" title="Sincerely！"></a>Sincerely！</h3><h3 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h3><p><a href="http://teliute.org/linux/Ubsetup/index.html" target="_blank" rel="external">http://teliute.org/linux/Ubsetup/index.html</a></p>
+<p><a href="http://blog.csdn.net/cc_net/article/details/2894510" target="_blank" rel="external">http://blog.csdn.net/cc_net/article/details/2894510</a></p>
+<p><a href="http://www.cnblogs.com/Athrun/archive/2008/08/04/1260350.html" target="_blank" rel="external">http://www.cnblogs.com/Athrun/archive/2008/08/04/1260350.html</a><br>等</p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+				
+    	<li class="prev"><a href="/2015/06/04/Logback-学习笔记/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+  		
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2015/05/13/Gradle无秘密之Dependencies/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2015/05/18/Linux-硬盘分区与目录结构/" data-title="Linux 硬盘分区与目录结构" data-url="http://webinglin.github.io/2015/05/18/Linux-硬盘分区与目录结构/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2015-05-18 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Linux/">Linux<span>1</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>

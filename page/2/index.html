@@ -1,0 +1,639 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第 2 页 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 <div class="page-header page-header-inverse ">
+  <h1 class="title title-inverse ">WEBINGLIN</h1>
+</div>
+
+<div class="row page">
+
+	
+	<div class="col-md-9">
+	
+
+		<div class="slogan">
+      <i class="fa fa-heart"></i>
+      以出世的精神干入世的事情，志存高远却又不拘泥于眼前的小事，杂事，乱事。这才能以坦荡的胸怀干成大事，这就是中庸。
+</div>    
+		<div id="top_search"></div>
+		<div class="mypage">
+		
+		<!-- title and entry -->
+        <!-- render top articles firstly -->
+        
+        <!-- render other articles -->
+        
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-11-01 </div>
+			<div class="article-title"><a href="/2015/11/01/SpringMVC-接收数组参数/" title="ajax如何传数组到后台">SpringMVC 接收数组参数</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>如果 JQuery 要往服务端传递一个数组参数，请求的方式如下</p>
+<pre><code>$.ajax({
+    url : ${yourURL},
+    data: {yourParam:[1,2,3,4]},
+    success:function(data){
+    }
+});
+</code></pre><p>或者：</p>
+<pre><code>$.ajax({
+    url : ${yourURL},
+    data: {&quot;yourParam[]&quot;:[1,2,3,4]},
+    success:function(data){
+    }
+});
+</code></pre><p>前端传递参数这两种写法都可以，建议写成第二种，而服务端的接收参数对应起来。</p>
+<p>那么在服务端的 Controller怎么接收这个参数？</p>
+<pre><code>@RequestMapping（&quot;/save&quot;)
+public void save(@RequestParam(value=&quot;yourParam[]&quot; String[] yourParam){
+    // do Something...
+}
+</code></pre><p>注意： @RequestParam 一定要用数组的形式 “yourParam[]” 作为接收参数， 这样的话才能够正确的接收到前端传递的数组， 如果前端的数组为空，接收到的也是空串。  比如：前端传递的参数： <code>data:{&quot;yourParam[]&quot;:[null,null,null]}</code> 那么服务端接收到的参数将会是 [“”,””,””] 无需担心空指针问题。</p>
+<p>如果不用 “yourParam[]” 作为接收参数的话，将会发生莫名的错误。</p>
+<p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
+<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-07-02 </div>
+			<div class="article-title"><a href="/2015/07/02/IntelliJ-IDEA14-起步/" title="首次使用IntelliJ IDEA14">IntelliJ IDEA14 起步</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>Myeclipse确实功能很强大，我也一直在用Myeclipse。但是Myeclipse确实太庞大了，有的没的一大堆。听闻IntelliJ IDEA非常好用，一年前就用了两个月。工作原因又回归到Myeclipse。这次再次使用IDEA的时候发现很多东西都陌生了。甚至一些IDEA基本的概念都忘却了。</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/07/02/IntelliJ-IDEA14-起步/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-25 </div>
+			<div class="article-title"><a href="/2015/06/25/MyEclipse常见问题与性能优化/" title="MyEclipse常见问题与性能优化">MyEclipse常见问题与性能优化</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>Myeclipse是一个非常好用的IDE（集成开发环境），使用很简单，但是要驾驭它却要一个长期的使用和总结经验，之所以写这篇文章是因为今天早上我的myeclipse总是自动退出，试过很多办法都没法解决，后来我的同事（肖帅哥）问我myeclipse有没有优化，我说，是指调整内存吗？ 接着他就过来教了我几招。因此就写下此文来记录今天所学以及之前使用过程中的一些经验教训</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/25/MyEclipse常见问题与性能优化/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-24 </div>
+			<div class="article-title"><a href="/2015/06/24/JQuery事件-document绑定-VS-ID绑定/" title="$(document).on(&#39;click&#39;, &#39;#id&#39;, function() {}) vs $(&#39;#id&#39;).on(&#39;click&#39;, function(){})">JQuery事件 document绑定 VS ID绑定</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h4 id="document-on-39-click-39-39-id-39-function-和-39-id-39-on-39-click-39-function-到底有什么区别？"><a href="#document-on-39-click-39-39-id-39-function-和-39-id-39-on-39-click-39-function-到底有什么区别？" class="headerlink" title="$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) 和 $(&#39;#id&#39;).on(&#39;click&#39;,function(){}) 到底有什么区别？"></a><code>$(document).on(&#39;click&#39;,&#39;#id&#39;,function(){}) 和 $(&#39;#id&#39;).on(&#39;click&#39;,function(){})</code> 到底有什么区别？</h4><p>这个问题在stackoverflow上面已经讨论过了，我今天也遇到这个问题。但是我在遇到该问题的时候想到的不是第一种做法，而是采用第二种在改版。后来我的同事小丸子这样写事件监听，我觉得很神奇，我就去google了。看到stackoverflow的这个答案我就明朗了。感谢小丸子！</p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/24/JQuery事件-document绑定-VS-ID绑定/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-10 </div>
+			<div class="article-title"><a href="/2015/06/10/MongoDB学习札记-第十篇-分片集群搭建/" title="MongoDB学习札记 第十篇 分片 测试架构实战">MongoDB学习札记 第十篇 分片集群搭建</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>##实验环境准备：</p>
+<p><strong>configSerer</strong></p>
+<blockquote>
+<p>192.168.236.131:27000</p>
+</blockquote>
+<p><strong>mongos</strong></p>
+<blockquote>
+<p>192.168.236.131:28000</p>
+</blockquote>
+<p><strong>shards</strong></p>
+<blockquote>
+<p>192.168.236.131:29001</p>
+<p>192.168.236.131:29002</p>
+<p>192.168.236.131:29003</p>
+</blockquote>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/10/MongoDB学习札记-第十篇-分片集群搭建/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-10 </div>
+			<div class="article-title"><a href="/2015/06/10/MongoDB学习札记-第九篇-分片核心概念/" title="MongoDB学习札记 第九篇 分片核心概念">MongoDB学习札记 第九篇 分片核心概念</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="分片集群的组成"><a href="#分片集群的组成" class="headerlink" title="分片集群的组成"></a>分片集群的组成</h2><p><strong>Shards</strong></p>
+<blockquote>
+<p>A shard is a MongoDB instance that holds a subset of a collection’s data. Each shard is either a single mongod instance or a replica set. In production, all shards are replica sets. </p>
+</blockquote>
+<p><strong>Config Servers</strong></p>
+<blockquote>
+<p>Each config server is a mongod instance that holds metadata about the cluster. The metadata maps chunks to shards. </p>
+</blockquote>
+<p><strong>Routing Instances</strong></p>
+<blockquote>
+<p>Each router is a mongos instance that routes the reads and writes from applications to the shards. Applications do not access the shards directly.</p>
+</blockquote>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/10/MongoDB学习札记-第九篇-分片核心概念/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-09 </div>
+			<div class="article-title"><a href="/2015/06/09/MongoDB学习札记-第八篇-Replica-Set-实战/" title="MongoDB学习札记 第八篇 Replica Set 实战">MongoDB学习札记 第八篇 Replica Set 实战</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>Ubuntu12.0.4</li>
+<li>mongodb3.0.3</li>
+<li>三台机器，分别为： 192.168.236.131 ;  192.168.236.133 ;  192.168.236.134</li>
+</ul>
+<p>如果对于怎么安装Mongodb还不清楚的同学可以查看我之前的学习札记</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/09/MongoDB学习札记-第八篇-Replica-Set-实战/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-09 </div>
+			<div class="article-title"><a href="/2015/06/09/MongoDB学习札记-第七篇-Replica-Set-概念/" title="MongoDB学习札记 第七篇 Replica Set 核心概念">MongoDB学习札记 第七篇 Replica Set 核心概念</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>副本集是一组mongod进程组成的，提供了数据冗余和高可用性。</p>
+<h2 id="副本集的成员"><a href="#副本集的成员" class="headerlink" title="副本集的成员"></a>副本集的成员</h2><p><strong>Replica Set Primary</strong></p>
+<blockquote>
+<p>The primary is the only member of a replica set that accepts write operations.</p>
+</blockquote>
+<p><strong>Replica Set Secondary Members</strong></p>
+<blockquote>
+<p>Secondary members replicate the primary’s data set and accept read operations. If the set has no primary, a secondary <strong>can become primary.</strong></p>
+</blockquote>
+<p><strong>Priority 0 Replica Set Members</strong></p>
+<blockquote>
+<p>Priority 0 members are secondaries that <strong>cannot become the primary.</strong></p>
+</blockquote>
+<p><strong>Hidden Replica Set Members</strong></p>
+<blockquote>
+<p>Hidden members are secondaries that are invisible to applications. These members support dedicated workloads, such as reporting or <strong>backup.</strong></p>
+</blockquote>
+<p><strong>Replica Set Arbiter</strong></p>
+<blockquote>
+<p>An arbiter <strong>does not maintain a copy of the data set</strong> but participate in <strong>elections.</strong></p>
+</blockquote>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/09/MongoDB学习札记-第七篇-Replica-Set-概念/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-08 </div>
+			<div class="article-title"><a href="/2015/06/08/MongoDB学习札记-第六篇-主从复制/" title="MongoDB学习札记 第六篇 主从复制">MongoDB学习札记 第六篇 主从复制</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备:"></a>环境准备:</h2><ul>
+<li>ubuntu12.0.4</li>
+<li>mongodb3.0.3</li>
+</ul>
+<p>主从复制是MongoDB中最常见的复制方式。这种方式非常灵活，可用于备份，故障恢复，读扩展 等。</p>
+<p>本次试验中，我们采用一个主节点，一个从节点。</p>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/08/MongoDB学习札记-第六篇-主从复制/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+           
+			  
+	
+	<!-- display as entry -->	
+		<h3 class="title">
+			<div class="date"> 2015-06-07 </div>
+			<div class="article-title"><a href="/2015/06/07/MongoDB学习札记-第五篇-监控/" title="MongoDB学习札记 第五篇 监控">MongoDB学习札记 第五篇 监控</a></div>						
+		</h3>
+	
+
+
+			  <div class="entry">
+  <div class="row">
+	
+	
+		<p>对数据库的监控对于数据库管理人员（包括开发人员排查问题也是）来说是一项很重要的工作。</p>
+<p>Mongodb提供了三种监控策略：</p>
+<ul>
+<li>mongodb提供的工具集合，实时监听数据库的活动。</li>
+<li>database commands 返回当前数据库的状态</li>
+<li>MongoDB Management Service(MMS) 提供可视化的监控结果。</li>
+</ul>
+		<!-- only display read_more button if there's more to display -->
+		<a type="button" href="/2015/06/07/MongoDB学习札记-第五篇-监控/#more" class="btn btn-default more">阅读此文</a>
+	
+	</div>
+</div>
+
+           
+		
+
+		</div>
+
+		<!-- pagination -->
+		<div>
+  		<center>
+		<div class="pagination">
+<ul class="pagination">
+	 
+		
+    	<li class="prev"><a href="/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i> 上一页</a></li>
+  		
+
+        <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
+		
+		   <li class="next"> <a href="/page/3/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a> </li>          
+        
+	
+</ul>
+</div>
+
+  		</center>
+		</div>
+
+		
+		
+	</div> <!-- col-md-9 -->
+
+	
+		<div class="col-md-3">
+	<div id="sidebar">
+	
+			
+  <div id="site_search">
+   <div class="form-group">
+    <input type="text" id="local-search-input" name="q" results="0" placeholder="搜索" class="st-search-input st-default-search-input form-control"/>
+   </div>  
+  <div id="local-search-result"></div>
+  </div>
+
+
+		
+			
+		
+			
+	<div class="widget">
+		<h4>标签云</h4>
+		<ul class="tag_box inline list-unstyled">		
+		
+			<li><a href="/tags/JavaScript/">JavaScript<span>1</span></a></li>
+		
+			<li><a href="/tags/JQuery/">JQuery<span>2</span></a></li>
+		
+			<li><a href="/tags/Ubuntu/">Ubuntu<span>2</span></a></li>
+		
+			<li><a href="/tags/Java/">Java<span>1</span></a></li>
+		
+			<li><a href="/tags/Logback/">Logback<span>1</span></a></li>
+		
+			<li><a href="/tags/MySQL/">MySQL<span>3</span></a></li>
+		
+			<li><a href="/tags/SpringMVC/">SpringMVC<span>1</span></a></li>
+		
+			<li><a href="/tags/Spark/">Spark<span>1</span></a></li>
+		
+			<li><a href="/tags/Gradle/">Gradle<span>3</span></a></li>
+		
+			<li><a href="/tags/Spring/">Spring<span>1</span></a></li>
+		
+			<li><a href="/tags/Ant/">Ant<span>1</span></a></li>
+		
+			<li><a href="/tags/Idea/">Idea<span>1</span></a></li>
+		
+			<li><a href="/tags/Git/">Git<span>1</span></a></li>
+		
+			<li><a href="/tags/Markdown/">Markdown<span>1</span></a></li>
+		
+			<li><a href="/tags/MongoDB/">MongoDB<span>10</span></a></li>
+		
+			<li><a href="/tags/Linux/">Linux<span>1</span></a></li>
+		
+			<li><a href="/tags/css/">css<span>1</span></a></li>
+		
+			<li><a href="/tags/Maven/">Maven<span>1</span></a></li>
+		
+			<li><a href="/tags/Eclipse/">Eclipse<span>1</span></a></li>
+		
+		 
+		</ul>
+	</div>
+
+
+		
+			
+<div class="widget">
+  <h4>最新文章</h4>
+  <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2017/05/16/引用awesome打造漂亮图标/"  title="利用awesome的css图标库" ><i class="fa fa-file-o"></i>引用awesome打造漂亮图标</a>
+      </li>
+    
+      <li>
+        <a href="/2017/05/04/Java执行Python、Shell/"  title="java执行Python或者Shell" ><i class="fa fa-file-o"></i>Java执行Python、Shell</a>
+      </li>
+    
+      <li>
+        <a href="/2017/01/14/Ubuntu安装后传/"  title="ubuntu安装之后要处理的软件安装和备份" ><i class="fa fa-file-o"></i>Ubuntu安装后传</a>
+      </li>
+    
+      <li>
+        <a href="/2016/03/20/Spring-cron-表达式/"  title="Spring cron 表达式" ><i class="fa fa-file-o"></i>Spring cron 表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/01/28/JQuery滚动加载/"  title="Jquery滚动加载数据" ><i class="fa fa-file-o"></i>JQuery滚动加载</a>
+      </li>
+    
+  </ul>
+</div>
+
+		
+			
+<div class="widget">
+	<h4>链接</h4>
+	<ul class="blogroll list-unstyled">
+	
+		<li><i class="fa fa-github"></i><a href="http://www.github.com/webinglin" title="My Github account." target="_blank"]);">Github</a></li>
+	
+	</ul>
+</div>
+
+
+		
+	</div> <!-- sidebar -->
+</div> <!-- col-md-3 -->
+
+	
+	
+</div> <!-- row-fluid -->
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>
