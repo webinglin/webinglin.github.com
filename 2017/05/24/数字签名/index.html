@@ -1,0 +1,336 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>数字签名 | WEBINGLIN</title>
+  <meta name="author" content="weblinglin">
+  
+  <meta name="description" content="keytool命令详解以及数字签名，信息摘要等概念解释">
+  
+  <meta name="keywords" content="数字证书，数字签名，信息摘要，keytool，jarsigner">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="数字签名"/>
+  <meta property="og:site_name" content="WEBINGLIN"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/themes/paper.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?webinglin.github.io";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?5b85c739304ef001d084ec36c03a6b52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+       <a class="navbar-brand" href="/">WEBINGLIN</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header page-header-inverse ">		
+			<h1 class="title title-inverse "> 数字签名</h1>
+		</div>		
+	
+
+
+
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> <p>keytool命令详解以及数字签名，信息摘要等概念解释</p>
+			
+		 </div> <!-- alert -->
+	  		
+
+	  <h3 id="加密算法"><a href="#加密算法" class="headerlink" title="加密算法"></a>加密算法</h3><p>公钥加密算法又称为非对称加密算法，包含一个 公钥-私钥对，成为密钥对 key pair</p>
+<p>公钥加密的只能私钥解密， 私钥加密的只能用公钥解密</p>
+<p>常用的非对称加密算法有： RSA , DSA</p>
+<h3 id="信息摘要"><a href="#信息摘要" class="headerlink" title="信息摘要"></a>信息摘要</h3><p>对任意长度的输入内容进行Hash运算，得到一个固定长度的数据。 输出数据称为消息摘要。（Digest）</p>
+<p>常用的消息摘要算法（Hash算法）： MD5， SHA-1</p>
+<a id="more"></a>
+<h3 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h3><p>用 私钥对信息摘要进行加密，就得到了数字签名。（Signature）</p>
+<p>然后别人可以用 公钥 对数字签名进行解密，然后将内容进行同样的Hash运算，得到新的 信息摘要。对比新生成的信息摘要和收到的 数字签名解密出来的信息摘要。 就能判断 消息内容是否被修改过。</p>
+<p>存在一个问题，我们无法确认 用来解密的公钥是否是合法的， 这时候需要 证书中心-CA（certificate authority）来为公钥认证。CA用自己的私钥，对我们发出的公钥和一些相关的信息一起加密，生成数字证书。（Digital Certificate）</p>
+<p>这样，我们再用自己的私钥进行数字签名的时候，再带上该数字证书即可。 收件者收到信息之后，用CA的公钥解开数字证书，数字证书里面就可以得到我们自己的公钥，然后就能证明该数字签名就是我们的了。</p>
+<h3 id="Https例子说明"><a href="#Https例子说明" class="headerlink" title="Https例子说明"></a>Https例子说明</h3><ol>
+<li>客户端向服务器发出加密请求</li>
+<li>服务器用自己的私钥对网页内容进行加密，然后连同本身的数字证书一起发给客户端。</li>
+<li>客户端（浏览器）会根据 受信任的根证书颁发机构 列表来判断 解开数字证书的公钥是否在信任列表中。</li>
+<li>如果数字证书记载的网址和我们正在浏览的网址不一致的话，就说明这张证书可能被盗用。浏览器会发出红色警告。</li>
+<li>如果数字证书是可信任的，客户端就会使用证书中的公钥进行信息加密和服务器进行加密信息的交换。</li>
+</ol>
+<h3 id="keytool-命令的使用"><a href="#keytool-命令的使用" class="headerlink" title="keytool 命令的使用"></a>keytool 命令的使用</h3><h4 id="生成keystore"><a href="#生成keystore" class="headerlink" title="生成keystore"></a>生成keystore</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -genkey -v -alias server -keyalg RSA -keysize 1024 -keypass yourKeyPWD -dname <span class="string">"cn=webinglin,ou=00,o=00,l=xm,st=fj,c=CN"</span> -keystore server.jks -storepass yourStorePWD -validity 3650</div></pre></td></tr></table></figure>
+<h4 id="生成服务器证书申请书"><a href="#生成服务器证书申请书" class="headerlink" title="生成服务器证书申请书"></a>生成服务器证书申请书</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -certreq -v -alias server -sigalg MD5withRSA -file server.csr -keypass yourKeyPWD -keystore server.jks -storepass yourStorePWD</div></pre></td></tr></table></figure>
+<p><img src="https://github.com/webinglin/blogImages/blob/master/keytool/keytool.png?raw=true" alt="img"></p>
+<p>// todo 将CSR提交给CA，再将CA的根证书，二级证书以及签发后的服务器证书一起导入keystore</p>
+<h4 id="导入根证书"><a href="#导入根证书" class="headerlink" title="导入根证书"></a>导入根证书</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -import -alias root -trustcacerts -file root.cer -keystore server.jks -storepass yourStorePWD</div></pre></td></tr></table></figure>
+<h4 id="导入-签名之后的-服务器证书"><a href="#导入-签名之后的-服务器证书" class="headerlink" title="导入 签名之后的 服务器证书"></a>导入 签名之后的 服务器证书</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -import -v -trustcacerts -keypass yourKeyPWD -alias server -file server.cer -keysotre server.jks -storepass yourStorePWD</div></pre></td></tr></table></figure>
+<h4 id="查看证书信息"><a href="#查看证书信息" class="headerlink" title="查看证书信息"></a>查看证书信息</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -list -v -keystore youKS.jks -storepass yourStorePWD</div></pre></td></tr></table></figure>
+<h3 id="签发Jar包"><a href="#签发Jar包" class="headerlink" title="签发Jar包"></a>签发Jar包</h3><p>对jar包的数字签名和认证过程和数字签名原理是一致的。jar包就是待发送的消息，经过签名之后，jar包内置了数字签名和公钥，验证这就有了这两项数据进行验证。</p>
+<p>当然加上CA的证书签发，那么这个jar包才能确保可信任。不然依旧会有警告jar包的发布者不受信任这样的情况。</p>
+<p>经过签名之后，jar包内包含了如下内容：</p>
+<ol>
+<li>原jar包内编译过得class和resource文件</li>
+<li>签名文件 META-INF/*.SF: 这是文本文件，包含了原jar包内的class和resource文件的Hash</li>
+<li>META-INF/*.DSA：这是一个数据文件，包含了签名者的certificate和数字签名。其中certificate包含了签名者的有关信息和公钥，如果由CA签发，就是数字证书了（包含了签名者的基本信息和公钥）；数字签名是对 .SF文件内的Hash值使用私钥加密得到的。</li>
+</ol>
+<p>keytool支持的算法：</p>
+<ol>
+<li>RSA算法采用MD5进行Hash的</li>
+<li>DSA采用 SHA-1进行Hash的。</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># jarsigner读取keystore为jar包进行数字签名</span></div><div class="line">jarsigner -keystore yourKS.jks -signedjar tools_signed.jar tools.jar yourKS</div><div class="line"></div><div class="line"><span class="comment"># 验证</span></div><div class="line">jarsigner -verify tools_signed.jar</div></pre></td></tr></table></figure>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://www.cnblogs.com/jackofhearts/p/jar_signing.html" target="_blank" rel="external">http://www.cnblogs.com/jackofhearts/p/jar_signing.html</a></p>
+	  
+	</div>
+
+	<div>
+  	<center>
+	<div class="pagination">
+<ul class="pagination">
+	 
+		
+          <li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>上一页</a></li>
+        
+
+        <li><a href="/archives"><i class="fa fa-archive"></i>Archive</a></li>
+
+		
+		   <li class="next"><a href="/2017/05/16/引用awesome打造漂亮图标/" class="alignright next">下一页<i class="fa fa-arrow-circle-o-right"></i></a></li>         
+        
+	
+</ul>
+</div>
+
+    </center>
+	</div>
+
+    <!-- share -->
+    
+        
+    <div class="bdsharebuttonbox">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+        <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+        <a href="#" class="bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+        <a href="#" class="bds_evernotecn" data-cmd="evernotecn" title="分享到印象笔记"></a>
+        <a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a>
+        <a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+    </div>
+    <script>
+        window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"24"},"share":{}};
+        with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
+
+
+        
+
+    
+	
+	<!-- comment -->
+	
+<section id="comment">
+  <h2 class="title">留言</h2>
+
+  
+  	 <div class="ds-thread" data-thread-key="2017/05/24/数字签名/" data-title="数字签名" data-url="http://webinglin.github.io/2017/05/24/数字签名/"></div>  
+  
+</section>
+
+	</div> <!-- col-md-9/col-md-12 -->
+		
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2017-05-24 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/Java/">Java<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+	</div>
+		
+
+</div><!-- row -->
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'webinglin' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+
+
+  &copy; 2017 weblinglin
+ 
+      with help from <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-freemind/">Freemind</a>.    
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+
+</body>
+   </html>
