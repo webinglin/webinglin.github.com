@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://webinglin.github.io/"/>
-  <updated>2017-05-24T13:34:18.407Z</updated>
+  <updated>2017-05-24T15:35:48.858Z</updated>
   <id>http://webinglin.github.io/</id>
   
   <author>
@@ -20,9 +20,9 @@
     <link href="http://webinglin.github.io/2017/05/24/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D/"/>
     <id>http://webinglin.github.io/2017/05/24/数字签名/</id>
     <published>2017-05-24T13:26:46.000Z</published>
-    <updated>2017-05-24T13:34:18.407Z</updated>
+    <updated>2017-05-24T15:35:48.858Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="加密算法"><a href="#加密算法" class="headerlink" title="加密算法"></a>加密算法</h3><p>公钥加密算法又称为非对称加密算法，包含一个 公钥-私钥对，成为密钥对 key pair</p>
+    <content type="html"><![CDATA[<h3 id="加密算法"><a href="#加密算法" class="headerlink" title="加密算法"></a>加密算法</h3><p>公钥加密算法又称为非对称加密算法，包含一个 公钥-私钥对，称为密钥对 key pair</p>
 <p>公钥加密的只能私钥解密， 私钥加密的只能用公钥解密</p>
 <p>常用的非对称加密算法有： RSA , DSA</p>
 <h3 id="信息摘要"><a href="#信息摘要" class="headerlink" title="信息摘要"></a>信息摘要</h3><p>对任意长度的输入内容进行Hash运算，得到一个固定长度的数据。 输出数据称为消息摘要。（Digest）</p>
@@ -46,11 +46,11 @@
 <h4 id="导入根证书"><a href="#导入根证书" class="headerlink" title="导入根证书"></a>导入根证书</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -import -alias root -trustcacerts -file root.cer -keystore server.jks -storepass yourStorePWD</div></pre></td></tr></table></figure>
 <h4 id="导入-签名之后的-服务器证书"><a href="#导入-签名之后的-服务器证书" class="headerlink" title="导入 签名之后的 服务器证书"></a>导入 签名之后的 服务器证书</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -import -v -trustcacerts -keypass yourKeyPWD -alias server -file server.cer -keysotre server.jks -storepass yourStorePWD</div></pre></td></tr></table></figure>
 <h4 id="查看证书信息"><a href="#查看证书信息" class="headerlink" title="查看证书信息"></a>查看证书信息</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">keytool -list -v -keystore youKS.jks -storepass yourStorePWD</div></pre></td></tr></table></figure>
-<h3 id="签发Jar包"><a href="#签发Jar包" class="headerlink" title="签发Jar包"></a>签发Jar包</h3><p>对jar包的数字签名和认证过程和数字签名原理是一致的。jar包就是待发送的消息，经过签名之后，jar包内置了数字签名和公钥，验证这就有了这两项数据进行验证。</p>
+<h3 id="签发Jar包"><a href="#签发Jar包" class="headerlink" title="签发Jar包"></a>签发Jar包</h3><p>对jar包的数字签名和认证过程和数字签名原理是一致的。jar包就是待发送的消息，经过签名之后，jar包内置了数字签名和公钥，验证就是对这两项数据进行验证。</p>
 <p>当然加上CA的证书签发，那么这个jar包才能确保可信任。不然依旧会有警告jar包的发布者不受信任这样的情况。</p>
 <p>经过签名之后，jar包内包含了如下内容：</p>
 <ol>
-<li>原jar包内编译过得class和resource文件</li>
+<li>原jar包内编译过的class和resource文件</li>
 <li>签名文件 META-INF/*.SF: 这是文本文件，包含了原jar包内的class和resource文件的Hash</li>
 <li>META-INF/*.DSA：这是一个数据文件，包含了签名者的certificate和数字签名。其中certificate包含了签名者的有关信息和公钥，如果由CA签发，就是数字证书了（包含了签名者的基本信息和公钥）；数字签名是对 .SF文件内的Hash值使用私钥加密得到的。</li>
 </ol>
