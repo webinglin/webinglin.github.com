@@ -72,7 +72,7 @@ var _hmt = _hmt || [];
 </head>
 
  <body>  
-  <nav id="main-nav" class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+  <nav id="main-nav" class="navbar <% if (theme.inverse){ %>navbar-inverse<% } %> navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
       <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 	<span class="sr-only">Toggle navigation</span>
@@ -80,28 +80,16 @@ var _hmt = _hmt || [];
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-       <a class="navbar-brand" href="/">WEBINGLIN</a>
+       <a class="navbar-brand" href="<%- config.root %>"><%= config.title %></a>
       <div class="collapse navbar-collapse nav-menu">
 		<ul class="nav navbar-nav">
-		  
+		  <% theme.menu.forEach(function(m){ %>
 		  <li>
-			<a href="/archives" title="All the articles.">
-			  <i class="fa fa-archive"></i>归档
+			<a href="<%- config.root %><%- m.url %>" title="<%- m.intro %>">
+			  <i class="<%- m.icon %>"></i><%- m.title %>
 			</a>
 		  </li>
-		  
-		  <li>
-			<a href="/tags" title="All the tags.">
-			  <i class="fa fa-tags"></i>标签
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/about" title="About me.">
-			  <i class="fa fa-user"></i>关于
-			</a>
-		  </li>
-		  
+		  <% }) %>
 		</ul>
       </div>
     </div> <!-- container -->
@@ -229,7 +217,9 @@ var _hmt = _hmt || [];
   <h2 class="title">留言</h2>
 
   
-  	 <div class="ds-thread" data-thread-key="2015/11/07/Spark-Tutorials-01-Introduce-To-Spark/" data-title="Spark Tutorials 01 : Introduce To Spark" data-url="http://webinglin.github.io/2015/11/07/Spark-Tutorials-01-Introduce-To-Spark/"></div>  
+  	 <div id="disqus_thread">
+     <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  	 </div>
   
 </section>
 
@@ -276,15 +266,14 @@ var _hmt = _hmt || [];
 </div><!-- row -->
 
 <script type="text/javascript">
-  var duoshuoQuery = { short_name: 'webinglin' };
-  (function() {
-    var ds = document.createElement('script');
-    ds.type = 'text/javascript';
-    ds.async = true;
-    ds.src = 'http://static.duoshuo.com/embed.js';
-    ds.charset = 'UTF-8';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
-  })();
+var disqus_shortname = 'webinglin';
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
 </script>
 
 
