@@ -163,8 +163,9 @@ public void save(@RequestParam(value=&quot;yourParam[]&quot; String[] yourParam)
 }
 </code></pre><p>注意： @RequestParam 一定要用数组的形式 “yourParam[]” 作为接收参数， 这样的话才能够正确的接收到前端传递的数组， 如果前端的数组为空，接收到的也是空串。  比如：前端传递的参数： <code>data:{&quot;yourParam[]&quot;:[null,null,null]}</code> 那么服务端接收到的参数将会是 [“”,””,””] 无需担心空指针问题。</p>
 <p>如果不用 “yourParam[]” 作为接收参数的话，将会发生莫名的错误。</p>
+<p><a href="http://webinglin.github.io/about/">&lt;&lt;&lt; 捐赠 &gt;&gt;&gt; </a></p>
 <p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
-<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3>	  
+	  
 	</div>
 
 	<div>

@@ -175,7 +175,7 @@ var _hmt = _hmt || [];
 <p>所谓的行动则是执行实际的计算，它们会将计算所得的结果返回给驱动器程序。如上述例子中的 count。 会将RDD中包含的总数返回给spark shell。</p>
 <p>需要注意的是, RDD的转换操作是惰性求值的。惰性求值意味着当我们对RDD调用转换操作（如：map）的时候，操作不会立刻执行。同样，把数据读取到RDD的操作也是惰性的，因此，当我们调用 sc.textFile(..) 的时候，数据并没有读取进来，而是在必要的时候才会读取。 而这个必要的时候就是行动执行的时候。如： 调用 RDD的 count()方法之后，就会强制Spark执行RDD 的转换操作。</p>
 <p><em>转载请注明出处！ 原文地址： <a href="http://webinglin.github.io">http://webinglin.github.io</a></em></p>
-<h3 id="Sincerely"><a href="#Sincerely" class="headerlink" title="Sincerely!"></a>Sincerely!</h3><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p>《OReilly.Learning.Spark.Lightning-Fast.Big.Data.Analysis》</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p>《OReilly.Learning.Spark.Lightning-Fast.Big.Data.Analysis》</p>
 	  
 	</div>
 
